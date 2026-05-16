@@ -19,6 +19,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Badge } from "../components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
+import { slugify } from "../lib/slug";
 
 export default function SEOEnginePage() {
   const { interpolate } = useSEOStore();
@@ -38,6 +39,7 @@ export default function SEOEnginePage() {
   // Example variables for preview
   const exampleVariables = { service: "Plumber", city: "Delhi" };
   const preview = interpolate(patternText, exampleVariables);
+  const previewSlug = buildPageSlug(exampleVariables, preview);
 
   const generateAIDescription = async () => {
     setIsGeneratingAI(true);
@@ -66,10 +68,18 @@ export default function SEOEnginePage() {
     try {
       const data = JSON.parse(batchData);
       if (!Array.isArray(data)) throw new Error("Batch data must be an array of objects.");
-      
-      const pagesToCreate = data.map((variables: any) => {
+
+      const pagesToCreate = data.map((variables: any, index: number) => {
+        if (!variables || typeof variables !== "object" || Array.isArray(variables)) {
+          throw new Error(`Row ${index + 1} must be a JSON object.`);
+        }
+
         const title = interpolate(patternText, variables);
-        const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const slug = buildPageSlug(variables, title);
+
+        if (!slug) {
+          throw new Error(`Row ${index + 1} produced an empty page URL. Add a title variable or provide "slug", "url", or "path" in the JSON.`);
+        }
         
         return {
           website_id: website.id,
@@ -81,6 +91,11 @@ export default function SEOEnginePage() {
           content: { sections: [] }
         };
       });
+
+      const duplicateSlugs = findDuplicateSlugs(pagesToCreate.map((page) => page.slug));
+      if (duplicateSlugs.length > 0) {
+        throw new Error(`Duplicate page URLs found in this batch: ${duplicateSlugs.join(", ")}`);
+      }
 
       const result = await bulkAddPages(pagesToCreate);
       setBulkSuccess(result?.length || 0);
@@ -201,7 +216,7 @@ export default function SEOEnginePage() {
                     {preview} | Theseofly
                   </p>
                   <p className="text-[#006621] text-sm flex items-center gap-1 truncate">
-                    https://{website?.domain || "yourdomain.com"}/{preview.toLowerCase().replace(/\s+/g, '-')}
+                    https://{website?.domain || "yourdomain.com"}/{previewSlug}
                     <ArrowRight className="w-3 h-3" />
                   </p>
                   <p className="text-slate-600 text-sm line-clamp-3">
@@ -273,4 +288,42 @@ export default function SEOEnginePage() {
       </div>
     </div>
   );
+}
+
+function buildPageSlug(variables: Record<string, unknown>, fallbackTitle: string) {
+  const rawSlug = readCustomSlug(variables) || fallbackTitle;
+
+  return String(rawSlug)
+    .split("/")
+    .map((segment) => slugify(segment))
+    .filter(Boolean)
+    .join("/");
+}
+
+function readCustomSlug(variables: Record<string, unknown>) {
+  const candidate = variables.slug || variables.url || variables.path || variables.page_url;
+
+  if (typeof candidate !== "string") {
+    return "";
+  }
+
+  return candidate
+    .trim()
+    .replace(/^https?:\/\/[^/]+/i, "")
+    .replace(/^\/+|\/+$/g, "");
+}
+
+function findDuplicateSlugs(slugs: string[]) {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+
+  for (const slug of slugs) {
+    if (seen.has(slug)) {
+      duplicates.add(slug);
+    } else {
+      seen.add(slug);
+    }
+  }
+
+  return Array.from(duplicates);
 }
