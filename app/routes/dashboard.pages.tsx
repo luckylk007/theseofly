@@ -19,7 +19,8 @@ import {
   Tag as TagIcon,
   FolderTree,
   MessageSquare,
-  Zap
+  Zap,
+  X
 } from "lucide-react";
 import { usePages } from "../hooks/usePages";
 import { useWebsite } from "../hooks/useWebsite";
@@ -57,6 +58,7 @@ export default function PagesManagement() {
   const { taxonomies: allTaxonomies } = useTaxonomies(website?.id);
   
   const categories = useMemo(() => allTaxonomies.filter(t => t.type === 'category'), [allTaxonomies]);
+  const availableTags = useMemo(() => allTaxonomies.filter(t => t.type === 'tag'), [allTaxonomies]);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -163,6 +165,7 @@ export default function PagesManagement() {
         status: formData.status,
         is_programmatic: formData.is_programmatic,
         category: formData.category,
+        tags: formData.tags,
         allow_comments: formData.allow_comments
       });
       setIsEditModalOpen(false);
@@ -213,6 +216,15 @@ export default function PagesManagement() {
     }
   };
 
+  const toggleTag = (tagName: string) => {
+    setFormData(prev => {
+      const tags = prev.tags.includes(tagName)
+        ? prev.tags.filter(t => t !== tagName)
+        : [...prev.tags, tagName];
+      return { ...prev, tags };
+    });
+  };
+
   if (loading || websiteLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -229,7 +241,17 @@ export default function PagesManagement() {
           <p className="text-slate-500">Manage {website?.name || 'your'} website's static and programmatic pages.</p>
         </div>
         <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90 rounded-full" onClick={() => {
-          setFormData(prev => ({ ...prev, website_id: website?.id }));
+          setFormData({ 
+            title: "", 
+            slug: "", 
+            website_id: website?.id || "", 
+            status: "draft",
+            is_programmatic: false,
+            category: "",
+            tags: [],
+            parent_id: null,
+            allow_comments: false
+          });
           setIsCreateModalOpen(true);
         }}>
           <Plus className="w-4 h-4" />
@@ -431,7 +453,7 @@ export default function PagesManagement() {
                     </td>
                     <td className="px-6 py-4">
                       {page.category ? (
-                        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">
+                        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-bold uppercase tracking-tighter text-[10px]">
                           {page.category}
                         </Badge>
                       ) : (
@@ -580,6 +602,40 @@ export default function PagesManagement() {
               </div>
             </div>
 
+            {/* Multi-Tag Select */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-slate-700">Assign Tags</label>
+              <div className="flex flex-wrap gap-2 p-4 bg-blue-50/30 border border-slate-200 rounded-2xl min-h-[56px]">
+                {formData.tags.length === 0 && <span className="text-xs text-slate-400 font-medium">No tags selected</span>}
+                {formData.tags.map(tagName => (
+                  <Badge key={tagName} className="bg-[#155dfc] text-white gap-1 pr-1.5 h-7">
+                    {tagName}
+                    <button type="button" onClick={() => toggleTag(tagName)} className="hover:bg-white/20 rounded-full p-0.5 transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {availableTags.map(tag => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => toggleTag(tag.name)}
+                    className={cn(
+                      "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
+                      formData.tags.includes(tag.name)
+                        ? "bg-[#155dfc] text-white border-[#155dfc] shadow-lg shadow-blue-200 scale-105"
+                        : "bg-white text-slate-500 border-slate-200 hover:border-blue-200 hover:text-[#155dfc]"
+                    )}
+                  >
+                    {tag.name}
+                  </button>
+                ))}
+                {availableTags.length === 0 && <p className="text-[10px] text-slate-400 italic">No tags created yet. Go to Taxonomies to add some.</p>}
+              </div>
+            </div>
+
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border">
@@ -645,18 +701,66 @@ export default function PagesManagement() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Category</label>
-              <select 
-                className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              >
-                <option value="">Select Category</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.name}>{cat.name}</option>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Category</label>
+                <select 
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Parent Page</label>
+                <select 
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
+                  value={formData.parent_id || ""}
+                  onChange={(e) => setFormData({ ...formData, parent_id: e.target.value || null })}
+                >
+                  <option value="">No Parent</option>
+                  {pages.filter(p => p.id !== selectedPage?.id).map(p => (
+                    <option key={p.id} value={p.id}>{p.title}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Multi-Tag Select */}
+            <div className="space-y-3">
+              <label className="text-sm font-bold text-slate-700">Assign Tags</label>
+              <div className="flex flex-wrap gap-2 p-4 bg-blue-50/30 border border-slate-200 rounded-2xl min-h-[56px]">
+                {formData.tags.length === 0 && <span className="text-xs text-slate-400 font-medium">No tags selected</span>}
+                {formData.tags.map(tagName => (
+                  <Badge key={tagName} className="bg-[#155dfc] text-white gap-1 pr-1.5 h-7">
+                    {tagName}
+                    <button type="button" onClick={() => toggleTag(tagName)} className="hover:bg-white/20 rounded-full p-0.5 transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </Badge>
                 ))}
-              </select>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {availableTags.map(tag => (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => toggleTag(tag.name)}
+                    className={cn(
+                      "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
+                      formData.tags.includes(tag.name)
+                        ? "bg-[#155dfc] text-white border-[#155dfc] shadow-lg shadow-blue-200 scale-105"
+                        : "bg-white text-slate-500 border-slate-200 hover:border-blue-200 hover:text-[#155dfc]"
+                    )}
+                  >
+                    {tag.name}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
