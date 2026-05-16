@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      navigate("/");
+      navigate("/admin");
     }
   }, [user, authLoading, navigate]);
 
@@ -36,7 +36,7 @@ export default function LoginPage() {
       setError(error.message);
       setLoading(false);
     } else {
-      navigate("/");
+      navigate("/admin");
     }
   };
 

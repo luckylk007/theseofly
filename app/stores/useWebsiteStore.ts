@@ -15,16 +15,15 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
   error: null,
 
   fetchWebsite: async (user) => {
-    const { website, loading } = get();
+    const { website } = get();
     if (!user) {
       set({ loading: false });
       return;
     }
 
-    // Prevent redundant fetches if already loaded or loading
-    if (website || (loading && website === null && get().error === null)) {
-      // If we are already in initial loading or have data, don't restart
-      if (website) set({ loading: false });
+    // Prevent redundant fetches if we already have the data
+    if (website) {
+      set({ loading: false });
       return;
     }
     
