@@ -25,9 +25,6 @@ export default function HomePage() {
           <a href="#pricing" className="hover:text-blue-600 transition-colors">Pricing</a>
         </div>
         <div className="flex items-center gap-4">
-          <Link to="/login">
-            <Button variant="ghost" className="font-semibold">Login</Button>
-          </Link>
           <Button className="font-bold shadow-lg shadow-blue-200">
             Get Started
           </Button>
