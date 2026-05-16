@@ -153,11 +153,10 @@ export default function SettingsPage() {
                   <textarea 
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none h-32 resize-none"
+                    className="w-full px-4 py-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none h-32 resize-none"
                     placeholder="Describe your site for search engines..."
                   />
-                </div>
-              </CardContent>
+                </div>              </CardContent>
             </Card>
           )}
 

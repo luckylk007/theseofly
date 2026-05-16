@@ -3,6 +3,7 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --color-accent: #155dfc;
 }
 
 html,
@@ -11,5 +12,19 @@ body {
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
+  }
+}
+
+@layer base {
+  input:not([type="checkbox"]):not([type="radio"]), 
+  select, 
+  textarea {
+    @apply bg-blue-50/30 border-slate-200 transition-all;
+  }
+
+  input:focus, 
+  select:focus, 
+  textarea:focus {
+    @apply ring-2 ring-[#155dfc]/20 border-[#155dfc] outline-none;
   }
 }

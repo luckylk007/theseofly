@@ -140,7 +140,7 @@ export default function SEOEnginePage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Select Template (Optional)</label>
                   <select 
-                    className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
+                    className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none"
                     value={selectedTemplateId}
                     onChange={(e) => setSelectedTemplateId(e.target.value)}
                   >
@@ -238,7 +238,7 @@ export default function SEOEnginePage() {
                 </div>
               )}
               <textarea 
-                className="w-full h-32 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500/20 outline-none resize-none"
+                className="w-full h-32 px-4 py-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none resize-none"
                 value={batchData}
                 onChange={(e) => setBatchData(e.target.value)}
                 placeholder="Paste your JSON array here..."
@@ -319,13 +319,13 @@ export default function SEOEnginePage() {
                   value={aiDescription}
                   onChange={(e) => setAiDescription(e.target.value)}
                   placeholder="AI meta description..."
-                  className="w-full h-32 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500/20 outline-none resize-none"
+                  className="w-full h-32 px-4 py-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none resize-none"
                 />
                 {aiDescription && (
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="absolute bottom-3 right-3 h-8 w-8 bg-white border shadow-sm"
+                    className="absolute bottom-3 right-3 h-8 w-8 bg-white/80 backdrop-blur-sm border shadow-sm"
                     onClick={() => copyToClipboard(aiDescription)}
                   >
                     {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}

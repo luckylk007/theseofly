@@ -329,7 +329,7 @@ export default function MediaLibraryPage() {
                 <textarea 
                   defaultValue={selectedItem?.alt_text}
                   placeholder="Describe this asset for SEO..."
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none h-24 resize-none"
+                  className="w-full px-4 py-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none h-24 resize-none"
                 />
               </div>
 

@@ -565,7 +565,7 @@ export default function PagesManagement() {
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Parent Page</label>
                 <select 
-                  className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none"
                   value={formData.parent_id || ""}
                   onChange={(e) => setFormData({ ...formData, parent_id: e.target.value || null })}
                 >
@@ -630,7 +630,7 @@ export default function PagesManagement() {
                 <label className="text-sm font-bold text-slate-700">Status</label>
                 <select 
                   required
-                  className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none font-bold"
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none font-bold"
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                 >

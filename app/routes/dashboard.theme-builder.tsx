@@ -155,7 +155,7 @@ export default function ThemeBuilderDashboard() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 icon={<Search className="w-4 h-4" />}
-                className="h-11 bg-white border-slate-200 rounded-xl"
+                className="h-11 bg-blue-50/30 border-slate-200 rounded-xl"
               />
             </div>
           </div>
@@ -224,7 +224,7 @@ export default function ThemeBuilderDashboard() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700">Template Type</label>
-              <select id="new-template-type" className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20">
+              <select id="new-template-type" className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc]">
                 {Object.entries(TEMPLATE_TYPE_LABELS).map(([val, label]) => (
                   <option key={val} value={val}>{label}</option>
                 ))}
@@ -430,7 +430,7 @@ function ConditionsModal({ template, isOpen, onClose, onSave }: {
 
                       <div className="col-span-4">
                         <select 
-                          className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20"
+                          className="w-full h-10 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc]"
                           value={condition.target}
                           onChange={(e) => updateCondition(condition.id, { target: e.target.value as any, subTarget: 'all' })}
                         >
@@ -535,7 +535,7 @@ function ConditionSubSelector({ condition, onChange }: {
   return (
     <div className="flex gap-2">
       <select 
-        className="flex-1 h-10 px-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20"
+        className="flex-1 h-10 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc]"
         value={condition.subTarget}
         onChange={(e) => onChange(e.target.value as any, [])}
       >

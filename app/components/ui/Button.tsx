@@ -11,7 +11,7 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", isLoading, children, disabled, ...props }, ref) => {
     const variants = {
-      primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-sm",
+      primary: "bg-[#155dfc] text-white hover:bg-[#155dfc]/90 shadow-sm shadow-blue-200",
       secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
       outline: "border border-slate-200 bg-transparent hover:bg-slate-50 text-slate-700",
       ghost: "bg-transparent hover:bg-slate-100 text-slate-600",
