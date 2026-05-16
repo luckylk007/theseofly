@@ -20,7 +20,6 @@ export interface TaxonomyAssignment {
 export interface CMSPage {
   id: string;
   website_id: string;
-  template_id?: string | null;
   title: string;
   slug: string;
   content?: any;

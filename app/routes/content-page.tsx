@@ -1,7 +1,6 @@
 import { supabase } from "../lib/supabase";
 import type { Route } from "./+types/content-page";
 import { useMemo } from "react";
-import { resolveTemplateForPage } from "../lib/templateConditions";
 
 export async function loader({ params }: Route.LoaderArgs) {
   const { slug } = params;
@@ -10,7 +9,6 @@ export async function loader({ params }: Route.LoaderArgs) {
     .from("pages")
     .select(`
       *,
-      template:templates(*),
       seo:seo_metadata(*),
       page_taxonomies(
         taxonomy:taxonomies(*)
@@ -25,42 +23,15 @@ export async function loader({ params }: Route.LoaderArgs) {
     throw new Response("Page Not Found", { status: 404 });
   }
 
-  const { data: templates } = await supabase
-    .from("templates")
-    .select("*")
-    .eq("website_id", page.website_id)
-    .eq("is_active", true)
-    .order("priority", { ascending: false });
-
   const assignments = (page.page_taxonomies || [])
     .map((entry: any) => entry.taxonomy)
     .filter(Boolean);
   const categories = assignments.filter((item: any) => item.type === "category");
   const tags = assignments.filter((item: any) => item.type === "tag");
 
-  const resolvedTemplate =
-    page.template ||
-    resolveTemplateForPage((templates as any[]) || [], {
-      pageId: page.id,
-      slug: page.slug,
-      pageType: page.content_type === "post" ? "single_post" : "single_page",
-      postType: page.post_type,
-      countryIds: page.variables?.country_id ? [page.variables.country_id] : [],
-      countrySlugs: page.variables?.country_slug ? [page.variables.country_slug] : [],
-      cityIds: page.variables?.city_id ? [page.variables.city_id] : [],
-      citySlugs: page.variables?.city_slug ? [page.variables.city_slug] : [],
-      serviceIds: page.variables?.service_id ? [page.variables.service_id] : [],
-      serviceSlugs: page.variables?.service_slug ? [page.variables.service_slug] : [],
-      categoryIds: categories.map((item: any) => item.id),
-      categorySlugs: categories.map((item: any) => item.slug),
-      tagIds: tags.map((item: any) => item.id),
-      tagSlugs: tags.map((item: any) => item.slug),
-    });
-
   return {
     page: {
       ...page,
-      resolvedTemplate,
       categories,
       tag_entities: tags,
     },
@@ -94,7 +65,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
   };
 
   const renderData = useMemo(() => {
-    const rawContent = page.content || page.resolvedTemplate?.content || { sections: [] };
+    const rawContent = page.content || { sections: [] };
     const variables = page.variables || {};
 
     const processContent = (content: any): any => {

@@ -32,7 +32,6 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
   { icon: FileText, label: "Pages", href: "/admin/pages" },
   { icon: FolderTree, label: "Categories & Tags", href: "/admin/taxonomies" },
-  { icon: Layout, label: "Theme Builder", href: "/admin/theme-builder" },
   { icon: Search, label: "SEO Engine", href: "/admin/seo" },
   { icon: Globe, label: "Programmatic SEO", href: "/admin/programmatic-seo" },
   { icon: ImageIcon, label: "Media", href: "/admin/media" },

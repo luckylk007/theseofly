@@ -167,7 +167,7 @@ export default function TaxonomiesPage() {
           <div className="flex items-start justify-between gap-6 flex-wrap">
             <div>
               <h3 className="font-black text-slate-900">Starter Categories</h3>
-              <p className="text-sm text-slate-500 mt-1">Quick-create common editorial buckets for your template rules.</p>
+              <p className="text-sm text-slate-500 mt-1">Quick-create common editorial buckets for your programmatic pages.</p>
             </div>
             <div className="flex flex-wrap gap-2">
               {starterCategories.map((starter) => {

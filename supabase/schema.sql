@@ -28,38 +28,22 @@ CREATE TABLE websites (
   owner_id UUID REFERENCES profiles(id)
 );
 
--- 3. Templates (Reusable page structures)
-CREATE TABLE templates (
+-- 3. Taxonomies (Categories & Tags)
+CREATE TABLE taxonomies (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   website_id UUID REFERENCES websites(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  type TEXT CHECK (type IN ('category', 'tag')),
   description TEXT,
-  content JSONB NOT NULL DEFAULT '{"sections": []}', -- Structure of sections
-  type TEXT DEFAULT 'single_page',
-  status TEXT DEFAULT 'draft',
-  is_active BOOLEAN DEFAULT true,
-  priority INTEGER DEFAULT 0,
-  conditions JSONB DEFAULT '[]',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  CONSTRAINT templates_type_check CHECK (type IN (
-    'header', 'footer', 'single_post', 'single_page', 'archive', 
-    'search_results', 'category_archive', 'tag_archive', 'author_archive',
-    'woo_product', 'woo_archive', 'cart', 'checkout', 'error_404', 
-    'coming_soon', 'maintenance_mode', 'custom_post_type'
-  )),
-  CONSTRAINT templates_status_check CHECK (status IN ('draft', 'published', 'scheduled'))
+  UNIQUE(website_id, slug, type)
 );
-
--- Add index for condition evaluation
-CREATE INDEX IF NOT EXISTS idx_templates_type_active ON templates(type, is_active);
-CREATE INDEX IF NOT EXISTS idx_templates_priority ON templates(priority DESC);
-CREATE INDEX IF NOT EXISTS idx_templates_conditions_gin ON templates USING GIN (conditions jsonb_path_ops);
 
 -- 4. Pages (Dynamic SEO pages)
 CREATE TABLE pages (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   website_id UUID REFERENCES websites(id) ON DELETE CASCADE,
-  template_id UUID REFERENCES templates(id),
   title TEXT NOT NULL,
   slug TEXT NOT NULL,
   content JSONB DEFAULT '{"sections": []}',
@@ -175,10 +159,9 @@ CREATE TABLE ai_generations (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- RLS POLICIES (Simplified)
+-- RLS POLICIES
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE websites ENABLE ROW LEVEL SECURITY;
-ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE page_taxonomies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE taxonomies ENABLE ROW LEVEL SECURITY;
@@ -194,12 +177,8 @@ ALTER TABLE ai_generations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 
--- Websites: Admins can see all, editors can see assigned (simplified here to owner_id)
+-- Websites: Users can see websites they own
 CREATE POLICY "Users can see websites they own" ON websites FOR ALL USING (auth.uid() = owner_id);
-
--- Templates: Based on website ownership
-CREATE POLICY "Users can manage templates of their websites" ON templates FOR ALL 
-USING (EXISTS (SELECT 1 FROM websites WHERE id = templates.website_id AND owner_id = auth.uid()));
 
 -- Pages: Based on website ownership
 CREATE POLICY "Users can manage pages of their websites" ON pages FOR ALL 

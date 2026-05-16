@@ -220,8 +220,8 @@ export default function SettingsPage() {
                   <Input defaultValue="| Theseofly Platform" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-700 ml-1">Default OG Image Template</label>
-                  <Input defaultValue="https://cdn.theseofly.com/templates/og-default.png" />
+                  <label className="text-sm font-bold text-slate-700 ml-1">Default OG Image Pattern</label>
+                  <Input defaultValue="https://cdn.theseofly.com/patterns/og-default.png" />
                 </div>
                 <div className="flex items-center gap-2 pt-2">
                   <input type="checkbox" id="noindex_all" className="w-4 h-4 text-blue-600 rounded" />

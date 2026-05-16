@@ -263,7 +263,7 @@ export default function HomePage() {
             </p>
             <div className="space-y-4">
               {[
-                "Custom Dynamic Templates",
+                "Dynamic Page Generation",
                 "Automated Internal Linking",
                 "AI Content Generation",
                 "Instant Google Indexing API"
@@ -312,7 +312,7 @@ export default function HomePage() {
             { 
               icon: Database, 
               title: "Dataset Management", 
-              desc: "Upload CSVs or connect directly to your database to feed your programmatic templates with live data.",
+              desc: "Upload CSVs or connect directly to your database to feed your programmatic landing pages with live data.",
               color: "text-purple-600", bg: "bg-purple-50"
             },
             { 
@@ -323,8 +323,8 @@ export default function HomePage() {
             },
             { 
               icon: Layers, 
-              title: "Dynamic Templates", 
-              desc: "Build once, deploy everywhere. Our visual builder creates pixel-perfect templates for mass generation.",
+              title: "Dynamic Content Engine", 
+              desc: "Build once, deploy everywhere. Our visual engine creates pixel-perfect landing pages for mass generation.",
               color: "text-indigo-600", bg: "bg-indigo-50"
             },
             { 

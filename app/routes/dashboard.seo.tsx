@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { useSEOStore } from "../stores/useSEOStore";
 import { useWebsite } from "../hooks/useWebsite";
-import { useTemplates } from "../hooks/useTemplates";
 import { usePages } from "../hooks/usePages";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -27,11 +26,9 @@ import { cn } from "../lib/utils";
 export default function SEOEnginePage() {
   const { interpolate } = useSEOStore();
   const { website, loading: websiteLoading } = useWebsite();
-  const { templates } = useTemplates(website?.id);
-  const [selectedTemplateId, setSelectedTemplateId] = useState("");
   const { bulkAddPages } = usePages(website?.id);
 
-  const [templateText, setTemplateText] = useState("Best {service} in {city}");
+  const [patternText, setPatternText] = useState("Best {service} in {city}");
   const [testVariables, setTestVariables] = useState({ service: "Plumber", city: "Delhi" });
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [aiDescription, setAiDescription] = useState("");
@@ -42,8 +39,7 @@ export default function SEOEnginePage() {
   const [bulkError, setBulkError] = useState<string | null>(null);
   const [bulkSuccess, setBulkSuccess] = useState<number | null>(null);
 
-  const preview = interpolate(templateText, testVariables);
-  const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+  const preview = interpolate(patternText, testVariables);
 
   const generateAIDescription = async () => {
     setIsGeneratingAI(true);
@@ -74,18 +70,17 @@ export default function SEOEnginePage() {
       if (!Array.isArray(data)) throw new Error("Batch data must be an array of objects.");
       
       const pagesToCreate = data.map((variables: any) => {
-        const title = interpolate(templateText, variables);
+        const title = interpolate(patternText, variables);
         const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         
         return {
           website_id: website.id,
-          template_id: selectedTemplateId || null,
           title,
           slug,
           variables,
           status: 'published',
           is_programmatic: true,
-          content: selectedTemplate?.content || { sections: [] }
+          content: { sections: [] }
         };
       });
 
@@ -111,7 +106,7 @@ export default function SEOEnginePage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Programmatic SEO Engine</h2>
-          <p className="text-slate-500">Generate thousands of pages for {website?.name || 'your website'} using dynamic templates and variables.</p>
+          <p className="text-slate-500">Generate thousands of pages for {website?.name || 'your website'} using dynamic patterns and variables.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="outline" className="gap-2">
@@ -127,49 +122,22 @@ export default function SEOEnginePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          {/* Configuration */}
-          <Card className="border-slate-100">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="w-5 h-5 text-blue-600" />
-                Step 1: Configuration
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Select Template (Optional)</label>
-                  <select 
-                    className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none"
-                    value={selectedTemplateId}
-                    onChange={(e) => setSelectedTemplateId(e.target.value)}
-                  >
-                    <option value="">Select a template</option>
-                    {templates.map(t => (
-                      <option key={t.id} value={t.id}>{t.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Template Builder */}
+          {/* Pattern Builder */}
           <Card className="border-slate-100">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <CardTitle className="flex items-center gap-2">
                 <Type className="w-5 h-5 text-blue-600" />
-                Step 2: Template Builder
+                Pattern Builder
               </CardTitle>
               <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100 uppercase tracking-wider text-[10px]">Draft Mode</Badge>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700">Page Title Template</label>
+                <label className="text-sm font-medium text-slate-700">Page Title Pattern</label>
                 <div className="relative">
                   <Input 
-                    value={templateText}
-                    onChange={(e) => setTemplateText(e.target.value)}
+                    value={patternText}
+                    onChange={(e) => setPatternText(e.target.value)}
                     placeholder="e.g. Best {service} in {city}"
                     className="pr-12"
                   />
@@ -221,7 +189,7 @@ export default function SEOEnginePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Play className="w-5 h-5 text-green-600" />
-                Step 3: Batch Data (JSON)
+                Batch Data (JSON)
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">

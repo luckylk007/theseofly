@@ -19,7 +19,6 @@ import {
 import { useWebsite } from "../hooks/useWebsite";
 import { useMedia } from "../hooks/useMedia";
 import { useTaxonomies } from "../hooks/useTaxonomies";
-import { useTemplates } from "../hooks/useTemplates";
 import { usePages } from "../hooks/usePages";
 import { useProgrammaticSEO } from "../hooks/useProgrammaticSEO";
 import { parseCSV, buildImportPreview, downloadTextFile } from "../lib/csv";
@@ -58,7 +57,6 @@ export default function ProgrammaticSEOPage() {
   const { website, loading: websiteLoading } = useWebsite();
   const { media, uploadFile } = useMedia();
   const { taxonomies } = useTaxonomies(website?.id);
-  const { templates } = useTemplates(website?.id);
   const { bulkAddPages } = usePages(website?.id);
   const countriesApi = useProgrammaticSEO("countries", website?.id);
   const citiesApi = useProgrammaticSEO("cities", website?.id);
@@ -76,7 +74,6 @@ export default function ProgrammaticSEOPage() {
     countryIds: [] as string[],
     cityIds: [] as string[],
     serviceIds: [] as string[],
-    templateId: "",
     mode: "country_city_service" as "service_only" | "country_city_service",
   });
 
@@ -104,7 +101,7 @@ export default function ProgrammaticSEOPage() {
         <div>
           <h2 className="text-2xl font-black tracking-tight">Programmatic SEO Management</h2>
           <p className="text-slate-500 max-w-3xl">
-            Manage countries, cities, and services, then combine them into scalable SEO landing pages with reusable templates.
+            Manage countries, cities, and services, then combine them into scalable SEO landing pages.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -174,7 +171,6 @@ export default function ProgrammaticSEOPage() {
             countries={allCountries}
             cities={allCities}
             services={allServices}
-            templates={templates.filter((template) => template.type === "single_page" || template.type === "single_post")}
             generatorState={generatorState}
             setGeneratorState={setGeneratorState}
             onGenerate={async () => {
@@ -188,7 +184,6 @@ export default function ProgrammaticSEOPage() {
                 cities: allCities,
                 services: allServices,
                 generatorState,
-                templateContent: templates.find((template) => template.id === generatorState.templateId),
               });
 
               if (generatedPages.length === 0) {
@@ -203,20 +198,20 @@ export default function ProgrammaticSEOPage() {
 
           <Card className="border-slate-100">
             <CardHeader>
-              <CardTitle>Template Condition Targets</CardTitle>
-              <CardDescription>Use the Theme Builder to target templates by these programmatic entities.</CardDescription>
+              <CardTitle>Programmatic Structure</CardTitle>
+              <CardDescription>Scale your reach with location and service-based landing pages.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-slate-600">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Country pages can target country-specific templates like USA or India landing layouts.</div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">City pages can target location-specific templates like Delhi or New York variants.</div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Service pages can target service-specific templates like SEO, Web Design, or PPC pages.</div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Country pages act as top-level hubs for geographical expansion.</div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">City pages provide localized intent for specific service areas.</div>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Service pages target specific user needs across all active locations.</div>
             </CardContent>
           </Card>
 
           <Card className="border-slate-100">
             <CardHeader>
               <CardTitle>Reusable Taxonomy Signals</CardTitle>
-              <CardDescription>Categories and tags stay available for template rules and generated pages.</CardDescription>
+              <CardDescription>Categories and tags stay available for generated pages.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
               {taxonomies.slice(0, 8).map((taxonomy) => (
@@ -912,7 +907,6 @@ function GeneratorPanel({
   countries,
   cities,
   services,
-  templates,
   generatorState,
   setGeneratorState,
   onGenerate,
@@ -920,19 +914,16 @@ function GeneratorPanel({
   countries: CountryEntity[];
   cities: CityEntity[];
   services: ServiceEntity[];
-  templates: any[];
   generatorState: {
     countryIds: string[];
     cityIds: string[];
     serviceIds: string[];
-    templateId: string;
     mode: "service_only" | "country_city_service";
   };
   setGeneratorState: React.Dispatch<React.SetStateAction<{
     countryIds: string[];
     cityIds: string[];
     serviceIds: string[];
-    templateId: string;
     mode: "service_only" | "country_city_service";
   }>>;
   onGenerate: () => Promise<void>;
@@ -994,22 +985,6 @@ function GeneratorPanel({
           selected={generatorState.serviceIds}
           onToggle={(id) => setGeneratorState((current) => ({ ...current, serviceIds: toggleValue(current.serviceIds, id) }))}
         />
-
-        <div className="space-y-2">
-          <label className="text-sm font-bold text-slate-700">Template</label>
-          <select
-            className="h-11 w-full rounded-xl border border-slate-200 bg-blue-50/30 px-3 text-sm"
-            value={generatorState.templateId}
-            onChange={(e) => setGeneratorState((current) => ({ ...current, templateId: e.target.value }))}
-          >
-            <option value="">No template</option>
-            {templates.map((template) => (
-              <option key={template.id} value={template.id}>
-                {template.name}
-              </option>
-            ))}
-          </select>
-        </div>
 
         <Button
           className="w-full rounded-full bg-[#155dfc] hover:bg-[#155dfc]/90"
@@ -1469,7 +1444,6 @@ function buildProgrammaticPages({
   cities,
   services,
   generatorState,
-  templateContent,
 }: {
   websiteId: string;
   countries: CountryEntity[];
@@ -1479,16 +1453,13 @@ function buildProgrammaticPages({
     countryIds: string[];
     cityIds: string[];
     serviceIds: string[];
-    templateId: string;
     mode: "service_only" | "country_city_service";
   };
-  templateContent: any;
 }) {
   const selectedServices = services.filter((service) => generatorState.serviceIds.includes(service.id));
   if (generatorState.mode === "service_only") {
     return selectedServices.map((service) => ({
       website_id: websiteId,
-      template_id: generatorState.templateId || null,
       title: `${service.name} Services`,
       slug: `services/${slugify(service.slug || service.name)}`,
       status: "published",
@@ -1499,7 +1470,7 @@ function buildProgrammaticPages({
         service_id: service.id,
         service_slug: service.slug,
       },
-      content: templateContent?.content || { sections: [] },
+      content: { sections: [] },
     }));
   }
 
@@ -1512,7 +1483,6 @@ function buildProgrammaticPages({
       for (const service of selectedServices) {
         pages.push({
           website_id: websiteId,
-          template_id: generatorState.templateId || null,
           title: `${service.name} Services in ${city.name}, ${country.name}`,
           slug: `${country.slug}/${city.slug}/${service.slug}-services`,
           status: "published",
@@ -1527,7 +1497,7 @@ function buildProgrammaticPages({
             city_slug: city.slug,
             service_slug: service.slug,
           },
-          content: templateContent?.content || { sections: [] },
+          content: { sections: [] },
         });
       }
     }
