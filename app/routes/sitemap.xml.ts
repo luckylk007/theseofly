@@ -2,40 +2,30 @@ import { supabase } from "../lib/supabase";
 import type { Route } from "./+types/sitemap.xml";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  // 1. Fetch all published pages
-  const { data: pageData } = await supabase
-    .from("pages")
-    .select("slug, updated_at")
-    .eq("status", "published");
-
-  // 2. Fetch website config for base URL
+  // Fetch website config for base URL
   const { data: websiteData } = await supabase
     .from("websites")
     .select("domain")
     .single();
 
-  const pages = (pageData as unknown as Array<{ slug: string; updated_at: string }>) || [];
   const website = websiteData as { domain?: string } | null;
   const baseUrl = website?.domain ? `https://${website.domain}` : new URL(request.url).origin;
 
-  // 3. Generate XML
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${baseUrl}/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  ${pages.map((page) => `
-  <url>
-    <loc>${baseUrl}/${page.slug}</loc>
-    <lastmod>${new Date(page.updated_at).toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>`).join("")}
-</urlset>`;
+  // Generate Sitemap Index XML
+  const sitemapIndex = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>${baseUrl}/sitemap-pages.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>${baseUrl}/sitemap-cities.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>${baseUrl}/sitemap-services.xml</loc>
+  </sitemap>
+</sitemapindex>`;
 
-  return new Response(sitemap, {
+  return new Response(sitemapIndex, {
     headers: {
       "Content-Type": "application/xml",
       "Cache-Control": "public, max-age=3600, s-maxage=18000",

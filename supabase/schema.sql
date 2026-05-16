@@ -293,3 +293,37 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE handle_new_user();
+- -   E n a b l e   p u b l i c   r e a d   a c c e s s   f o r   p u b l i s h e d   p a g e s   a n d   p r o g r a m m a t i c   S E O   e n t i t i e s  
+  
+ - -   1 .   P a g e s   t a b l e  
+ D R O P   P O L I C Y   I F   E X I S T S   " P u b l i c   r e a d   a c c e s s   f o r   p u b l i s h e d   p a g e s "   O N   p a g e s ;  
+ C R E A T E   P O L I C Y   " P u b l i c   r e a d   a c c e s s   f o r   p u b l i s h e d   p a g e s "   O N   p a g e s   F O R   S E L E C T   U S I N G   ( s t a t u s   =   ' p u b l i s h e d ' ) ;  
+  
+ - -   2 .   C o u n t r i e s   t a b l e  
+ D R O P   P O L I C Y   I F   E X I S T S   " P u b l i c   r e a d   a c c e s s   f o r   p u b l i c   c o u n t r i e s "   O N   c o u n t r i e s ;  
+ C R E A T E   P O L I C Y   " P u b l i c   r e a d   a c c e s s   f o r   p u b l i c   c o u n t r i e s "   O N   c o u n t r i e s   F O R   S E L E C T   U S I N G   ( s t a t u s   =   ' p u b l i c ' ) ;  
+  
+ - -   3 .   C i t i e s   t a b l e  
+ D R O P   P O L I C Y   I F   E X I S T S   " P u b l i c   r e a d   a c c e s s   f o r   p u b l i c   c i t i e s "   O N   c i t i e s ;  
+ C R E A T E   P O L I C Y   " P u b l i c   r e a d   a c c e s s   f o r   p u b l i c   c i t i e s "   O N   c i t i e s   F O R   S E L E C T   U S I N G   ( s t a t u s   =   ' p u b l i c ' ) ;  
+  
+ - -   4 .   S e r v i c e s   t a b l e  
+ D R O P   P O L I C Y   I F   E X I S T S   " P u b l i c   r e a d   a c c e s s   f o r   p u b l i c   s e r v i c e s "   O N   s e r v i c e s ;  
+ C R E A T E   P O L I C Y   " P u b l i c   r e a d   a c c e s s   f o r   p u b l i c   s e r v i c e s "   O N   s e r v i c e s   F O R   S E L E C T   U S I N G   ( s t a t u s   =   ' p u b l i c ' ) ;  
+  
+ - -   5 .   S E O   M e t a d a t a  
+ D R O P   P O L I C Y   I F   E X I S T S   " P u b l i c   r e a d   a c c e s s   f o r   s e o   m e t a d a t a "   O N   s e o _ m e t a d a t a ;  
+ C R E A T E   P O L I C Y   " P u b l i c   r e a d   a c c e s s   f o r   s e o   m e t a d a t a "   O N   s e o _ m e t a d a t a   F O R   S E L E C T   U S I N G   (  
+     E X I S T S   (  
+         S E L E C T   1   F R O M   p a g e s   W H E R E   p a g e s . i d   =   s e o _ m e t a d a t a . p a g e _ i d   A N D   p a g e s . s t a t u s   =   ' p u b l i s h e d '  
+     )  
+ ) ;  
+  
+ - -   6 .   P a g e   T a x o n o m i e s  
+ D R O P   P O L I C Y   I F   E X I S T S   " P u b l i c   r e a d   a c c e s s   f o r   p a g e   t a x o n o m i e s "   O N   p a g e _ t a x o n o m i e s ;  
+ C R E A T E   P O L I C Y   " P u b l i c   r e a d   a c c e s s   f o r   p a g e   t a x o n o m i e s "   O N   p a g e _ t a x o n o m i e s   F O R   S E L E C T   U S I N G   (  
+     E X I S T S   (  
+         S E L E C T   1   F R O M   p a g e s   W H E R E   p a g e s . i d   =   p a g e _ t a x o n o m i e s . p a g e _ i d   A N D   p a g e s . s t a t u s   =   ' p u b l i s h e d '  
+     )  
+ ) ;  
+ 
