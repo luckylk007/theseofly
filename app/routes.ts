@@ -7,6 +7,7 @@ export default [
   layout("layouts/DashboardLayout.tsx", [
     route("admin", "routes/dashboard.home.tsx"),
     route("admin/pages", "routes/dashboard.pages.tsx"),
+    route("admin/taxonomies", "routes/dashboard.taxonomies.tsx"),
     route("admin/seo", "routes/dashboard.seo.tsx"),
     route("admin/media", "routes/dashboard.media.tsx"),
     route("admin/theme-builder", "routes/dashboard.theme-builder.tsx"),

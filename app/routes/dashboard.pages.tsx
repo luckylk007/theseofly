@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { usePages } from "../hooks/usePages";
 import { useWebsite } from "../hooks/useWebsite";
+import { useTaxonomies } from "../hooks/useTaxonomies";
 import { useState, useEffect, useMemo } from "react";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -53,7 +54,10 @@ export default function PagesManagement() {
     addPage, updatePage, deletePage, 
     bulkUpdatePages, bulkDeletePages 
   } = usePages(website?.id);
+  const { taxonomies: allTaxonomies } = useTaxonomies(website?.id);
   
+  const categories = useMemo(() => allTaxonomies.filter(t => t.type === 'category'), [allTaxonomies]);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -84,12 +88,6 @@ export default function PagesManagement() {
       setFormData(prev => ({ ...prev, website_id: website.id }));
     }
   }, [website]);
-
-  // Extract unique categories for filter
-  const categories = useMemo(() => {
-    const cats = new Set(pages.map(p => p.category).filter(Boolean));
-    return Array.from(cats);
-  }, [pages]);
 
   const filteredAndSortedPages = useMemo(() => {
     return pages
@@ -230,7 +228,7 @@ export default function PagesManagement() {
           <h2 className="text-2xl font-bold tracking-tight">Pages</h2>
           <p className="text-slate-500">Manage {website?.name || 'your'} website's static and programmatic pages.</p>
         </div>
-        <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90" onClick={() => {
+        <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90 rounded-full" onClick={() => {
           setFormData(prev => ({ ...prev, website_id: website?.id }));
           setIsCreateModalOpen(true);
         }}>
@@ -256,7 +254,7 @@ export default function PagesManagement() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               icon={<Search className="w-4 h-4" />}
-              className="h-10"
+              className="h-10 bg-blue-50/30"
             />
           </div>
           
@@ -291,7 +289,7 @@ export default function PagesManagement() {
                 <DropdownMenuItem onClick={() => setCategoryFilter("all")}>All Categories</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {categories.map(cat => (
-                  <DropdownMenuItem key={cat} onClick={() => setCategoryFilter(cat)}>{cat}</DropdownMenuItem>
+                  <DropdownMenuItem key={cat.id} onClick={() => setCategoryFilter(cat.name)}>{cat.name}</DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -556,16 +554,21 @@ export default function PagesManagement() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Category</label>
-                <Input 
-                  placeholder="e.g. Blog" 
+                <select 
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                />
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Parent Page</label>
                 <select 
-                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none"
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
                   value={formData.parent_id || ""}
                   onChange={(e) => setFormData({ ...formData, parent_id: e.target.value || null })}
                 >
@@ -630,7 +633,7 @@ export default function PagesManagement() {
                 <label className="text-sm font-bold text-slate-700">Status</label>
                 <select 
                   required
-                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none font-bold"
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none font-bold text-slate-900"
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
                 >
@@ -644,10 +647,16 @@ export default function PagesManagement() {
 
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700">Category</label>
-              <Input 
+              <select 
+                className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              />
+              >
+                <option value="">Select Category</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.name}>{cat.name}</option>
+                ))}
+              </select>
             </div>
 
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
@@ -722,4 +731,3 @@ export default function PagesManagement() {
     </div>
   );
 }
-

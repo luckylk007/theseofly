@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   Loader2,
-  Layout
+  Layout,
+  FolderTree
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,6 +30,7 @@ function cn(...inputs: ClassValue[]) {
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
   { icon: FileText, label: "Pages", href: "/admin/pages" },
+  { icon: FolderTree, label: "Categories & Tags", href: "/admin/taxonomies" },
   { icon: Layout, label: "Theme Builder", href: "/admin/theme-builder" },
   { icon: Search, label: "SEO Engine", href: "/admin/seo" },
   { icon: ImageIcon, label: "Media", href: "/admin/media" },
