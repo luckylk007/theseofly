@@ -352,6 +352,84 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 5.1 Our Services Section (Detailed) */}
+      <section className="py-24 md:py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <p className="text-sm font-black text-blue-600 uppercase tracking-widest">Our Services</p>
+                <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+                  Tailored SEO Services <br />
+                  For Your Business Growth
+                </h2>
+              </div>
+              <p className="text-lg text-slate-500 leading-relaxed">
+                Beyond our platform's automated capabilities, we provide deep-dive strategic services to ensure your programmatic SEO efforts align with your broader business goals.
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {[
+                  { title: "SEO Strategy", desc: "Customized roadmaps built on data and market research." },
+                  { title: "Technical Audit", desc: "Deep-dive analysis of your site structure and performance." },
+                  { title: "Content Marketing", desc: "High-quality, data-driven content that ranks and converts." },
+                  { title: "Link Building", desc: "Strategic outreach to build high-authority backlink profiles." }
+                ].map((service, i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="w-6 h-6 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 mt-1 shrink-0">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900">{service.title}</h4>
+                      <p className="text-sm text-slate-500 mt-1">{service.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <Button size="lg" variant="outline" className="h-14 px-10 rounded-2xl font-bold border-slate-200">
+                View All Services
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-6 pt-12">
+                <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm mb-6 group-hover:scale-110 transition-transform">
+                    <MousePointerClick className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900 mb-2">CRO Analysis</h3>
+                  <p className="text-sm text-slate-500 font-medium">Turn traffic into revenue with conversion testing.</p>
+                </div>
+                <div className="p-8 bg-blue-600 rounded-[32px] text-white shadow-xl shadow-blue-200 group">
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <BarChart3 className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-black mb-2">Data Analytics</h3>
+                  <p className="text-sm text-blue-100 font-medium">Real-time tracking of every keyword and click.</p>
+                </div>
+              </div>
+              <div className="space-y-6">
+                <div className="p-8 bg-indigo-600 rounded-[32px] text-white shadow-xl shadow-indigo-200 group">
+                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
+                    <Globe className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-black mb-2">Global Reach</h3>
+                  <p className="text-sm text-indigo-100 font-medium">Scale your presence across multiple languages.</p>
+                </div>
+                <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm mb-6 group-hover:scale-110 transition-transform">
+                    <Search className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900 mb-2">Market Intel</h3>
+                  <p className="text-sm text-slate-500 font-medium">Monitor competitors and industry trends.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 6. Stats Section */}
       <section className="py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
