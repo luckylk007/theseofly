@@ -111,7 +111,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="relative"
           >
-            <div className="relative bg-white rounded-3xl border border-slate-100 shadow-2xl overflow-hidden p-6 md:p-10">
+            <div className="relative bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 md:p-10">
               <div className="flex items-center justify-between mb-10">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
