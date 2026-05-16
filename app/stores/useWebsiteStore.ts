@@ -5,24 +5,32 @@ interface WebsiteState {
   website: any | null;
   loading: boolean;
   error: string | null;
+  loadedForUserId: string | null;
   fetchWebsite: (user: any) => Promise<void>;
   updateWebsite: (updates: any) => Promise<any>;
+  reset: () => void;
 }
 
 export const useWebsiteStore = create<WebsiteState>((set, get) => ({
   website: null,
   loading: true,
   error: null,
+  loadedForUserId: null,
 
   fetchWebsite: async (user) => {
-    const { website } = get();
+    const { website, loadedForUserId } = get();
     if (!user) {
-      set({ loading: false });
+      set({ website: null, loading: false, error: null, loadedForUserId: null });
       return;
     }
 
     // Prevent redundant fetches if we already have the data
-    if (website) {
+    if (website && loadedForUserId === user.id) {
+      set({ loading: false });
+      return;
+    }
+
+    if (!website && loadedForUserId === user.id) {
       set({ loading: false });
       return;
     }
@@ -37,12 +45,12 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        set({ error: error.message, website: null, loading: false });
+        set({ error: error.message, website: null, loading: false, loadedForUserId: user.id });
       } else {
-        set({ website: data || null, loading: false });
+        set({ website: data || null, loading: false, loadedForUserId: user.id });
       }
     } catch (err: any) {
-      set({ error: err.message, loading: false });
+      set({ error: err.message, loading: false, loadedForUserId: user.id });
     }
   },
 
@@ -60,5 +68,7 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
     if (error) throw error;
     set({ website: data });
     return data;
-  }
+  },
+
+  reset: () => set({ website: null, loading: false, error: null, loadedForUserId: null }),
 }));

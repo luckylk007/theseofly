@@ -1,4 +1,4 @@
-import { Outlet, Link, useNavigate } from "react-router";
+import { Outlet, Link, useLocation, useNavigate } from "react-router";
 import { 
   LayoutDashboard, 
   FileText, 
@@ -42,27 +42,31 @@ const navItems = [
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, profile, loading: authLoading } = useAuth();
-  const { website, loading: websiteLoading, fetchWebsite } = useWebsiteStore();
+  const { user, profile, loading: authLoading, initialized } = useAuth();
+  const { website, loading: websiteLoading, fetchWebsite, reset } = useWebsiteStore();
   const { signOut } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // 1. Auth Guard
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (initialized && !authLoading && !user) {
+      reset();
       navigate("/login");
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, initialized, navigate, reset]);
 
   // 2. Initial Data Fetch
   useEffect(() => {
     if (user) {
       fetchWebsite(user);
+    } else if (initialized) {
+      reset();
     }
-  }, [user, fetchWebsite]);
+  }, [user, fetchWebsite, initialized, reset]);
 
   // 3. Main Loading State
-  if (authLoading || (user && websiteLoading && !website)) {
+  if (!initialized || authLoading || (user && websiteLoading && !website)) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center space-y-4">
