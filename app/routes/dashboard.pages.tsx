@@ -515,58 +515,73 @@ export default function PagesManagement() {
                       {new Date(page.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-slate-400">Manage Page</DropdownMenuLabel>
-                          <DropdownMenuItem 
-                            className="gap-2"
-                            onClick={() => {
-                              if (website) {
-                                window.open(`https://${website.domain}/${page.slug}`, '_blank');
-                              }
-                            }}
-                          >
-                            <Eye className="w-4 h-4" /> View Page
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="gap-2"
-                            onClick={() => {
-                              setSelectedPage(page);
-                              setFormData({
-                                title: page.title,
-                                slug: page.slug,
-                                website_id: page.website_id,
-                                status: page.status,
-                                is_programmatic: !!page.is_programmatic,
-                                content_type: page.content_type || "page",
-                                post_type: page.post_type || "page",
-                                category_id: page.categories[0]?.id || "",
-                                tag_ids: page.tag_entities?.map((tag) => tag.id) || [],
-                                parent_id: page.parent_id || null,
-                                allow_comments: !!page.allow_comments
-                              });
-                              setIsEditModalOpen(true);
-                            }}
-                          >
-                            <Settings className="w-4 h-4" /> Page Settings
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem 
-                            className="gap-2 text-red-600 focus:text-red-600 focus:bg-red-50"
-                            onClick={() => {
-                              setSelectedPage(page);
-                              setIsDeleteModalOpen(true);
-                            }}
-                          >
-                            <Trash2 className="w-4 h-4" /> Delete Permanently
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center justify-end gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          title="View Live Page"
+                          onClick={() => {
+                            if (website) {
+                              window.open(`https://${website.domain}/${page.slug}`, '_blank');
+                            }
+                          }}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-slate-400">Manage Page</DropdownMenuLabel>
+                            <DropdownMenuItem 
+                              className="gap-2"
+                              onClick={() => {
+                                if (website) {
+                                  window.open(`https://${website.domain}/${page.slug}`, '_blank');
+                                }
+                              }}
+                            >
+                              <Eye className="w-4 h-4" /> View Page
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="gap-2"
+                              onClick={() => {
+                                setSelectedPage(page);
+                                setFormData({
+                                  title: page.title,
+                                  slug: page.slug,
+                                  website_id: page.website_id,
+                                  status: page.status,
+                                  is_programmatic: !!page.is_programmatic,
+                                  content_type: page.content_type || "page",
+                                  post_type: page.post_type || "page",
+                                  category_id: page.categories[0]?.id || "",
+                                  tag_ids: page.tag_entities?.map((tag) => tag.id) || [],
+                                  parent_id: page.parent_id || null,
+                                  allow_comments: !!page.allow_comments
+                                });
+                                setIsEditModalOpen(true);
+                              }}
+                            >
+                              <Settings className="w-4 h-4" /> Page Settings
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              className="gap-2 text-red-600 focus:text-red-600 focus:bg-red-50"
+                              onClick={() => {
+                                setSelectedPage(page);
+                                setIsDeleteModalOpen(true);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" /> Delete Permanently
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -903,7 +918,21 @@ export default function PagesManagement() {
               />
             </div>
 
-            <DialogFooter>
+            <DialogFooter className="gap-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="gap-2 text-blue-600 border-blue-100 hover:bg-blue-50"
+                onClick={() => {
+                  if (website && formData.slug) {
+                    window.open(`https://${website.domain}/${formData.slug}`, '_blank');
+                  }
+                }}
+              >
+                <ExternalLink className="w-4 h-4" />
+                View Live
+              </Button>
+              <div className="flex-1" />
               <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
                 Cancel
               </Button>

@@ -3,6 +3,7 @@ import {
   Check,
   ChevronsLeftRightEllipsis,
   Download,
+  ExternalLink,
   FileJson,
   Globe,
   Loader2,
@@ -139,6 +140,7 @@ export default function ProgrammaticSEOPage() {
           module={activeTab}
           api={currentApi}
           countries={allCountries}
+          website={website}
           selectedIds={selectedIds}
           setSelectedIds={setSelectedIds}
           onEdit={(record) => {
@@ -148,6 +150,7 @@ export default function ProgrammaticSEOPage() {
           }}
           onOpenImport={() => setIsImportOpen(true)}
         />
+
       </div>
 
       <EntityFormDialog
@@ -158,7 +161,7 @@ export default function ProgrammaticSEOPage() {
         }}
         mode={entityMode}
         module={activeTab}
-        websiteId={website?.id}
+        website={website}
         countries={allCountries}
         media={media}
         uploadFile={uploadFile}
@@ -218,6 +221,7 @@ function EntityModuleTable({
   module,
   api,
   countries,
+  website,
   selectedIds,
   setSelectedIds,
   onEdit,
@@ -226,6 +230,7 @@ function EntityModuleTable({
   module: ModuleTab;
   api: ReturnType<typeof useProgrammaticSEO<ModuleTab>>;
   countries: CountryEntity[];
+  website: any;
   selectedIds: string[];
   setSelectedIds: React.Dispatch<React.SetStateAction<string[]>>;
   onEdit: (record: any) => void;
@@ -427,9 +432,25 @@ function EntityModuleTable({
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-500">{new Date(item.created_at).toLocaleDateString()}</td>
                   <td className="px-6 py-4 text-right">
-                    <Button variant="ghost" size="sm" onClick={() => onEdit(item)}>
-                      Edit
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        title="View Live Page"
+                        onClick={() => {
+                          if (website) {
+                            const url = buildUrlPreview(module, item, countries);
+                            window.open(`https://${website.domain}${url}`, '_blank');
+                          }
+                        }}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => onEdit(item)}>
+                        Edit
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -489,7 +510,7 @@ function EntityFormDialog({
   onClose,
   mode,
   module,
-  websiteId,
+  website,
   countries,
   media,
   uploadFile,
@@ -500,7 +521,7 @@ function EntityFormDialog({
   onClose: () => void;
   mode: "create" | "edit";
   module: ModuleTab;
-  websiteId?: string;
+  website: any;
   countries: CountryEntity[];
   media: any[];
   uploadFile: (file: File, websiteId: string) => Promise<any>;
@@ -508,6 +529,7 @@ function EntityFormDialog({
   onSubmit: (payload: Record<string, any>, createAnother: boolean) => Promise<void>;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const websiteId = website?.id;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [createAnother, setCreateAnother] = useState(false);
@@ -709,6 +731,23 @@ function EntityFormDialog({
         />
 
         <DialogFooter className="gap-3">
+          {mode === "edit" && record && (
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2 text-blue-600 border-blue-100 hover:bg-blue-50"
+              onClick={() => {
+                if (website) {
+                  const url = buildUrlPreview(module, form, countries);
+                  window.open(`https://${website.domain}${url}`, '_blank');
+                }
+              }}
+            >
+              <ExternalLink className="w-4 h-4" />
+              View Live
+            </Button>
+          )}
+          <div className="flex-1" />
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
