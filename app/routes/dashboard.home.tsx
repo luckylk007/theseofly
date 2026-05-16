@@ -14,7 +14,7 @@ import { cn } from "../lib/utils";
 
 const stats = [
   { label: "Total Pages", value: "12,450", change: "+12.5%", trend: "up" as const, icon: FileText },
-  { label: "Total Websites", value: "8", change: "+2", trend: "up" as const, icon: Globe },
+  { label: "Active Website", value: "1", change: "Verified", trend: "up" as const, icon: Globe },
   { label: "Total Leads", value: "1,204", change: "-3.2%", trend: "down" as const, icon: MousePointerClick },
   { label: "Total Users", value: "24", change: "+5.4%", trend: "up" as const, icon: Users },
 ];

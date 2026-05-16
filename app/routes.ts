@@ -5,7 +5,6 @@ export default [
   
   layout("layouts/DashboardLayout.tsx", [
     index("routes/dashboard.home.tsx"),
-    route("websites", "routes/dashboard.websites.tsx"),
     route("pages", "routes/dashboard.pages.tsx"),
     route("seo", "routes/dashboard.seo.tsx"),
     route("media", "routes/dashboard.media.tsx"),
