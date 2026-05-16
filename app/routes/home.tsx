@@ -28,12 +28,9 @@ export default function HomePage() {
           <Link to="/login">
             <Button variant="ghost" className="font-semibold">Login</Button>
           </Link>
-          <Link to="/admin">
-            <Button className="font-bold shadow-lg shadow-blue-200 gap-2">
-              <LayoutDashboard className="w-4 h-4" />
-              Admin Portal
-            </Button>
-          </Link>
+          <Button className="font-bold shadow-lg shadow-blue-200">
+            Get Started
+          </Button>
         </div>
       </nav>
 
