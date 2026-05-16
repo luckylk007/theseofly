@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
 import { 
   Search, 
-  Variable, 
   Zap, 
   ArrowRight,
   Database,
   Type,
   Sparkles,
   Loader2,
-  RefreshCw,
   Copy,
   Check,
   AlertCircle,
@@ -21,7 +19,6 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Badge } from "../components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
-import { cn } from "../lib/utils";
 
 export default function SEOEnginePage() {
   const { interpolate } = useSEOStore();
@@ -29,7 +26,6 @@ export default function SEOEnginePage() {
   const { bulkAddPages } = usePages(website?.id);
 
   const [patternText, setPatternText] = useState("Best {service} in {city}");
-  const [testVariables, setTestVariables] = useState({ service: "Plumber", city: "Delhi" });
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [aiDescription, setAiDescription] = useState("");
   const [copied, setCopied] = useState(false);
@@ -39,12 +35,14 @@ export default function SEOEnginePage() {
   const [bulkError, setBulkError] = useState<string | null>(null);
   const [bulkSuccess, setBulkSuccess] = useState<number | null>(null);
 
-  const preview = interpolate(patternText, testVariables);
+  // Example variables for preview
+  const exampleVariables = { service: "Plumber", city: "Delhi" };
+  const preview = interpolate(patternText, exampleVariables);
 
   const generateAIDescription = async () => {
     setIsGeneratingAI(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
-    const result = `Looking for the most reliable ${testVariables.service} in ${testVariables.city}? Our certified experts provide top-rated, affordable, and 24/7 ${testVariables.service} services. 100% Satisfaction Guaranteed!`;
+    const result = `Looking for the most reliable ${exampleVariables.service} in ${exampleVariables.city}? Our certified experts provide top-rated, affordable, and 24/7 ${exampleVariables.service} services. 100% Satisfaction Guaranteed!`;
     setAiDescription(result);
     setIsGeneratingAI(false);
   };
@@ -150,37 +148,6 @@ export default function SEOEnginePage() {
                 </div>
                 <p className="text-xs text-slate-400">Use curly braces for variables: {'{city}'}, {'{service}'}</p>
               </div>
-
-              <div className="space-y-4 pt-4 border-t">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-sm font-bold flex items-center gap-2">
-                    <Variable className="w-4 h-4 text-slate-400" />
-                    Test Variables
-                  </h4>
-                  <Button variant="ghost" size="sm" className="text-xs text-blue-600 h-8 gap-1">
-                    <RefreshCw className="w-3 h-3" />
-                    Randomize
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-slate-500 ml-1">Service</label>
-                    <Input 
-                      value={testVariables.service}
-                      onChange={(e) => setTestVariables({...testVariables, service: e.target.value})}
-                      className="h-9"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs text-slate-500 ml-1">City</label>
-                    <Input 
-                      value={testVariables.city}
-                      onChange={(e) => setTestVariables({...testVariables, city: e.target.value})}
-                      className="h-9"
-                    />
-                  </div>
-                </div>
-              </div>
             </CardContent>
           </Card>
 
@@ -238,7 +205,7 @@ export default function SEOEnginePage() {
                     <ArrowRight className="w-3 h-3" />
                   </p>
                   <p className="text-slate-600 text-sm line-clamp-3">
-                    {aiDescription || `Looking for the ${preview}? Our expert team provides the highest quality ${testVariables.service} services in ${testVariables.city}. Book your appointment today!`}
+                    {aiDescription || `Looking for the ${preview}? Our expert team provides the highest quality ${exampleVariables.service} services in ${exampleVariables.city}. Book your appointment today!`}
                   </p>
                 </div>
               </div>
