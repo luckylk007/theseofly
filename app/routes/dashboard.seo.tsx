@@ -1,0 +1,341 @@
+import { useState, useEffect } from "react";
+import { 
+  Search, 
+  Variable, 
+  Zap, 
+  ArrowRight,
+  Database,
+  Type,
+  Sparkles,
+  Loader2,
+  RefreshCw,
+  Copy,
+  Check,
+  AlertCircle,
+  Play
+} from "lucide-react";
+import { useSEOStore } from "../stores/useSEOStore";
+import { useWebsite } from "../hooks/useWebsite";
+import { useTemplates } from "../hooks/useTemplates";
+import { usePages } from "../hooks/usePages";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Badge } from "../components/ui/Badge";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
+import { cn } from "../lib/utils";
+
+export default function SEOEnginePage() {
+  const { interpolate } = useSEOStore();
+  const { website, loading: websiteLoading } = useWebsite();
+  const { templates } = useTemplates(website?.id);
+  const [selectedTemplateId, setSelectedTemplateId] = useState("");
+  const { addPage } = usePages(website?.id);
+
+  const [templateText, setTemplateText] = useState("Best {service} in {city}");
+  const [testVariables, setTestVariables] = useState({ service: "Plumber", city: "Delhi" });
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [aiDescription, setAiDescription] = useState("");
+  const [copied, setCopied] = useState(false);
+  
+  const [batchData, setBatchData] = useState("[{\"service\": \"Electrician\", \"city\": \"Mumbai\"}, {\"service\": \"Carpenter\", \"city\": \"Bangalore\"}]");
+  const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+  const [bulkError, setBulkError] = useState<string | null>(null);
+  const [bulkSuccess, setBulkSuccess] = useState<number | null>(null);
+
+  const preview = interpolate(templateText, testVariables);
+  const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+
+  const generateAIDescription = async () => {
+    setIsGeneratingAI(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const result = `Looking for the most reliable ${testVariables.service} in ${testVariables.city}? Our certified experts provide top-rated, affordable, and 24/7 ${testVariables.service} services. 100% Satisfaction Guaranteed!`;
+    setAiDescription(result);
+    setIsGeneratingAI(false);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleBulkGenerate = async () => {
+    if (!website?.id) {
+      setBulkError("Website configuration not found.");
+      return;
+    }
+    
+    setBulkError(null);
+    setBulkSuccess(null);
+    setIsBulkGenerating(true);
+    
+    try {
+      const data = JSON.parse(batchData);
+      if (!Array.isArray(data)) throw new Error("Batch data must be an array of objects.");
+      
+      let count = 0;
+      for (const variables of data) {
+        const title = interpolate(templateText, variables);
+        const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        
+        await addPage({
+          website_id: website.id,
+          template_id: selectedTemplateId || null,
+          title,
+          slug,
+          variables,
+          status: 'published',
+          is_programmatic: true,
+          content: selectedTemplate?.content || {}
+        });
+        count++;
+      }
+      setBulkSuccess(count);
+    } catch (err: any) {
+      setBulkError(err.message || "Failed to generate pages. Check your JSON format.");
+    } finally {
+      setIsBulkGenerating(false);
+    }
+  };
+
+  if (websiteLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Programmatic SEO Engine</h2>
+          <p className="text-slate-500">Generate thousands of pages for {website?.name || 'your website'} using dynamic templates and variables.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" className="gap-2">
+            <Database className="w-4 h-4" />
+            Import CSV
+          </Button>
+          <Button className="gap-2 shadow-lg shadow-blue-200" onClick={handleBulkGenerate} isLoading={isBulkGenerating}>
+            <Zap className="w-4 h-4" />
+            Bulk Generate
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          {/* Configuration */}
+          <Card className="border-slate-100">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="w-5 h-5 text-blue-600" />
+                Step 1: Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Select Template (Optional)</label>
+                  <select 
+                    className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
+                    value={selectedTemplateId}
+                    onChange={(e) => setSelectedTemplateId(e.target.value)}
+                  >
+                    <option value="">Select a template</option>
+                    {templates.map(t => (
+                      <option key={t.id} value={t.id}>{t.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Template Builder */}
+          <Card className="border-slate-100">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="flex items-center gap-2">
+                <Type className="w-5 h-5 text-blue-600" />
+                Step 2: Template Builder
+              </CardTitle>
+              <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100 uppercase tracking-wider text-[10px]">Draft Mode</Badge>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Page Title Template</label>
+                <div className="relative">
+                  <Input 
+                    value={templateText}
+                    onChange={(e) => setTemplateText(e.target.value)}
+                    placeholder="e.g. Best {service} in {city}"
+                    className="pr-12"
+                  />
+                  <button 
+                    title="Generate AI Title"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-blue-600 transition-colors"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                  </button>
+                </div>
+                <p className="text-xs text-slate-400">Use curly braces for variables: {'{city}'}, {'{service}'}</p>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-bold flex items-center gap-2">
+                    <Variable className="w-4 h-4 text-slate-400" />
+                    Test Variables
+                  </h4>
+                  <Button variant="ghost" size="sm" className="text-xs text-blue-600 h-8 gap-1">
+                    <RefreshCw className="w-3 h-3" />
+                    Randomize
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-slate-500 ml-1">Service</label>
+                    <Input 
+                      value={testVariables.service}
+                      onChange={(e) => setTestVariables({...testVariables, service: e.target.value})}
+                      className="h-9"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs text-slate-500 ml-1">City</label>
+                    <Input 
+                      value={testVariables.city}
+                      onChange={(e) => setTestVariables({...testVariables, city: e.target.value})}
+                      className="h-9"
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Batch Data */}
+          <Card className="border-slate-100">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Play className="w-5 h-5 text-green-600" />
+                Step 3: Batch Data (JSON)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {bulkError && (
+                <div className="p-4 bg-red-50 text-red-600 rounded-xl flex gap-3 items-center text-sm font-medium border border-red-100">
+                  <AlertCircle className="w-5 h-5" />
+                  {bulkError}
+                </div>
+              )}
+              {bulkSuccess && (
+                <div className="p-4 bg-green-50 text-green-700 rounded-xl flex gap-3 items-center text-sm font-medium border border-green-100">
+                  <Check className="w-5 h-5" />
+                  Successfully generated {bulkSuccess} pages!
+                </div>
+              )}
+              <textarea 
+                className="w-full h-32 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:ring-2 focus:ring-blue-500/20 outline-none resize-none"
+                value={batchData}
+                onChange={(e) => setBatchData(e.target.value)}
+                placeholder="Paste your JSON array here..."
+              />
+              <p className="text-[10px] text-slate-400 italic font-mono">
+                [{"{ \"service\": \"Value\", \"city\": \"Value\" }"}]
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Live Preview & AI */}
+        <div className="space-y-8">
+          <Card className="border-slate-100">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="w-5 h-5 text-green-600" />
+                SERP Preview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="bg-slate-50 rounded-xl border border-dashed p-6 min-h-[200px] flex flex-col justify-center">
+                <div className="space-y-2">
+                  <p className="text-[#1a0dab] text-xl font-medium hover:underline cursor-pointer break-words">
+                    {preview} | Theseofly
+                  </p>
+                  <p className="text-[#006621] text-sm flex items-center gap-1 truncate">
+                    https://{website?.domain || "yourdomain.com"}/{preview.toLowerCase().replace(/\s+/g, '-')}
+                    <ArrowRight className="w-3 h-3" />
+                  </p>
+                  <p className="text-slate-600 text-sm line-clamp-3">
+                    {aiDescription || `Looking for the ${preview}? Our expert team provides the highest quality ${testVariables.service} services in ${testVariables.city}. Book your appointment today!`}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-500">Title Length:</span>
+                  <Badge variant={preview.length > 60 ? "error" : "success"}>{preview.length} / 60</Badge>
+                </div>
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold text-slate-400 uppercase">SEO Score</span>
+                    <span className="text-xs font-bold text-green-600">92%</span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-500 w-[92%] rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-100 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-4 opacity-5">
+              <Sparkles className="w-24 h-24" />
+            </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-600" />
+                AI Assistant
+              </CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-8 text-xs border-purple-200 text-purple-600 hover:bg-purple-50"
+                onClick={generateAIDescription}
+                isLoading={isGeneratingAI}
+              >
+                {!isGeneratingAI && <Sparkles className="w-3 h-3 mr-1" />}
+                Generate
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="relative">
+                <textarea 
+                  value={aiDescription}
+                  onChange={(e) => setAiDescription(e.target.value)}
+                  placeholder="AI meta description..."
+                  className="w-full h-32 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500/20 outline-none resize-none"
+                />
+                {aiDescription && (
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute bottom-3 right-3 h-8 w-8 bg-white border shadow-sm"
+                    onClick={() => copyToClipboard(aiDescription)}
+                  >
+                    {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
