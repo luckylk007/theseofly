@@ -19,7 +19,7 @@ body {
   input:not([type="checkbox"]):not([type="radio"]), 
   select, 
   textarea {
-    @apply bg-blue-50/30 border-slate-200 transition-all;
+    @apply bg-blue-50/30 border-slate-200 text-slate-900 transition-all;
   }
 
   input:focus, 
