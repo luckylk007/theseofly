@@ -471,6 +471,64 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 5.3 Our Process Section (Agency Style) */}
+      <section id="process" className="py-24 md:py-32 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="text-center mb-20 space-y-4">
+            <p className="text-sm font-black text-blue-600 uppercase tracking-widest">Workflow</p>
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
+              Our Strategic SEO Process
+            </h2>
+            <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+              We follow a rigorous, data-driven methodology to ensure every page we generate contributes to your bottom line.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { 
+                step: "01", 
+                title: "Discovery & Audit", 
+                desc: "We start by understanding your niche, competitors, and current search footprint to identify opportunities." 
+              },
+              { 
+                step: "02", 
+                title: "Keyword Intelligence", 
+                desc: "Our AI engines analyze thousands of data points to find high-intent long-tail keywords for your campaign." 
+              },
+              { 
+                step: "03", 
+                title: "Template Engineering", 
+                desc: "We build high-performance, dynamic layouts that automatically adapt to your target datasets." 
+              },
+              { 
+                step: "04", 
+                title: "Launch & Iterate", 
+                desc: "We deploy your programmatic pages and use real-time analytics to refine and scale what works." 
+              }
+            ].map((item, idx) => (
+              <div key={idx} className="relative group">
+                <div className="bg-white p-10 rounded-[32px] border border-slate-200/60 shadow-sm hover:shadow-xl transition-all h-full flex flex-col gap-6 relative z-10">
+                  <div className="text-6xl font-black text-slate-50 group-hover:text-blue-50 transition-colors duration-500 absolute top-4 right-8 z-0">
+                    {item.step}
+                  </div>
+                  <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200 relative z-10">
+                    <CheckCircle2 className="w-7 h-7" />
+                  </div>
+                  <div className="space-y-3 relative z-10 mt-4">
+                    <h3 className="text-xl font-black text-slate-900">{item.title}</h3>
+                    <p className="text-slate-500 leading-relaxed text-sm font-medium">{item.desc}</p>
+                  </div>
+                </div>
+                {idx < 3 && (
+                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-px bg-slate-200 z-0" />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 6. Stats Section */}
       <section className="py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
@@ -485,63 +543,6 @@ export default function HomePage() {
               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{stat.label}</p>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* 7. Process Section */}
-      <section id="process" className="py-24 md:py-32 bg-slate-900 text-white rounded-[60px] mx-6 md:mx-12 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-blue-600/20 blur-[120px] rounded-full translate-x-1/4 -translate-y-1/4" />
-        
-        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-12">
-            <div className="space-y-4">
-              <p className="text-sm font-black text-blue-400 uppercase tracking-[0.3em]">Work Process</p>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tight leading-tight">
-                How We Scale Your SEO <br />
-                <span className="text-blue-500">In 3 Simple Steps</span>
-              </h2>
-            </div>
-            
-            <div className="space-y-8">
-              {[
-                { step: "01", title: "Upload Your Dataset", desc: "Import your keywords, locations, and custom variables via CSV or API." },
-                { step: "02", title: "Design Your Template", desc: "Use our visual builder to create high-converting layouts that adapt to your data." },
-                { step: "03", title: "Generate & Index", desc: "Launch thousands of pages instantly and push them directly to search engines." },
-              ].map((item) => (
-                <div key={item.step} className="flex gap-8 group">
-                  <div className="text-5xl font-black text-white/10 group-hover:text-blue-500 transition-colors duration-500">
-                    {item.step}
-                  </div>
-                  <div className="space-y-2 pt-2">
-                    <h4 className="text-xl font-black">{item.title}</h4>
-                    <p className="text-slate-400 font-medium">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="aspect-[4/5] rounded-[40px] bg-white/5 border border-white/10 overflow-hidden p-3 backdrop-blur-sm">
-              <div className="w-full h-full rounded-[30px] overflow-hidden relative">
-                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000" alt="SEO Process" className="w-full h-full object-cover opacity-80" />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
-                
-                {/* Floating Badge */}
-                <div className="absolute bottom-10 left-10 right-10 bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/20">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white">
-                      <Play className="w-7 h-7" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold">Watch Platform Demo</p>
-                      <p className="text-xs text-slate-400">See how it works in 2 mins</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
