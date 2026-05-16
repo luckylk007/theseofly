@@ -246,9 +246,7 @@ export default function SEOEnginePage() {
                     size="sm" 
                     className="gap-2 text-blue-600 border-blue-100 hover:bg-blue-50"
                     onClick={() => {
-                      if (website) {
-                        window.open(`https://${website.domain}/${previewSlug}`, '_blank');
-                      }
+                      window.open(`/${previewSlug}`, '_blank');
                     }}
                   >
                     <ExternalLink className="w-4 h-4" />

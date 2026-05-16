@@ -4,9 +4,21 @@ import { useMemo } from "react";
 import { Link } from "react-router";
 import { MapPin, Briefcase, CheckCircle2, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
 
-export async function loader({ params }: Route.LoaderArgs) {
-  const slug = params["*"] || "";
+export async function loader({ params, request }: Route.LoaderArgs) {
+  // 1. Extract and normalize the slug from the URL
+  // We use params["*"] to capture the entire nested path.
+  let rawSlug = params["*"] || "";
+  
+  // Clean the slug: remove leading/trailing slashes and whitespace
+  const slug = rawSlug.trim().replace(/^\/+|\/+$/g, "");
 
+  // Don't try to query empty slugs (handled by index route)
+  if (!slug) {
+    throw new Response("Page Not Found", { status: 404 });
+  }
+
+  // 2. Query Supabase for the page
+  // We look for an exact match. RLS policies must allow SELECT for 'published' pages.
   const { data: pageData, error } = await supabase
     .from("pages")
     .select(`
@@ -17,20 +29,47 @@ export async function loader({ params }: Route.LoaderArgs) {
       )
     `)
     .eq("slug", slug)
-    .eq("status", "published")
-    .single();
+    .maybeSingle();
 
-  if (error || !pageData) {
-    throw new Response("Page Not Found", { status: 404 });
+  if (error) {
+    console.error(`[ContentPage] Database error for slug "${slug}":`, error);
+    // If it's a connection error or similar, we might want to return a 500
+    throw new Response("Database Error", { status: 500 });
   }
 
+  // 3. Fallback: try with leading slash if not found
+  if (!pageData) {
+    const { data: slashPageData } = await supabase
+      .from("pages")
+      .select(`
+        *,
+        seo:seo_metadata(*),
+        page_taxonomies(
+          taxonomy:taxonomies(*)
+        )
+      `)
+      .eq("slug", `/${slug}`)
+      .maybeSingle();
+
+    if (!slashPageData) {
+      console.warn(`[ContentPage] No page found for slug: "${slug}"`);
+      throw new Response("Page Not Found", { status: 404 });
+    }
+    
+    return processPage(slashPageData);
+  }
+
+  return processPage(pageData);
+}
+
+async function processPage(pageData: any) {
   const page = pageData as any;
   let relatedCities: any[] = [];
   let relatedServices: any[] = [];
   
+  // Internal linking logic for programmatic SEO
   if (page.is_programmatic && page.variables) {
-    // Fetch related links for internal linking
-    const { country_id, city_id, service_id } = page.variables;
+    const { country_id } = page.variables;
 
     if (country_id) {
       const { data: cities } = await supabase
@@ -173,7 +212,6 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                 </div>
               </div>
               
-              {/* Optional: Add a hero image or dynamic illustration here */}
               <div className="bg-slate-100 rounded-[2.5rem] aspect-square lg:aspect-[4/3] flex items-center justify-center border-8 border-white shadow-2xl relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-indigo-50 opacity-50" />
                 <div className="relative text-center space-y-4">
@@ -223,7 +261,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                 <div className="grid grid-cols-2 gap-4">
                   {relatedCities.map((c) => {
                      const serviceSlug = vars.service_slug || "services";
-                     const link = `/${c.country?.slug}/${c.slug}/${serviceSlug}`;
+                     const link = `/${c.country?.slug || 'locations'}/${c.slug}/${serviceSlug}`;
                      return (
                       <Link key={c.id} to={link} className="flex items-center gap-2 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all font-semibold text-slate-700 hover:text-blue-600">
                         <ArrowRight className="w-4 h-4 text-slate-400" />
@@ -244,7 +282,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                 <p className="text-slate-500">Explore our full range of solutions:</p>
                 <div className="flex flex-wrap gap-2">
                   {relatedServices.map((s) => {
-                     const countrySlug = vars.country_slug || "country";
+                     const countrySlug = vars.country_slug || "locations";
                      const citySlug = vars.city_slug || "city";
                      const link = `/${countrySlug}/${citySlug}/${s.slug}-services`;
                      return (

@@ -522,9 +522,7 @@ export default function PagesManagement() {
                           className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                           title="View Live Page"
                           onClick={() => {
-                            if (website) {
-                              window.open(`https://${website.domain}/${page.slug}`, '_blank');
-                            }
+                            window.open(`/${page.slug}`, '_blank');
                           }}
                         >
                           <ExternalLink className="w-4 h-4" />
@@ -540,9 +538,7 @@ export default function PagesManagement() {
                             <DropdownMenuItem 
                               className="gap-2"
                               onClick={() => {
-                                if (website) {
-                                  window.open(`https://${website.domain}/${page.slug}`, '_blank');
-                                }
+                                window.open(`/${page.slug}`, '_blank');
                               }}
                             >
                               <Eye className="w-4 h-4" /> View Page
@@ -924,8 +920,8 @@ export default function PagesManagement() {
                 variant="outline" 
                 className="gap-2 text-blue-600 border-blue-100 hover:bg-blue-50"
                 onClick={() => {
-                  if (website && formData.slug) {
-                    window.open(`https://${website.domain}/${formData.slug}`, '_blank');
+                  if (formData.slug) {
+                    window.open(`/${formData.slug}`, '_blank');
                   }
                 }}
               >

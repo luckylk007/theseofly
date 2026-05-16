@@ -3,7 +3,6 @@ import { type RouteConfig, index, layout, route } from "@react-router/dev/routes
 export default [
   index("routes/home.tsx"),
   route("login", "routes/login.tsx"),
-  route("*", "routes/content-page.tsx"),
   
   layout("layouts/DashboardLayout.tsx", [
     route("admin", "routes/dashboard.home.tsx"),
@@ -15,10 +14,14 @@ export default [
     route("admin/users", "routes/dashboard.users.tsx"),
     route("admin/settings", "routes/dashboard.settings.tsx"),
   ]),
+  
   // SEO Endpoints
   route("sitemap.xml", "routes/sitemap.xml.ts"),
   route("sitemap-pages.xml", "routes/sitemap-pages.xml.ts"),
   route("sitemap-cities.xml", "routes/sitemap-cities.xml.ts"),
   route("sitemap-services.xml", "routes/sitemap-services.xml.ts"),
   route("robots.txt", "routes/robots.txt.ts"),
+
+  // Catch-all route for dynamic pages (MUST BE LAST)
+  route("*", "routes/content-page.tsx"),
 ] satisfies RouteConfig;
