@@ -6,19 +6,15 @@ import {
   FileJson,
   Globe,
   Loader2,
-  MapPin,
   Plus,
   Search,
   Settings2,
-  Sparkles,
   Trash2,
   Upload,
-  Wand2,
   X,
 } from "lucide-react";
 import { useWebsite } from "../hooks/useWebsite";
 import { useMedia } from "../hooks/useMedia";
-import { useTaxonomies } from "../hooks/useTaxonomies";
 import { useProgrammaticSEO } from "../hooks/useProgrammaticSEO";
 import { parseCSV, buildImportPreview, downloadTextFile } from "../lib/csv";
 import { slugify } from "../lib/slug";
@@ -55,7 +51,6 @@ const ICON_OPTIONS = ["Search", "Globe", "MapPin", "Sparkles", "Wand2", "Setting
 export default function ProgrammaticSEOPage() {
   const { website, loading: websiteLoading } = useWebsite();
   const { media, uploadFile } = useMedia();
-  const { taxonomies } = useTaxonomies(website?.id);
   const countriesApi = useProgrammaticSEO("countries", website?.id);
   const citiesApi = useProgrammaticSEO("cities", website?.id);
   const servicesApi = useProgrammaticSEO("services", website?.id);
@@ -120,70 +115,39 @@ export default function ProgrammaticSEOPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-8">
-        <div className="space-y-6">
-          <Card className="border-slate-100">
-            <CardContent className="p-4">
-              <div className="flex flex-wrap gap-2">
-                {(["countries", "cities", "services"] as ModuleTab[]).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={cn(
-                      "px-4 py-2.5 rounded-2xl text-sm font-black transition-all",
-                      activeTab === tab ? "bg-[#155dfc] text-white shadow-lg shadow-blue-200" : "bg-slate-100 text-slate-500 hover:text-slate-900"
-                    )}
-                  >
-                    {getModuleLabel(tab)}
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <EntityModuleTable
-            module={activeTab}
-            api={currentApi}
-            countries={allCountries}
-            selectedIds={selectedIds}
-            setSelectedIds={setSelectedIds}
-            onEdit={(record) => {
-              setEditingRecord(record);
-              setEntityMode("edit");
-              setIsEntityModalOpen(true);
-            }}
-            onOpenImport={() => setIsImportOpen(true)}
-          />
-        </div>
-
-        <div className="space-y-6">
-          <Card className="border-slate-100">
-            <CardHeader>
-              <CardTitle>Programmatic Structure</CardTitle>
-              <CardDescription>Scale your reach with location and service-based landing pages.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-slate-600">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Country pages act as top-level hubs for geographical expansion.</div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">City pages provide localized intent for specific service areas.</div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">Service pages target specific user needs across all active locations.</div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-100">
-            <CardHeader>
-              <CardTitle>Reusable Taxonomy Signals</CardTitle>
-              <CardDescription>Categories and tags stay available for generated pages.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              {taxonomies.slice(0, 8).map((taxonomy) => (
-                <Badge key={taxonomy.id} variant="outline" className="border-slate-200 bg-white text-slate-600">
-                  {taxonomy.name}
-                </Badge>
+      <div className="space-y-6">
+        <Card className="border-slate-100">
+          <CardContent className="p-4">
+            <div className="flex flex-wrap gap-2">
+              {(["countries", "cities", "services"] as ModuleTab[]).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
+                    "px-4 py-2.5 rounded-2xl text-sm font-black transition-all",
+                    activeTab === tab ? "bg-[#155dfc] text-white shadow-lg shadow-blue-200" : "bg-slate-100 text-slate-500 hover:text-slate-900"
+                  )}
+                >
+                  {getModuleLabel(tab)}
+                </button>
               ))}
-              {taxonomies.length === 0 && <p className="text-sm text-slate-400">No categories or tags created yet.</p>}
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <EntityModuleTable
+          module={activeTab}
+          api={currentApi}
+          countries={allCountries}
+          selectedIds={selectedIds}
+          setSelectedIds={setSelectedIds}
+          onEdit={(record) => {
+            setEditingRecord(record);
+            setEntityMode("edit");
+            setIsEntityModalOpen(true);
+          }}
+          onOpenImport={() => setIsImportOpen(true)}
+        />
       </div>
 
       <EntityFormDialog
