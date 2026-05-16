@@ -524,6 +524,156 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 5.4 Why Choose Us Section */}
+      <section className="py-24 md:py-32 bg-white relative overflow-hidden">
+        {/* Background Decorative Shapes */}
+        <div className="absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-emerald-50/50 rounded-full blur-[100px] -z-10" />
+        
+        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            className="relative"
+          >
+            <div className="relative rounded-[40px] overflow-hidden border border-slate-100 shadow-2xl">
+              <img 
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200" 
+                alt="Our Team" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
+            </div>
+            
+            {/* Floating Analytics Card */}
+            <motion.div 
+              animate={{ y: [0, -15, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -bottom-10 -right-6 md:right-10 bg-white/90 backdrop-blur-xl p-6 rounded-[32px] shadow-2xl border border-emerald-100 flex items-center gap-5 z-20"
+            >
+              <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                <BarChart3 className="w-7 h-7" />
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Growth Rate</p>
+                <p className="text-2xl font-black text-slate-900">+312% <span className="text-xs font-bold text-slate-400">YoY</span></p>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          <div className="space-y-10">
+            <div className="space-y-5">
+              <p className="text-sm font-black text-emerald-600 uppercase tracking-widest">Why Choose Us</p>
+              <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+                Empowering Your Business <br />
+                To Grow Smarter
+              </h2>
+              <p className="text-lg text-slate-500 leading-relaxed max-w-xl">
+                We specialize in scaling digital footprints through a unique blend of programmatic automation, strategic SEO, and data-driven marketing innovation.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                { title: "Proven Expertise", icon: ShieldCheck, desc: "Years of experience delivering top-tier SEO results." },
+                { title: "Innovative Strategies", icon: Zap, desc: "Cutting-edge techniques that stay ahead of search algorithms." },
+                { title: "Result-Driven Approach", icon: MousePointerClick, desc: "Focused on metrics that actually impact your bottom line." },
+                { title: "Dedicated Support", icon: RefreshCw, desc: "24/7 strategic guidance for your automation journey." }
+              ].map((feature, i) => (
+                <motion.div 
+                  key={i}
+                  whileHover={{ y: -5 }}
+                  className="p-6 bg-white border border-slate-100 rounded-3xl shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all group"
+                >
+                  <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform">
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-lg mb-2">{feature.title}</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5.5 Testimonial Section */}
+      <section className="py-24 md:py-32 bg-slate-50 border-y border-slate-100 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            <div className="lg:col-span-5 space-y-8">
+              <div className="space-y-4">
+                <p className="text-sm font-black text-emerald-600 uppercase tracking-widest">Testimonials</p>
+                <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 leading-tight">
+                  Success Stories From <br />
+                  Happy Clients
+                </h2>
+                <p className="text-lg text-slate-500 leading-relaxed pr-8">
+                  Don't just take our word for it. Hear from the businesses we've helped scale through the power of programmatic SEO.
+                </p>
+              </div>
+              
+              <div className="p-8 bg-white rounded-[32px] border border-emerald-100 shadow-xl shadow-emerald-50 flex items-center gap-6">
+                <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 font-black text-2xl">
+                  99%
+                </div>
+                <div>
+                  <p className="font-black text-slate-900">Client Satisfaction</p>
+                  <p className="text-sm text-slate-400 font-bold uppercase">Industry Leading Results</p>
+                </div>
+              </div>
+
+              <Button size="lg" className="h-14 px-10 rounded-2xl font-bold bg-slate-900 hover:bg-slate-800">
+                View All Case Studies
+              </Button>
+            </div>
+
+            <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+              {/* Floating Quote Background */}
+              <div className="absolute top-0 right-0 opacity-5 -z-0">
+                <svg width="200" height="200" viewBox="0 0 24 24" fill="currentColor" className="text-emerald-500">
+                  <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H16.017C15.4647 8 15.017 8.44772 15.017 9V12C15.017 12.5523 14.5693 13 14.017 13H11.017V21H14.017ZM3.017 21L3.017 18C3.017 16.8954 3.91239 16 5.017 16H8.017C8.56928 16 9.017 15.5523 9.017 15V9C9.017 8.44772 8.56928 8 8.017 8H5.017C4.46472 8 4.017 8.44772 4.017 9V12C4.017 12.5523 3.56928 13 3.017 13H0.017V21H3.017Z" />
+                </svg>
+              </div>
+
+              {[
+                { 
+                  name: "Sarah Johnson", 
+                  role: "Head of Growth, TechFlow", 
+                  text: "Implementing programmatic SEO with Theseofly was the best decision we made this year. Our organic traffic tripled in 4 months.",
+                  img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah"
+                },
+                { 
+                  name: "Marcus Chen", 
+                  role: "CEO, RetailStack", 
+                  text: "The speed of page generation is incredible. We launched 5,000 keyword-optimized landing pages in a single afternoon.",
+                  img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus"
+                }
+              ].map((review, i) => (
+                <motion.div 
+                  key={i}
+                  whileHover={{ y: -10 }}
+                  className="bg-white p-8 rounded-[32px] border border-slate-100 shadow-lg flex flex-col gap-6 relative z-10 hover:border-emerald-200 transition-all"
+                >
+                  <div className="flex gap-1">
+                    {[1,2,3,4,5].map(s => <Sparkles key={s} className="w-3 h-3 text-yellow-400 fill-current" />)}
+                  </div>
+                  <p className="text-slate-600 font-medium italic leading-relaxed flex-1">
+                    "{review.text}"
+                  </p>
+                  <div className="flex items-center gap-4 border-t pt-6">
+                    <img src={review.img} alt={review.name} className="w-12 h-12 rounded-full bg-slate-100" />
+                    <div>
+                      <p className="font-black text-slate-900 text-sm">{review.name}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{review.role}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 6. Stats Section */}
       <section className="py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
