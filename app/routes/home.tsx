@@ -475,36 +475,31 @@ export default function HomePage() {
       <section id="process" className="py-24 md:py-32 bg-slate-50 border-y border-slate-100">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="text-center mb-20 space-y-4">
-            <p className="text-sm font-black text-blue-600 uppercase tracking-widest">Workflow</p>
+            <p className="text-sm font-black text-blue-600 uppercase tracking-widest">Our Process</p>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
-              Our Strategic SEO Process
+              Step-by-Step to Achieving Your Goals
             </h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto">
               We follow a rigorous, data-driven methodology to ensure every page we generate contributes to your bottom line.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { 
                 step: "01", 
-                title: "Discovery & Audit", 
-                desc: "We start by understanding your niche, competitors, and current search footprint to identify opportunities." 
+                title: "Initial Consultation", 
+                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo." 
               },
               { 
                 step: "02", 
-                title: "Keyword Intelligence", 
-                desc: "Our AI engines analyze thousands of data points to find high-intent long-tail keywords for your campaign." 
+                title: "Market Research", 
+                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo." 
               },
               { 
                 step: "03", 
-                title: "Template Engineering", 
-                desc: "We build high-performance, dynamic layouts that automatically adapt to your target datasets." 
-              },
-              { 
-                step: "04", 
-                title: "Launch & Iterate", 
-                desc: "We deploy your programmatic pages and use real-time analytics to refine and scale what works." 
+                title: "Strategy Development", 
+                desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo." 
               }
             ].map((item, idx) => (
               <div key={idx} className="relative group">
@@ -520,7 +515,7 @@ export default function HomePage() {
                     <p className="text-slate-500 leading-relaxed text-sm font-medium">{item.desc}</p>
                   </div>
                 </div>
-                {idx < 3 && (
+                {idx < 2 && (
                   <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-px bg-slate-200 z-0" />
                 )}
               </div>
