@@ -19,7 +19,6 @@ import {
 import { useWebsite } from "../hooks/useWebsite";
 import { useMedia } from "../hooks/useMedia";
 import { useTaxonomies } from "../hooks/useTaxonomies";
-import { usePages } from "../hooks/usePages";
 import { useProgrammaticSEO } from "../hooks/useProgrammaticSEO";
 import { parseCSV, buildImportPreview, downloadTextFile } from "../lib/csv";
 import { slugify } from "../lib/slug";
@@ -57,7 +56,6 @@ export default function ProgrammaticSEOPage() {
   const { website, loading: websiteLoading } = useWebsite();
   const { media, uploadFile } = useMedia();
   const { taxonomies } = useTaxonomies(website?.id);
-  const { bulkAddPages } = usePages(website?.id);
   const countriesApi = useProgrammaticSEO("countries", website?.id);
   const citiesApi = useProgrammaticSEO("cities", website?.id);
   const servicesApi = useProgrammaticSEO("services", website?.id);
@@ -70,18 +68,10 @@ export default function ProgrammaticSEOPage() {
   const [entityMode, setEntityMode] = useState<"create" | "edit">("create");
   const [createAnother, setCreateAnother] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
-  const [generatorState, setGeneratorState] = useState({
-    countryIds: [] as string[],
-    cityIds: [] as string[],
-    serviceIds: [] as string[],
-    mode: "country_city_service" as "service_only" | "country_city_service",
-  });
 
   const currentApi = activeTab === "countries" ? countriesApi : activeTab === "cities" ? citiesApi : servicesApi;
 
   const allCountries = countriesApi.result.items as CountryEntity[];
-  const allCities = citiesApi.result.items as CityEntity[];
-  const allServices = servicesApi.result.items as ServiceEntity[];
 
   useEffect(() => {
     setSelectedIds([]);
@@ -167,35 +157,6 @@ export default function ProgrammaticSEOPage() {
         </div>
 
         <div className="space-y-6">
-          <GeneratorPanel
-            countries={allCountries}
-            cities={allCities}
-            services={allServices}
-            generatorState={generatorState}
-            setGeneratorState={setGeneratorState}
-            onGenerate={async () => {
-              if (!website?.id) {
-                return;
-              }
-
-              const generatedPages = buildProgrammaticPages({
-                websiteId: website.id,
-                countries: allCountries,
-                cities: allCities,
-                services: allServices,
-                generatorState,
-              });
-
-              if (generatedPages.length === 0) {
-                setNotification("Select at least one valid combination before generating pages.");
-                return;
-              }
-
-              await bulkAddPages(generatedPages);
-              setNotification(`Generated ${generatedPages.length} programmatic page${generatedPages.length === 1 ? "" : "s"}.`);
-            }}
-          />
-
           <Card className="border-slate-100">
             <CardHeader>
               <CardTitle>Programmatic Structure</CardTitle>
@@ -903,145 +864,6 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function GeneratorPanel({
-  countries,
-  cities,
-  services,
-  generatorState,
-  setGeneratorState,
-  onGenerate,
-}: {
-  countries: CountryEntity[];
-  cities: CityEntity[];
-  services: ServiceEntity[];
-  generatorState: {
-    countryIds: string[];
-    cityIds: string[];
-    serviceIds: string[];
-    mode: "service_only" | "country_city_service";
-  };
-  setGeneratorState: React.Dispatch<React.SetStateAction<{
-    countryIds: string[];
-    cityIds: string[];
-    serviceIds: string[];
-    mode: "service_only" | "country_city_service";
-  }>>;
-  onGenerate: () => Promise<void>;
-}) {
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const filteredCities = useMemo(() => {
-    if (generatorState.countryIds.length === 0) {
-      return cities;
-    }
-    return cities.filter((city) => generatorState.countryIds.includes(city.country_id));
-  }, [cities, generatorState.countryIds]);
-
-  return (
-    <Card className="border-slate-100">
-      <CardHeader>
-        <CardTitle>Generate Programmatic Pages</CardTitle>
-        <CardDescription>Create SEO landing pages from country, city, and service combinations.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
-          {[
-            { value: "service_only", label: "/services/seo" },
-            { value: "country_city_service", label: "/india/delhi/seo-services" },
-          ].map((mode) => (
-            <button
-              key={mode.value}
-              onClick={() => setGeneratorState((current) => ({ ...current, mode: mode.value as any }))}
-              className={cn(
-                "rounded-xl px-3 py-2 text-xs font-black transition-all",
-                generatorState.mode === mode.value ? "bg-white text-[#155dfc] shadow-sm" : "text-slate-500"
-              )}
-            >
-              {mode.label}
-            </button>
-          ))}
-        </div>
-
-        {generatorState.mode === "country_city_service" && (
-          <>
-            <MultiSelectList
-              title="Countries"
-              items={countries.map((country) => ({ id: country.id, label: country.name }))}
-              selected={generatorState.countryIds}
-              onToggle={(id) => setGeneratorState((current) => ({ ...current, countryIds: toggleValue(current.countryIds, id) }))}
-            />
-            <MultiSelectList
-              title="Cities"
-              items={filteredCities.map((city) => ({ id: city.id, label: city.name }))}
-              selected={generatorState.cityIds}
-              onToggle={(id) => setGeneratorState((current) => ({ ...current, cityIds: toggleValue(current.cityIds, id) }))}
-            />
-          </>
-        )}
-
-        <MultiSelectList
-          title="Services"
-          items={services.map((service) => ({ id: service.id, label: service.name }))}
-          selected={generatorState.serviceIds}
-          onToggle={(id) => setGeneratorState((current) => ({ ...current, serviceIds: toggleValue(current.serviceIds, id) }))}
-        />
-
-        <Button
-          className="w-full rounded-full bg-[#155dfc] hover:bg-[#155dfc]/90"
-          isLoading={isGenerating}
-          onClick={async () => {
-            setIsGenerating(true);
-            try {
-              await onGenerate();
-            } finally {
-              setIsGenerating(false);
-            }
-          }}
-        >
-          <Wand2 className="w-4 h-4" />
-          Generate Landing Pages
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-function MultiSelectList({
-  title,
-  items,
-  selected,
-  onToggle,
-}: {
-  title: string;
-  items: Array<{ id: string; label: string }>;
-  selected: string[];
-  onToggle: (id: string) => void;
-}) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-bold text-slate-700">{title}</label>
-      <div className="max-h-40 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50 p-2">
-        <div className="flex flex-wrap gap-2">
-          {items.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onToggle(item.id)}
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-xs font-black transition-all",
-                selected.includes(item.id) ? "border-[#155dfc] bg-[#155dfc] text-white" : "border-slate-200 bg-white text-slate-500"
-              )}
-            >
-              {item.label}
-            </button>
-          ))}
-          {items.length === 0 && <p className="px-2 py-4 text-sm text-slate-400">No options available yet.</p>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ImportDialog({
   isOpen,
   onClose,
@@ -1352,10 +1174,6 @@ function getStatusBadgeClass(status: ProgrammaticEntityStatus) {
   return "bg-blue-50 text-blue-700";
 }
 
-function toggleValue(values: string[], next: string) {
-  return values.includes(next) ? values.filter((value) => value !== next) : [...values, next];
-}
-
 function getSampleTemplate(module: ModuleTab) {
   if (module === "countries") {
     return "name,country_code,slug,description,status\nIndia,IN,india,Indian market pages,public\nUnited States,US,usa,US service pages,draft";
@@ -1436,71 +1254,4 @@ function convertImportRowsToPayload({
       seo: {},
     };
   });
-}
-
-function buildProgrammaticPages({
-  websiteId,
-  countries,
-  cities,
-  services,
-  generatorState,
-}: {
-  websiteId: string;
-  countries: CountryEntity[];
-  cities: CityEntity[];
-  services: ServiceEntity[];
-  generatorState: {
-    countryIds: string[];
-    cityIds: string[];
-    serviceIds: string[];
-    mode: "service_only" | "country_city_service";
-  };
-}) {
-  const selectedServices = services.filter((service) => generatorState.serviceIds.includes(service.id));
-  if (generatorState.mode === "service_only") {
-    return selectedServices.map((service) => ({
-      website_id: websiteId,
-      title: `${service.name} Services`,
-      slug: `services/${slugify(service.slug || service.name)}`,
-      status: "published",
-      is_programmatic: true,
-      content_type: "page",
-      post_type: "page",
-      variables: {
-        service_id: service.id,
-        service_slug: service.slug,
-      },
-      content: { sections: [] },
-    }));
-  }
-
-  const selectedCountries = countries.filter((country) => generatorState.countryIds.includes(country.id));
-  const selectedCities = cities.filter((city) => generatorState.cityIds.includes(city.id));
-
-  const pages: any[] = [];
-  for (const country of selectedCountries) {
-    for (const city of selectedCities.filter((entry) => entry.country_id === country.id)) {
-      for (const service of selectedServices) {
-        pages.push({
-          website_id: websiteId,
-          title: `${service.name} Services in ${city.name}, ${country.name}`,
-          slug: `${country.slug}/${city.slug}/${service.slug}-services`,
-          status: "published",
-          is_programmatic: true,
-          content_type: "page",
-          post_type: "page",
-          variables: {
-            country_id: country.id,
-            city_id: city.id,
-            service_id: service.id,
-            country_slug: country.slug,
-            city_slug: city.slug,
-            service_slug: service.slug,
-          },
-          content: { sections: [] },
-        });
-      }
-    }
-  }
-  return pages;
 }
