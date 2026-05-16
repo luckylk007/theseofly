@@ -430,6 +430,47 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 5.2 CTA Section */}
+      <section className="py-12 md:py-20">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <div className="relative bg-blue-600 rounded-[40px] overflow-hidden p-8 md:p-20 text-center">
+            {/* Background elements */}
+            <div className="absolute top-0 right-0 w-[40%] h-full bg-gradient-to-l from-blue-500/50 to-transparent" />
+            <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
+            
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="relative z-10 space-y-8"
+            >
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight">
+                Ready to Dominate <br className="hidden md:block" />
+                Your Search Category?
+              </h2>
+              <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed font-medium">
+                Join 1,500+ SEO teams using Theseofly to automate their growth. Start building your programmatic empire today.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
+                <Button size="lg" className="h-16 px-12 text-lg font-extrabold bg-white text-blue-600 hover:bg-slate-50 rounded-2xl shadow-2xl shadow-blue-900/20 group">
+                  Start Your Journey <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button size="lg" variant="ghost" className="h-16 px-10 text-lg font-bold text-white hover:bg-white/10 rounded-2xl">
+                  Contact Strategy Team
+                </Button>
+              </div>
+              <div className="flex items-center justify-center gap-8 pt-8">
+                <div className="flex items-center gap-2 text-blue-100 text-sm font-bold uppercase tracking-widest">
+                  <CheckCircle2 className="w-4 h-4" /> No Credit Card Required
+                </div>
+                <div className="flex items-center gap-2 text-blue-100 text-sm font-bold uppercase tracking-widest">
+                  <CheckCircle2 className="w-4 h-4" /> 14-Day Free Trial
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* 6. Stats Section */}
       <section className="py-20 md:py-28">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
