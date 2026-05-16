@@ -134,7 +134,11 @@ export default function PagesManagement() {
     if (!website?.id) return;
     setIsSubmitting(true);
     try {
-      await addPage({ ...formData, website_id: website.id });
+      await addPage({ 
+        ...formData, 
+        website_id: website.id,
+        content: { sections: [] } 
+      });
       setIsCreateModalOpen(false);
       setFormData({ 
         title: "", 
@@ -147,8 +151,9 @@ export default function PagesManagement() {
         parent_id: null,
         allow_comments: false
       });
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error("Failed to create page:", err);
+      alert("Failed to create page: " + (err.message || "Unknown error"));
     } finally {
       setIsSubmitting(false);
     }

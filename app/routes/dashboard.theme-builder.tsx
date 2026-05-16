@@ -66,6 +66,7 @@ export default function ThemeBuilderDashboard() {
   const [isConditionsModalOpen, setIsConditionsModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<ThemeTemplate | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newTemplateData, setNewTemplateData] = useState({ name: "", type: "single_page" as TemplateType });
 
   const filteredTemplates = useMemo(() => {
     return templates.filter(t => {
@@ -86,18 +87,26 @@ export default function ThemeBuilderDashboard() {
     { id: 'error_404', label: 'Error 404', icon: AlertCircle },
   ];
 
-  const handleCreate = async (name: string, type: TemplateType) => {
-    if (!website?.id) return;
-    await addTemplate({
-      website_id: website.id,
-      name,
-      type,
-      status: 'draft',
-      is_active: true,
-      priority: 0,
-      conditions: []
-    });
-    setIsCreateModalOpen(false);
+  const handleCreate = async () => {
+    if (!website?.id || !newTemplateData.name) return;
+    
+    try {
+      await addTemplate({
+        website_id: website.id,
+        name: newTemplateData.name,
+        type: newTemplateData.type,
+        status: 'draft',
+        is_active: true,
+        priority: 0,
+        conditions: [],
+        content: { sections: [] } // Added required content field
+      });
+      setIsCreateModalOpen(false);
+      setNewTemplateData({ name: "", type: "single_page" });
+    } catch (err: any) {
+      console.error("Failed to create template:", err);
+      alert("Failed to create template: " + (err.message || "Unknown error"));
+    }
   };
 
   if (loading || websiteLoading) {
@@ -220,11 +229,19 @@ export default function ThemeBuilderDashboard() {
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700">Template Name</label>
-              <Input id="new-template-name" placeholder="e.g. Main Header" />
+              <Input 
+                value={newTemplateData.name}
+                onChange={(e) => setNewTemplateData({ ...newTemplateData, name: e.target.value })}
+                placeholder="e.g. Main Header" 
+              />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700">Template Type</label>
-              <select id="new-template-type" className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc]">
+              <select 
+                value={newTemplateData.type}
+                onChange={(e) => setNewTemplateData({ ...newTemplateData, type: e.target.value as TemplateType })}
+                className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc]"
+              >
                 {Object.entries(TEMPLATE_TYPE_LABELS).map(([val, label]) => (
                   <option key={val} value={val}>{label}</option>
                 ))}
@@ -233,11 +250,7 @@ export default function ThemeBuilderDashboard() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
-            <Button onClick={() => {
-              const name = (document.getElementById('new-template-name') as HTMLInputElement).value;
-              const type = (document.getElementById('new-template-type') as HTMLSelectElement).value as TemplateType;
-              if (name) handleCreate(name, type);
-            }} className="bg-[#155dfc] hover:bg-[#155dfc]/90 min-w-[120px]">Create Template</Button>
+            <Button onClick={handleCreate} className="bg-[#155dfc] hover:bg-[#155dfc]/90 min-w-[120px]">Create Template</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -14,4 +14,11 @@ export default [
     route("admin/users", "routes/dashboard.users.tsx"),
     route("admin/settings", "routes/dashboard.settings.tsx"),
   ]),
+
+  // Catch-all dynamic route for programmatic pages
+  route(":slug", "routes/page.tsx"),
+
+  // SEO Endpoints
+  route("sitemap.xml", "routes/sitemap.xml.ts"),
+  route("robots.txt", "routes/robots.txt.ts"),
 ] satisfies RouteConfig;

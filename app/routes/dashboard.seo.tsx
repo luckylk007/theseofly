@@ -29,7 +29,7 @@ export default function SEOEnginePage() {
   const { website, loading: websiteLoading } = useWebsite();
   const { templates } = useTemplates(website?.id);
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
-  const { addPage } = usePages(website?.id);
+  const { bulkAddPages } = usePages(website?.id);
 
   const [templateText, setTemplateText] = useState("Best {service} in {city}");
   const [testVariables, setTestVariables] = useState({ service: "Plumber", city: "Delhi" });
@@ -73,12 +73,11 @@ export default function SEOEnginePage() {
       const data = JSON.parse(batchData);
       if (!Array.isArray(data)) throw new Error("Batch data must be an array of objects.");
       
-      let count = 0;
-      for (const variables of data) {
+      const pagesToCreate = data.map((variables: any) => {
         const title = interpolate(templateText, variables);
         const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         
-        await addPage({
+        return {
           website_id: website.id,
           template_id: selectedTemplateId || null,
           title,
@@ -86,11 +85,12 @@ export default function SEOEnginePage() {
           variables,
           status: 'published',
           is_programmatic: true,
-          content: selectedTemplate?.content || {}
-        });
-        count++;
-      }
-      setBulkSuccess(count);
+          content: selectedTemplate?.content || { sections: [] }
+        };
+      });
+
+      const result = await bulkAddPages(pagesToCreate);
+      setBulkSuccess(result?.length || 0);
     } catch (err: any) {
       setBulkError(err.message || "Failed to generate pages. Check your JSON format.");
     } finally {

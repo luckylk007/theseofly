@@ -55,6 +55,17 @@ export function usePages(websiteId?: string) {
     return data;
   };
 
+  const bulkAddPages = async (pagesData: any[]) => {
+    const { data, error } = await supabase
+      .from('pages')
+      .insert(pagesData)
+      .select();
+
+    if (error) throw error;
+    setPages([...(data || []), ...pages]);
+    return data;
+  };
+
   const updatePage = async (id: string, updates: any) => {
     const { data, error } = await supabase
       .from('pages')
@@ -100,5 +111,16 @@ export function usePages(websiteId?: string) {
     setPages(pages.filter(p => !ids.includes(p.id)));
   };
 
-  return { pages, loading, error, fetchPages, addPage, updatePage, deletePage, bulkUpdatePages, bulkDeletePages };
+  return { 
+    pages, 
+    loading, 
+    error, 
+    fetchPages, 
+    addPage, 
+    bulkAddPages, // Added
+    updatePage, 
+    deletePage, 
+    bulkUpdatePages, 
+    bulkDeletePages 
+  };
 }
