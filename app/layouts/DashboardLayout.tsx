@@ -22,6 +22,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthStore } from "../stores/useAuthStore";
+import { useWebsiteStore } from "../stores/useWebsiteStore";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -38,33 +39,42 @@ const navItems = [
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 
-
-
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
+  const { website, loading: websiteLoading, fetchWebsite } = useWebsiteStore();
   const { signOut } = useAuthStore();
   const navigate = useNavigate();
 
+  // 1. Auth Guard
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       navigate("/login");
     }
-  }, [user, loading, navigate]);
+  }, [user, authLoading, navigate]);
 
+  // 2. Initial Data Fetch
+  useEffect(() => {
+    if (user) {
+      fetchWebsite(user);
+    }
+  }, [user, fetchWebsite]);
 
-
-  if (loading) {
+  // 3. Main Loading State
+  if (authLoading || (user && websiteLoading && !website)) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        <div className="text-center space-y-4">
+          <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto" />
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest animate-pulse">Initializing Platform...</p>
+        </div>
       </div>
     );
   }
 
-  const activeUser = user || { email: 'guest@theseofly.com' };
-  const activeProfile = profile || { full_name: 'Guest Admin', role: 'admin' };
+  const activeUser = user || { email: 'admin@theseofly.com' };
+  const activeProfile = profile || { full_name: 'Admin', role: 'admin' };
 
   return (
     <div className="min-h-screen bg-slate-50 flex text-slate-900">
@@ -76,7 +86,7 @@ export default function DashboardLayout() {
         )}
       >
         <div className="p-6 flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">T</div>
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-200">T</div>
           {isSidebarOpen && <span className="font-bold text-xl tracking-tight">Theseofly</span>}
         </div>
 
@@ -85,21 +95,29 @@ export default function DashboardLayout() {
             <Link
               key={item.href}
               to={item.href}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors group"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
+                location.pathname === item.href 
+                  ? "bg-blue-50 text-blue-600" 
+                  : "text-slate-500 hover:bg-slate-50"
+              )}
             >
-              <item.icon className="w-5 h-5 text-slate-500 group-hover:text-blue-600 transition-colors" />
-              {isSidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
+              <item.icon className={cn(
+                "w-5 h-5 transition-colors",
+                location.pathname === item.href ? "text-blue-600" : "text-slate-400 group-hover:text-blue-600"
+              )} />
+              {isSidebarOpen && <span className="text-sm font-bold">{item.label}</span>}
             </Link>
           ))}
         </nav>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-slate-100">
           <button 
             onClick={() => signOut()}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-red-50 text-red-600 transition-colors group"
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-red-50 text-red-600 transition-colors group font-bold"
           >
             <LogOut className="w-5 h-5" />
-            {isSidebarOpen && <span className="text-sm font-medium">Logout</span>}
+            {isSidebarOpen && <span className="text-sm">Logout</span>}
           </button>
         </div>
       </aside>
@@ -107,21 +125,21 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
-        <header className="h-16 border-b bg-white flex items-center justify-between px-6 sticky top-0 z-10">
+        <header className="h-16 border-b bg-white flex items-center justify-between px-6 sticky top-0 z-10 shadow-sm shadow-slate-100">
           <div className="flex items-center gap-4">
             <button 
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 hover:bg-slate-100 rounded-lg hidden md:block"
+              className="p-2 hover:bg-slate-50 rounded-xl hidden md:block transition-colors"
             >
-              <Menu className="w-5 h-5 text-slate-500" />
+              <Menu className="w-5 h-5 text-slate-400" />
             </button>
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
-              className="p-2 hover:bg-slate-100 rounded-lg md:hidden"
+              className="p-2 hover:bg-slate-50 rounded-xl md:hidden transition-colors"
             >
-              <Menu className="w-5 h-5 text-slate-500" />
+              <Menu className="w-5 h-5 text-slate-400" />
             </button>
-            <h1 className="font-semibold text-lg hidden sm:block">Dashboard</h1>
+            <h1 className="font-bold text-lg hidden sm:block text-slate-900">Dashboard</h1>
           </div>
 
           <div className="flex items-center gap-4">
@@ -130,22 +148,23 @@ export default function DashboardLayout() {
               <input 
                 type="text" 
                 placeholder="Search..." 
-                className="pl-10 pr-4 py-2 bg-slate-100 border-none rounded-full text-sm w-64 focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+                className="pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-sm w-64 focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all"
               />
             </div>
-            <button className="p-2 hover:bg-slate-100 rounded-full relative">
-              <Bell className="w-5 h-5 text-slate-500" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            <button className="p-2 hover:bg-slate-50 rounded-full relative transition-colors border border-transparent hover:border-slate-100">
+              <Bell className="w-5 h-5 text-slate-400" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            <div className="flex items-center gap-3 pl-4 border-l ml-2">
+            <div className="flex items-center gap-3 pl-4 border-l border-slate-100 ml-2">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold leading-none">{activeProfile?.full_name || activeUser.email}</p>
-                <p className="text-xs text-slate-400 mt-1 capitalize">{activeProfile?.role || "Editor"}</p>
+                <p className="text-sm font-black leading-none text-slate-900">{activeProfile?.full_name || activeUser.email}</p>
+                <p className="text-[10px] font-black text-slate-400 mt-1 capitalize tracking-widest">{activeProfile?.role || "Editor"}</p>
               </div>
-              <div className="w-8 h-8 bg-slate-200 rounded-full overflow-hidden border">
+              <div className="w-10 h-10 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 shadow-inner">
                 <img 
                   src={activeProfile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${activeUser.email}`} 
                   alt="Avatar" 
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>
@@ -153,7 +172,7 @@ export default function DashboardLayout() {
         </header>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8">
+        <div className="flex-1 overflow-y-auto p-6 md:p-10 bg-[#f8fafc]">
           <Outlet />
         </div>
       </main>
@@ -168,22 +187,22 @@ export default function DashboardLayout() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 md:hidden"
             />
             <motion.aside
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 w-72 bg-white z-50 md:hidden flex flex-col"
+              className="fixed inset-y-0 left-0 w-72 bg-white z-50 md:hidden flex flex-col shadow-2xl"
             >
               <div className="p-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">T</div>
+                  <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">T</div>
                   <span className="font-bold text-xl tracking-tight">Theseofly</span>
                 </div>
-                <button onClick={() => setIsMobileMenuOpen(false)}>
-                  <X className="w-6 h-6 text-slate-500" />
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 hover:bg-slate-50 rounded-xl">
+                  <X className="w-6 h-6 text-slate-400" />
                 </button>
               </div>
               <nav className="flex-1 px-4 space-y-1">
@@ -192,17 +211,22 @@ export default function DashboardLayout() {
                     key={item.href}
                     to={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 transition-colors"
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all font-bold",
+                      location.pathname === item.href 
+                        ? "bg-blue-50 text-blue-600" 
+                        : "text-slate-500 hover:bg-slate-50"
+                    )}
                   >
-                    <item.icon className="w-5 h-5 text-slate-500" />
-                    <span className="font-medium">{item.label}</span>
+                    <item.icon className="w-5 h-5" />
+                    <span className="text-sm">{item.label}</span>
                   </Link>
                 ))}
               </nav>
-              <div className="p-6 border-t">
+              <div className="p-6 border-t border-slate-50">
                 <button 
                   onClick={() => signOut()}
-                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl bg-red-50 text-red-600 font-medium"
+                  className="flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl bg-red-50 text-red-600 font-black text-sm uppercase tracking-widest transition-all"
                 >
                   <LogOut className="w-5 h-5" />
                   Logout
@@ -215,4 +239,3 @@ export default function DashboardLayout() {
     </div>
   );
 }
-
