@@ -26,12 +26,12 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/" },
-  { icon: FileText, label: "Pages", href: "/pages" },
-  { icon: Search, label: "SEO Engine", href: "/seo" },
-  { icon: ImageIcon, label: "Media", href: "/media" },
-  { icon: Users, label: "Users", href: "/users" },
-  { icon: Settings, label: "Settings", href: "/settings" },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
+  { icon: FileText, label: "Pages", href: "/admin/pages" },
+  { icon: Search, label: "SEO Engine", href: "/admin/seo" },
+  { icon: ImageIcon, label: "Media", href: "/admin/media" },
+  { icon: Users, label: "Users", href: "/admin/users" },
+  { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 
 
