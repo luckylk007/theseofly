@@ -9,26 +9,34 @@ export function usePages(websiteId?: string) {
   const { user } = useAuthStore();
 
   const fetchPages = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     
     setLoading(true);
-    let query = supabase
-      .from('pages')
-      .select('*, seo_metadata(*)')
-      .order('updated_at', { ascending: false });
+    try {
+      let query = supabase
+        .from('pages')
+        .select('*, seo_metadata(*)')
+        .order('updated_at', { ascending: false });
 
-    if (websiteId) {
-      query = query.eq('website_id', websiteId);
+      if (websiteId) {
+        query = query.eq('website_id', websiteId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setPages(data || []);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-
-    const { data, error } = await query;
-
-    if (error) {
-      setError(error.message);
-    } else {
-      setPages(data || []);
-    }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -70,5 +78,27 @@ export function usePages(websiteId?: string) {
     setPages(pages.filter(p => p.id !== id));
   };
 
-  return { pages, loading, error, fetchPages, addPage, updatePage, deletePage };
+  const bulkUpdatePages = async (ids: string[], updates: any) => {
+    const { data, error } = await supabase
+      .from('pages')
+      .update(updates)
+      .in('id', ids)
+      .select();
+
+    if (error) throw error;
+    setPages(pages.map(p => ids.includes(p.id) ? { ...p, ...updates } : p));
+    return data;
+  };
+
+  const bulkDeletePages = async (ids: string[]) => {
+    const { error } = await supabase
+      .from('pages')
+      .delete()
+      .in('id', ids);
+
+    if (error) throw error;
+    setPages(pages.filter(p => !ids.includes(p.id)));
+  };
+
+  return { pages, loading, error, fetchPages, addPage, updatePage, deletePage, bulkUpdatePages, bulkDeletePages };
 }

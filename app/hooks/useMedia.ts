@@ -9,20 +9,28 @@ export function useMedia() {
   const { user } = useAuthStore();
 
   const fetchMedia = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     
     setLoading(true);
-    const { data, error } = await supabase
-      .from('media')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('media')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setMedia(data || []);
+      if (error) {
+        setError(error.message);
+      } else {
+        setMedia(data || []);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {

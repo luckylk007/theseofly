@@ -9,6 +9,7 @@ export default [
     route("admin/pages", "routes/dashboard.pages.tsx"),
     route("admin/seo", "routes/dashboard.seo.tsx"),
     route("admin/media", "routes/dashboard.media.tsx"),
+    route("admin/theme-builder", "routes/dashboard.theme-builder.tsx"),
     route("admin/users", "routes/dashboard.users.tsx"),
     route("admin/settings", "routes/dashboard.settings.tsx"),
   ]),

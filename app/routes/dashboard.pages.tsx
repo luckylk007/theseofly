@@ -11,11 +11,19 @@ import {
   Loader2,
   AlertCircle,
   Trash2,
-  ExternalLink
+  ExternalLink,
+  Filter,
+  ChevronDown,
+  ArrowUpDown,
+  User,
+  Tag as TagIcon,
+  FolderTree,
+  MessageSquare,
+  Zap
 } from "lucide-react";
 import { usePages } from "../hooks/usePages";
 import { useWebsite } from "../hooks/useWebsite";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Badge } from "../components/ui/Badge";
@@ -33,23 +41,41 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "../components/ui/DropdownMenu";
+import { cn } from "../lib/utils";
 
 export default function PagesManagement() {
   const { website, loading: websiteLoading } = useWebsite();
-  const { pages, loading, error, addPage, updatePage, deletePage } = usePages(website?.id);
+  const { 
+    pages, loading, error, 
+    addPage, updatePage, deletePage, 
+    bulkUpdatePages, bulkDeletePages 
+  } = usePages(website?.id);
   
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'updated_at', direction: 'desc' });
+  
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
   const [selectedPage, setSelectedPage] = useState<any>(null);
+  
   const [formData, setFormData] = useState({ 
     title: "", 
     slug: "", 
     website_id: "", 
-    status: "draft" as "draft" | "published" | "scheduled",
-    is_programmatic: false
+    status: "draft" as any,
+    is_programmatic: false,
+    category: "",
+    tags: [] as string[],
+    parent_id: null as string | null,
+    allow_comments: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -59,10 +85,49 @@ export default function PagesManagement() {
     }
   }, [website]);
 
-  const filteredPages = pages.filter(page => 
-    page.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    page.slug.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Extract unique categories for filter
+  const categories = useMemo(() => {
+    const cats = new Set(pages.map(p => p.category).filter(Boolean));
+    return Array.from(cats);
+  }, [pages]);
+
+  const filteredAndSortedPages = useMemo(() => {
+    return pages
+      .filter(page => {
+        const matchesSearch = page.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                             page.slug.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === "all" || page.status === statusFilter;
+        const matchesCategory = categoryFilter === "all" || page.category === categoryFilter;
+        return matchesSearch && matchesStatus && matchesCategory;
+      })
+      .sort((a, b) => {
+        let aVal = a[sortConfig.key];
+        let bVal = b[sortConfig.key];
+        
+        if (sortConfig.key === 'title') {
+          aVal = aVal.toLowerCase();
+          bVal = bVal.toLowerCase();
+        }
+
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+  }, [pages, searchTerm, statusFilter, categoryFilter, sortConfig]);
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredAndSortedPages.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredAndSortedPages.map(p => p.id));
+    }
+  };
+
+  const toggleSelectRow = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
 
   const handleCreatePage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +141,11 @@ export default function PagesManagement() {
         slug: "", 
         website_id: website.id, 
         status: "draft",
-        is_programmatic: false 
+        is_programmatic: false,
+        category: "",
+        tags: [],
+        parent_id: null,
+        allow_comments: false
       });
     } catch (err) {
       console.error(err);
@@ -94,10 +163,37 @@ export default function PagesManagement() {
         title: formData.title,
         slug: formData.slug,
         status: formData.status,
-        is_programmatic: formData.is_programmatic
+        is_programmatic: formData.is_programmatic,
+        category: formData.category,
+        allow_comments: formData.allow_comments
       });
       setIsEditModalOpen(false);
       setSelectedPage(null);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkStatusChange = async (newStatus: string) => {
+    setIsSubmitting(true);
+    try {
+      await bulkUpdatePages(selectedIds, { status: newStatus });
+      setSelectedIds([]);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    setIsSubmitting(true);
+    try {
+      await bulkDeletePages(selectedIds);
+      setSelectedIds([]);
+      setIsBulkDeleteModalOpen(false);
     } catch (err) {
       console.error(err);
     } finally {
@@ -122,19 +218,19 @@ export default function PagesManagement() {
   if (loading || websiteLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#155dfc] animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Pages</h2>
           <p className="text-slate-500">Manage {website?.name || 'your'} website's static and programmatic pages.</p>
         </div>
-        <Button className="gap-2" onClick={() => {
+        <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90" onClick={() => {
           setFormData(prev => ({ ...prev, website_id: website?.id }));
           setIsCreateModalOpen(true);
         }}>
@@ -150,21 +246,119 @@ export default function PagesManagement() {
         </div>
       )}
 
-      <div className="flex items-center gap-4">
-        <div className="flex-1 max-w-md">
-          <Input 
-            type="text" 
-            placeholder="Filter pages..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            icon={<Search className="w-4 h-4" />}
-            className="h-10"
-          />
-        </div>
-      </div>
+      {/* Filter Toolbar */}
+      <Card className="p-4 border-slate-100">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex-1 min-w-[300px]">
+            <Input 
+              type="text" 
+              placeholder="Search by title or slug..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              icon={<Search className="w-4 h-4" />}
+              className="h-10"
+            />
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-10 gap-2 border-slate-200">
+                  <Filter className="w-4 h-4 text-slate-400" />
+                  Status: <span className="capitalize">{statusFilter}</span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setStatusFilter("all")}>All Statuses</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setStatusFilter("published")}>Published</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter("draft")}>Draft</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter("private")}>Private</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setStatusFilter("pending_preview")}>Pending Preview</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-      <Card className="border-slate-100 overflow-hidden">
-        {filteredPages.length === 0 ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-10 gap-2 border-slate-200">
+                  <FolderTree className="w-4 h-4 text-slate-400" />
+                  Category: <span className="capitalize">{categoryFilter}</span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setCategoryFilter("all")}>All Categories</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {categories.map(cat => (
+                  <DropdownMenuItem key={cat} onClick={() => setCategoryFilter(cat)}>{cat}</DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-10 text-slate-500 hover:text-slate-900"
+              onClick={() => {
+                setSearchTerm("");
+                setStatusFilter("all");
+                setCategoryFilter("all");
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Pages Table */}
+      <Card className="border-slate-100 overflow-hidden relative">
+        {/* Bulk Action Bar */}
+        {selectedIds.length > 0 && (
+          <div className="absolute top-0 left-0 right-0 z-20 bg-[#155dfc] text-white px-6 py-3 flex items-center justify-between animate-in slide-in-from-top duration-300">
+            <div className="flex items-center gap-4">
+              <span className="font-bold text-sm">{selectedIds.length} pages selected</span>
+              <div className="h-4 w-px bg-white/20" />
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-white hover:bg-white/10 h-8 text-xs font-bold gap-1.5"
+                  onClick={() => handleBulkStatusChange('published')}
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Publish
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-white hover:bg-white/10 h-8 text-xs font-bold gap-1.5"
+                  onClick={() => handleBulkStatusChange('draft')}
+                >
+                  <Clock className="w-3.5 h-3.5" /> Set Draft
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-white hover:bg-white/10 h-8 text-xs font-bold gap-1.5"
+                  onClick={() => setIsBulkDeleteModalOpen(true)}
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                </Button>
+              </div>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-white hover:bg-white/10 h-8"
+              onClick={() => setSelectedIds([])}
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
+
+        {filteredAndSortedPages.length === 0 ? (
           <div className="p-16 text-center space-y-4">
             <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto border border-slate-100">
               <FileText className="w-8 h-8 text-slate-300" />
@@ -178,55 +372,95 @@ export default function PagesManagement() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 text-slate-500 text-xs font-bold uppercase tracking-wider border-b">
-                  <th className="px-6 py-4">Title</th>
-                  <th className="px-6 py-4">Type</th>
+                <tr className="bg-slate-50/50 text-slate-500 text-[11px] font-black uppercase tracking-wider border-b">
+                  <th className="px-6 py-4 w-10">
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 rounded border-slate-300 text-[#155dfc] focus:ring-[#155dfc]/20"
+                      checked={selectedIds.length === filteredAndSortedPages.length && filteredAndSortedPages.length > 0}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
+                  <th className="px-4 py-4 cursor-pointer hover:text-slate-900" onClick={() => setSortConfig({ key: 'title', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' })}>
+                    <div className="flex items-center gap-2">
+                      Title <ArrowUpDown className="w-3 h-3" />
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 cursor-pointer hover:text-slate-900" onClick={() => setSortConfig({ key: 'category', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' })}>
+                    <div className="flex items-center gap-2">
+                      Category <ArrowUpDown className="w-3 h-3" />
+                    </div>
+                  </th>
                   <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Last Modified</th>
+                  <th className="px-6 py-4 cursor-pointer hover:text-slate-900" onClick={() => setSortConfig({ key: 'updated_at', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' })}>
+                    <div className="flex items-center gap-2">
+                      Last Modified <ArrowUpDown className="w-3 h-3" />
+                    </div>
+                  </th>
                   <th className="px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredPages.map((page) => (
-                  <tr key={page.id} className="hover:bg-slate-50/30 transition-colors group">
+                {filteredAndSortedPages.map((page) => (
+                  <tr 
+                    key={page.id} 
+                    className={cn(
+                      "hover:bg-slate-50/30 transition-colors group",
+                      selectedIds.includes(page.id) ? "bg-blue-50/30" : ""
+                    )}
+                  >
                     <td className="px-6 py-4">
+                      <input 
+                        type="checkbox" 
+                        className="w-4 h-4 rounded border-slate-300 text-[#155dfc] focus:ring-[#155dfc]/20"
+                        checked={selectedIds.includes(page.id)}
+                        onChange={() => toggleSelectRow(page.id)}
+                      />
+                    </td>
+                    <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-[#155dfc] group-hover:border-blue-100 transition-colors shrink-0">
                           <FileText className="w-5 h-5" />
                         </div>
-                        <div>
-                          <p className="font-semibold text-sm text-slate-900">{page.title}</p>
-                          <p className="text-xs text-slate-400 flex items-center gap-1">
-                            {page.slug}
+                        <div className="min-w-0">
+                          <p className="font-bold text-sm text-slate-900 truncate">{page.title}</p>
+                          <p className="text-[11px] text-slate-400 flex items-center gap-1 truncate font-medium">
+                            /{page.slug}
                             <ArrowRight className="w-3 h-3" />
                           </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <Badge variant="outline" className={`font-bold uppercase tracking-tighter ${
-                        page.is_programmatic ? 'bg-purple-50 text-purple-600 border-purple-100' : 'bg-slate-50 text-slate-600'
-                      }`}>
-                        {page.is_programmatic ? 'programmatic' : 'static'}
-                      </Badge>
+                      {page.category ? (
+                        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">
+                          {page.category}
+                        </Badge>
+                      ) : (
+                        <span className="text-[11px] text-slate-300 italic font-medium">Uncategorized</span>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         {page.status === 'published' ? (
-                          <Badge variant="success" className="gap-1.5 px-2 py-1">
+                          <Badge variant="success" className="gap-1.5 px-2 py-1 bg-green-50 text-green-600 border-green-100">
                             <CheckCircle2 className="w-3 h-3" />
                             Published
                           </Badge>
-                        ) : (
-                          <Badge variant="warning" className="gap-1.5 px-2 py-1">
+                        ) : page.status === 'draft' ? (
+                          <Badge variant="warning" className="gap-1.5 px-2 py-1 bg-amber-50 text-amber-600 border-amber-100">
                             <Clock className="w-3 h-3" />
                             Draft
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="gap-1.5 px-2 py-1 bg-slate-50 text-slate-500 border-slate-200 capitalize">
+                            {page.status?.replace('_', ' ')}
                           </Badge>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500">
-                      {new Date(page.updated_at).toLocaleDateString()}
+                    <td className="px-6 py-4 text-xs font-bold text-slate-500">
+                      {new Date(page.updated_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <DropdownMenu>
@@ -235,7 +469,8 @@ export default function PagesManagement() {
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-slate-400">Manage Page</DropdownMenuLabel>
                           <DropdownMenuItem 
                             className="gap-2"
                             onClick={() => {
@@ -244,7 +479,7 @@ export default function PagesManagement() {
                               }
                             }}
                           >
-                            <Eye className="w-4 h-4" /> View
+                            <Eye className="w-4 h-4" /> View Page
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             className="gap-2"
@@ -255,13 +490,18 @@ export default function PagesManagement() {
                                 slug: page.slug,
                                 website_id: page.website_id,
                                 status: page.status,
-                                is_programmatic: !!page.is_programmatic
+                                is_programmatic: !!page.is_programmatic,
+                                category: page.category || "",
+                                tags: page.tags || [],
+                                parent_id: page.parent_id || null,
+                                allow_comments: !!page.allow_comments
                               });
                               setIsEditModalOpen(true);
                             }}
                           >
-                            <Settings className="w-4 h-4" /> Edit
+                            <Settings className="w-4 h-4" /> Page Settings
                           </DropdownMenuItem>
+                          <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             className="gap-2 text-red-600 focus:text-red-600 focus:bg-red-50"
                             onClick={() => {
@@ -269,7 +509,7 @@ export default function PagesManagement() {
                               setIsDeleteModalOpen(true);
                             }}
                           >
-                            <Trash2 className="w-4 h-4" /> Delete
+                            <Trash2 className="w-4 h-4" /> Delete Permanently
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -284,47 +524,82 @@ export default function PagesManagement() {
 
       {/* Create Page Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-xl">
           <DialogHeader>
             <DialogTitle>Create New Page</DialogTitle>
             <DialogDescription>
               Add a new static or programmatic page to your website.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleCreatePage} className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Page Title</label>
-              <Input 
-                required 
-                placeholder="Our Services" 
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              />
+          <form onSubmit={handleCreatePage} className="space-y-6 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Page Title</label>
+                <Input 
+                  required 
+                  placeholder="e.g. Services" 
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Slug</label>
+                <Input 
+                  required 
+                  placeholder="e.g. services" 
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Slug</label>
-              <Input 
-                required 
-                placeholder="our-services" 
-                value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-              />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Category</label>
+                <Input 
+                  placeholder="e.g. Blog" 
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Parent Page</label>
+                <select 
+                  className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
+                  value={formData.parent_id || ""}
+                  onChange={(e) => setFormData({ ...formData, parent_id: e.target.value || null })}
+                >
+                  <option value="">No Parent</option>
+                  {pages.filter(p => p.id !== selectedPage?.id).map(p => (
+                    <option key={p.id} value={p.id}>{p.title}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <div className="flex items-center gap-2 pt-2">
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Programmatic Mode</p>
+                  <p className="text-[11px] text-slate-500 font-medium">Generate pages from variables.</p>
+                </div>
+              </div>
               <input 
                 type="checkbox" 
-                id="is_programmatic"
-                className="w-4 h-4 text-blue-600 rounded"
+                className="w-5 h-5 text-[#155dfc] rounded-lg"
                 checked={formData.is_programmatic}
                 onChange={(e) => setFormData({ ...formData, is_programmatic: e.target.checked })}
               />
-              <label htmlFor="is_programmatic" className="text-sm font-medium">Is this a programmatic page?</label>
             </div>
-            <DialogFooter className="pt-4">
+
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" isLoading={isSubmitting}>
+              <Button type="submit" isLoading={isSubmitting} className="bg-[#155dfc] hover:bg-[#155dfc]/90 min-w-[140px]">
                 Create Page
               </Button>
             </DialogFooter>
@@ -334,60 +609,71 @@ export default function PagesManagement() {
 
       {/* Edit Page Modal */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>Edit Page</DialogTitle>
+            <DialogTitle>Edit Page Settings</DialogTitle>
             <DialogDescription>
-              Update page details and configuration.
+              Update configuration and meta data for this page.
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleUpdatePage} className="space-y-4 py-4">
+          <form onSubmit={handleUpdatePage} className="space-y-6 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Page Title</label>
+                <Input 
+                  required 
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Status</label>
+                <select 
+                  required
+                  className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none font-bold"
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                >
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                  <option value="private">Private</option>
+                  <option value="pending_preview">Pending Preview</option>
+                </select>
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <label className="text-sm font-medium">Page Title</label>
+              <label className="text-sm font-bold text-slate-700">Category</label>
               <Input 
-                required 
-                placeholder="Our Services" 
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Slug</label>
-              <Input 
-                required 
-                placeholder="our-services" 
-                value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
-              <select 
-                required
-                className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 outline-none"
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-              </select>
-            </div>
-            <div className="flex items-center gap-2 pt-2">
+
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Allow Comments</p>
+                  <p className="text-[11px] text-slate-500 font-medium">Enable visitor discussions on this page.</p>
+                </div>
+              </div>
               <input 
                 type="checkbox" 
-                id="edit_is_programmatic"
-                className="w-4 h-4 text-blue-600 rounded"
-                checked={formData.is_programmatic}
-                onChange={(e) => setFormData({ ...formData, is_programmatic: e.target.checked })}
+                className="w-5 h-5 text-[#155dfc] rounded-lg"
+                checked={formData.allow_comments}
+                onChange={(e) => setFormData({ ...formData, allow_comments: e.target.checked })}
               />
-              <label htmlFor="edit_is_programmatic" className="text-sm font-medium">Is this a programmatic page?</label>
             </div>
-            <DialogFooter className="pt-4">
+
+            <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsEditModalOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" isLoading={isSubmitting}>
-                Update Page
+              <Button type="submit" isLoading={isSubmitting} className="bg-[#155dfc] hover:bg-[#155dfc]/90 min-w-[140px]">
+                Save Changes
               </Button>
             </DialogFooter>
           </form>
@@ -398,9 +684,9 @@ export default function PagesManagement() {
       <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Page</DialogTitle>
+            <DialogTitle>Delete Page Permanently</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete <span className="font-bold text-slate-900">{selectedPage?.title}</span>? This action cannot be undone.
+              Are you sure you want to delete <span className="font-bold text-slate-900">{selectedPage?.title}</span>? This action is irreversible.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="pt-4">
@@ -408,7 +694,27 @@ export default function PagesManagement() {
               Cancel
             </Button>
             <Button variant="danger" isLoading={isSubmitting} onClick={handleDeletePage}>
-              Delete Page
+              Delete Permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Delete Confirmation Modal */}
+      <Dialog open={isBulkDeleteModalOpen} onOpenChange={setIsBulkDeleteModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete {selectedIds.length} Pages</DialogTitle>
+            <DialogDescription>
+              You are about to permanently delete <span className="font-bold text-slate-900">{selectedIds.length}</span> pages. This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="pt-4">
+            <Button variant="outline" onClick={() => setIsBulkDeleteModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="danger" isLoading={isSubmitting} onClick={handleBulkDelete}>
+              Delete Pages
             </Button>
           </DialogFooter>
         </DialogContent>

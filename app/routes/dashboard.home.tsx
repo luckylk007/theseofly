@@ -11,6 +11,7 @@ import { Button } from "../components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
 import { cn } from "../lib/utils";
+import { Link } from "react-router";
 
 const stats = [
   { label: "Total Pages", value: "12,450", change: "+12.5%", trend: "up" as const, icon: FileText },
@@ -27,10 +28,12 @@ export default function DashboardHome() {
           <h2 className="text-2xl font-bold">Welcome back, Admin</h2>
           <p className="text-slate-500">Here's what's happening with your SEO platform today.</p>
         </div>
-        <Button className="gap-2">
-          <Plus className="w-4 h-4" />
-          Quick Action
-        </Button>
+        <Link to="/admin/pages">
+          <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90">
+            <Plus className="w-4 h-4" />
+            Quick Action
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

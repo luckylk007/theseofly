@@ -9,22 +9,30 @@ export function useWebsite() {
   const { user } = useAuthStore();
 
   const fetchWebsite = async () => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     
     setLoading(true);
-    const { data, error } = await supabase
-      .from('websites')
-      .select('*')
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('websites')
+        .select('*')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .single();
 
-    if (error && error.code !== 'PGRST116') {
-      setError(error.message);
-    } else {
-      setWebsite(data || null);
+      if (error && error.code !== 'PGRST116') {
+        setError(error.message);
+      } else {
+        setWebsite(data || null);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
