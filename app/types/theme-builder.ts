@@ -19,31 +19,28 @@ export type TemplateType =
 
 export type ConditionType = 'include' | 'exclude';
 
-export type ConditionTarget = 
-  | 'entire_site' 
-  | 'singular' 
-  | 'archive' 
-  | 'woocommerce' 
-  | 'other';
+export type TemplateConditionField =
+  | "page_type"
+  | "category"
+  | "tag"
+  | "country"
+  | "city"
+  | "service"
+  | "post_type"
+  | "specific_page"
+  | "url_slug"
+  | "url_pattern";
 
-export type ConditionSubTarget = 
-  | 'all'
-  | 'post'
-  | 'page'
-  | 'category'
-  | 'tag'
-  | 'author'
-  | 'product'
-  | 'search'
-  | 'error_404'
-  | 'specific_id';
-
-export interface DisplayCondition {
-  id: string; // Internal UI ID for reordering/keys
+export interface TemplateConditionRule {
+  id: string;
   type: ConditionType;
-  target: ConditionTarget;
-  subTarget: ConditionSubTarget;
-  values: string[]; // IDs or slugs for specific targeting
+  field: TemplateConditionField;
+  values: string[];
+}
+
+export interface TemplateConditions {
+  match: "all" | "any";
+  rules: TemplateConditionRule[];
 }
 
 export interface ThemeTemplate {
@@ -54,7 +51,7 @@ export interface ThemeTemplate {
   status: 'draft' | 'published' | 'scheduled';
   is_active: boolean;
   priority: number;
-  conditions: DisplayCondition[];
+  conditions: TemplateConditions;
   content: any;
   created_at: string;
   updated_at: string;

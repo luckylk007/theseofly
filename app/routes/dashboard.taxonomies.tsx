@@ -45,6 +45,12 @@ export default function TaxonomiesPage() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [formData, setFormData] = useState({ name: "", slug: "", description: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const starterCategories = [
+    { name: "Blog", slug: "blog", description: "Standard editorial articles and insights." },
+    { name: "News", slug: "news", description: "Announcements, launches, and company updates." },
+    { name: "Newsletter", slug: "newsletter", description: "Recurring newsletter posts and digests." },
+    { name: "Case Study", slug: "case-study", description: "Proof-driven stories, wins, and outcomes." },
+  ];
 
   const filteredItems = taxonomies.filter(item => 
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -91,6 +97,19 @@ export default function TaxonomiesPage() {
       console.error(err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleCreateStarter = async (starter: { name: string; slug: string; description: string }) => {
+    if (!website?.id) {
+      return;
+    }
+
+    try {
+      await addTaxonomy({ ...starter, website_id: website.id, type: "category" });
+      setActiveTab("category");
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -142,6 +161,36 @@ export default function TaxonomiesPage() {
           Tags
         </button>
       </div>
+
+      {activeTab === "category" && (
+        <Card className="border-slate-100 p-5">
+          <div className="flex items-start justify-between gap-6 flex-wrap">
+            <div>
+              <h3 className="font-black text-slate-900">Starter Categories</h3>
+              <p className="text-sm text-slate-500 mt-1">Quick-create common editorial buckets for your template rules.</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {starterCategories.map((starter) => {
+                const exists = taxonomies.some((taxonomy) => taxonomy.slug === starter.slug);
+                return (
+                  <Button
+                    key={starter.slug}
+                    variant={exists ? "outline" : "primary"}
+                    className={cn(
+                      "rounded-full",
+                      exists ? "border-slate-200 text-slate-400" : "bg-[#155dfc] hover:bg-[#155dfc]/90"
+                    )}
+                    disabled={exists}
+                    onClick={() => handleCreateStarter(starter)}
+                  >
+                    {exists ? `${starter.name} Added` : `Add ${starter.name}`}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        </Card>
+      )}
 
       <Card className="border-slate-100 overflow-hidden">
         <div className="p-4 border-b flex items-center justify-between gap-4 bg-slate-50/30">

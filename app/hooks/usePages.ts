@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../stores/useAuthStore";
+import type { CMSPage, ContentType, PostType } from "../types/cms";
 
 export function usePages(websiteId?: string) {
-  const [pages, setPages] = useState<any[]>([]);
+  const [pages, setPages] = useState<CMSPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuthStore();
@@ -18,7 +19,7 @@ export function usePages(websiteId?: string) {
     try {
       let query = supabase
         .from('pages')
-        .select('*, seo_metadata(*)')
+        .select('*, seo_metadata(*), page_taxonomies(taxonomy:taxonomies(*))')
         .order('updated_at', { ascending: false });
 
       if (websiteId) {
@@ -30,7 +31,7 @@ export function usePages(websiteId?: string) {
       if (error) {
         setError(error.message);
       } else {
-        setPages(data || []);
+        setPages(normalizePages((data as any[]) || []));
       }
     } catch (err: any) {
       setError(err.message);
@@ -44,38 +45,67 @@ export function usePages(websiteId?: string) {
   }, [user, websiteId]);
 
   const addPage = async (page: any) => {
+    const { taxonomy_ids = [], ...pagePayload } = page;
+
     const { data, error } = await supabase
       .from('pages')
-      .insert([page])
+      .insert([pagePayload])
       .select()
       .single();
 
     if (error) throw error;
-    setPages([data, ...pages]);
-    return data;
+    const createdPage = data as any;
+
+    if (taxonomy_ids.length > 0) {
+      await syncPageTaxonomies(createdPage.id, taxonomy_ids);
+    }
+
+    await fetchPages();
+    return createdPage;
   };
 
   const bulkAddPages = async (pagesData: any[]) => {
+    const inserts = pagesData.map(({ taxonomy_ids, ...page }) => page);
     const { data, error } = await supabase
       .from('pages')
-      .insert(pagesData)
+      .insert(inserts)
       .select();
 
     if (error) throw error;
-    setPages([...(data || []), ...pages]);
+
+    if (data) {
+      await Promise.all(
+        (data as any[]).map((createdPage: any, index) => {
+          const taxonomyIds = pagesData[index]?.taxonomy_ids || [];
+          if (taxonomyIds.length === 0) {
+            return Promise.resolve();
+          }
+
+          return syncPageTaxonomies(createdPage.id, taxonomyIds);
+        })
+      );
+    }
+
+    await fetchPages();
     return data;
   };
 
   const updatePage = async (id: string, updates: any) => {
+    const { taxonomy_ids, ...pageUpdates } = updates;
     const { data, error } = await supabase
       .from('pages')
-      .update(updates)
+      .update(pageUpdates)
       .eq('id', id)
       .select()
       .single();
 
     if (error) throw error;
-    setPages(pages.map(p => p.id === id ? { ...p, ...(data as any) } : p));
+
+    if (Array.isArray(taxonomy_ids)) {
+      await syncPageTaxonomies(id, taxonomy_ids);
+    }
+
+    await fetchPages();
     return data;
   };
 
@@ -123,4 +153,52 @@ export function usePages(websiteId?: string) {
     bulkUpdatePages, 
     bulkDeletePages 
   };
+
+  async function syncPageTaxonomies(pageId: string, taxonomyIds: string[]) {
+    await supabase
+      .from("page_taxonomies")
+      .delete()
+      .eq("page_id", pageId);
+
+    if (taxonomyIds.length === 0) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("page_taxonomies")
+      .insert(taxonomyIds.map((taxonomyId) => ({ page_id: pageId, taxonomy_id: taxonomyId })));
+
+    if (error) {
+      throw error;
+    }
+  }
+}
+
+function normalizePages(data: any[]): CMSPage[] {
+  return data.map((page) => {
+    const assignments = (page.page_taxonomies || [])
+      .map((entry: any) => entry.taxonomy)
+      .filter(Boolean);
+    const categories = assignments.filter((item: any) => item.type === "category");
+    const tags = assignments.filter((item: any) => item.type === "tag");
+
+    return {
+      ...page,
+      content_type: (page.content_type || "page") as ContentType,
+      post_type: (page.post_type || inferPostType(page)) as PostType,
+      taxonomy_ids: assignments.map((item: any) => item.id),
+      categories,
+      tag_entities: tags,
+      category: page.category || categories[0]?.name || "",
+      tags: page.tags || tags.map((item: any) => item.name),
+    };
+  });
+}
+
+function inferPostType(page: any): PostType {
+  if (page.content_type === "post") {
+    return "post";
+  }
+
+  return "page";
 }

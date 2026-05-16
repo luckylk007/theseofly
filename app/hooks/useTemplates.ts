@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../stores/useAuthStore";
-import type { ThemeTemplate, DisplayCondition } from "../types/theme-builder";
+import { normalizeTemplateConditions } from "../lib/templateConditions";
+import type { ThemeTemplate, TemplateConditions } from "../types/theme-builder";
 
 export function useTemplates(websiteId?: string) {
   const [templates, setTemplates] = useState<ThemeTemplate[]>([]);
@@ -31,7 +32,7 @@ export function useTemplates(websiteId?: string) {
       if (error) {
         setError(error.message);
       } else {
-        setTemplates((data as any) || []);
+        setTemplates(normalizeTemplates((data as any) || []));
       }
     } catch (err: any) {
       setError(err.message);
@@ -52,7 +53,7 @@ export function useTemplates(websiteId?: string) {
       .single();
 
     if (error) throw error;
-    setTemplates([(data as any), ...templates]);
+    setTemplates([normalizeTemplate(data as any), ...templates]);
     return data;
   };
 
@@ -65,7 +66,7 @@ export function useTemplates(websiteId?: string) {
       .single();
 
     if (error) throw error;
-    setTemplates(templates.map(t => t.id === id ? { ...t, ...(data as any) } : t));
+    setTemplates(templates.map(t => t.id === id ? normalizeTemplate({ ...t, ...(data as any) }) : t));
     return data;
   };
 
@@ -92,7 +93,7 @@ export function useTemplates(websiteId?: string) {
     });
   };
 
-  const updateConditions = async (id: string, conditions: DisplayCondition[]) => {
+  const updateConditions = async (id: string, conditions: TemplateConditions) => {
     return updateTemplate(id, { conditions });
   };
 
@@ -111,5 +112,17 @@ export function useTemplates(websiteId?: string) {
     duplicateTemplate,
     updateConditions,
     toggleActive
+  };
+}
+
+function normalizeTemplates(templates: any[]) {
+  return templates.map(normalizeTemplate);
+}
+
+function normalizeTemplate(template: any): ThemeTemplate {
+  return {
+    ...template,
+    conditions: normalizeTemplateConditions(template.conditions),
+    priority: typeof template.priority === "number" ? template.priority : 0,
   };
 }

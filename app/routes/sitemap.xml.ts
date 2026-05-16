@@ -3,17 +3,19 @@ import type { Route } from "./+types/sitemap.xml";
 
 export async function loader({ request }: Route.LoaderArgs) {
   // 1. Fetch all published pages
-  const { data: pages } = await supabase
+  const { data: pageData } = await supabase
     .from("pages")
     .select("slug, updated_at")
     .eq("status", "published");
 
   // 2. Fetch website config for base URL
-  const { data: website } = await supabase
+  const { data: websiteData } = await supabase
     .from("websites")
     .select("domain")
     .single();
 
+  const pages = (pageData as unknown as Array<{ slug: string; updated_at: string }>) || [];
+  const website = websiteData as { domain?: string } | null;
   const baseUrl = website?.domain ? `https://${website.domain}` : new URL(request.url).origin;
 
   // 3. Generate XML
@@ -24,7 +26,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-  ${(pages || []).map((page) => `
+  ${pages.map((page) => `
   <url>
     <loc>${baseUrl}/${page.slug}</loc>
     <lastmod>${new Date(page.updated_at).toISOString()}</lastmod>

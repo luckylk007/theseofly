@@ -34,10 +34,26 @@ CREATE TABLE templates (
   website_id UUID REFERENCES websites(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT,
-  content JSONB NOT NULL, -- Structure of sections
-  dynamic_variables TEXT[], -- e.g., ['city', 'service']
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+  content JSONB NOT NULL DEFAULT '{"sections": []}', -- Structure of sections
+  type TEXT DEFAULT 'single_page',
+  status TEXT DEFAULT 'draft',
+  is_active BOOLEAN DEFAULT true,
+  priority INTEGER DEFAULT 0,
+  conditions JSONB DEFAULT '[]',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  CONSTRAINT templates_type_check CHECK (type IN (
+    'header', 'footer', 'single_post', 'single_page', 'archive', 
+    'search_results', 'category_archive', 'tag_archive', 'author_archive',
+    'woo_product', 'woo_archive', 'cart', 'checkout', 'error_404', 
+    'coming_soon', 'maintenance_mode', 'custom_post_type'
+  )),
+  CONSTRAINT templates_status_check CHECK (status IN ('draft', 'published', 'scheduled'))
 );
+
+-- Add index for condition evaluation
+CREATE INDEX IF NOT EXISTS idx_templates_type_active ON templates(type, is_active);
+CREATE INDEX IF NOT EXISTS idx_templates_priority ON templates(priority DESC);
+CREATE INDEX IF NOT EXISTS idx_templates_conditions_gin ON templates USING GIN (conditions jsonb_path_ops);
 
 -- 4. Pages (Dynamic SEO pages)
 CREATE TABLE pages (
@@ -46,15 +62,43 @@ CREATE TABLE pages (
   template_id UUID REFERENCES templates(id),
   title TEXT NOT NULL,
   slug TEXT NOT NULL,
-  content JSONB,
-  status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'scheduled')),
+  content JSONB DEFAULT '{"sections": []}',
+  status TEXT DEFAULT 'draft',
   published_at TIMESTAMP WITH TIME ZONE,
   is_programmatic BOOLEAN DEFAULT FALSE,
   variables JSONB DEFAULT '{}', -- Values for dynamic variables
+  category TEXT,
+  tags TEXT[] DEFAULT '{}',
+  content_type TEXT DEFAULT 'page',
+  post_type TEXT DEFAULT 'page',
+  parent_id UUID REFERENCES pages(id) ON DELETE SET NULL,
+  author_id UUID REFERENCES profiles(id),
+  allow_comments BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-  UNIQUE(website_id, slug)
+  UNIQUE(website_id, slug),
+  CONSTRAINT pages_status_check CHECK (status IN ('draft', 'published', 'scheduled', 'private', 'pending_preview')),
+  CONSTRAINT pages_content_type_check CHECK (content_type IN ('page', 'post')),
+  CONSTRAINT pages_post_type_check CHECK (post_type IN ('page', 'post', 'blog', 'news', 'newsletter', 'case-study'))
 );
+
+-- Add indexes for performance
+CREATE INDEX IF NOT EXISTS idx_pages_category ON pages(category);
+CREATE INDEX IF NOT EXISTS idx_pages_tags ON pages USING GIN (tags);
+CREATE INDEX IF NOT EXISTS idx_pages_content_type ON pages(content_type);
+CREATE INDEX IF NOT EXISTS idx_pages_post_type ON pages(post_type);
+CREATE INDEX IF NOT EXISTS idx_pages_parent_id ON pages(parent_id);
+CREATE INDEX IF NOT EXISTS idx_pages_author_id ON pages(author_id);
+
+CREATE TABLE page_taxonomies (
+  page_id UUID NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+  taxonomy_id UUID NOT NULL REFERENCES taxonomies(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  PRIMARY KEY (page_id, taxonomy_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_page_taxonomies_taxonomy_id ON page_taxonomies(taxonomy_id);
+CREATE INDEX IF NOT EXISTS idx_page_taxonomies_page_id ON page_taxonomies(page_id);
 
 -- 5. SEO Metadata
 CREATE TABLE seo_metadata (
@@ -134,7 +178,10 @@ CREATE TABLE ai_generations (
 -- RLS POLICIES (Simplified)
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE websites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE page_taxonomies ENABLE ROW LEVEL SECURITY;
+ALTER TABLE taxonomies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE seo_metadata ENABLE ROW LEVEL SECURITY;
 ALTER TABLE media ENABLE ROW LEVEL SECURITY;
 ALTER TABLE redirects ENABLE ROW LEVEL SECURITY;
@@ -150,9 +197,108 @@ CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.
 -- Websites: Admins can see all, editors can see assigned (simplified here to owner_id)
 CREATE POLICY "Users can see websites they own" ON websites FOR ALL USING (auth.uid() = owner_id);
 
+-- Templates: Based on website ownership
+CREATE POLICY "Users can manage templates of their websites" ON templates FOR ALL 
+USING (EXISTS (SELECT 1 FROM websites WHERE id = templates.website_id AND owner_id = auth.uid()));
+
 -- Pages: Based on website ownership
 CREATE POLICY "Users can manage pages of their websites" ON pages FOR ALL 
 USING (EXISTS (SELECT 1 FROM websites WHERE id = pages.website_id AND owner_id = auth.uid()));
+
+CREATE POLICY "Users can manage page taxonomies of their websites" ON page_taxonomies FOR ALL
+USING (
+  EXISTS (
+    SELECT 1
+    FROM pages
+    JOIN websites ON websites.id = pages.website_id
+    WHERE pages.id = page_taxonomies.page_id
+      AND websites.owner_id = auth.uid()
+  )
+);
+
+-- Taxonomies: Based on website ownership
+CREATE POLICY "Users can manage taxonomies of their websites" ON taxonomies FOR ALL 
+USING (EXISTS (SELECT 1 FROM websites WHERE id = taxonomies.website_id AND owner_id = auth.uid()));
+
+CREATE TABLE countries (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  website_id UUID NOT NULL REFERENCES websites(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  country_code TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT,
+  flag_media_id UUID REFERENCES media(id) ON DELETE SET NULL,
+  flag_url TEXT,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'public', 'private', 'pending_review')),
+  live_page BOOLEAN NOT NULL DEFAULT FALSE,
+  seo JSONB NOT NULL DEFAULT '{}',
+  deleted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_countries_website_slug_unique ON countries(website_id, slug) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_countries_website_code_unique ON countries(website_id, country_code) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_countries_status ON countries(website_id, status);
+CREATE INDEX IF NOT EXISTS idx_countries_deleted_at ON countries(deleted_at);
+
+CREATE TABLE services (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  website_id UUID NOT NULL REFERENCES websites(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT,
+  icon_name TEXT,
+  icon_media_id UUID REFERENCES media(id) ON DELETE SET NULL,
+  icon_url TEXT,
+  service_category TEXT,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'public', 'private', 'pending_review')),
+  live_page BOOLEAN NOT NULL DEFAULT FALSE,
+  seo JSONB NOT NULL DEFAULT '{}',
+  deleted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_services_website_slug_unique ON services(website_id, slug) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_services_status ON services(website_id, status);
+CREATE INDEX IF NOT EXISTS idx_services_deleted_at ON services(deleted_at);
+
+CREATE TABLE cities (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  website_id UUID NOT NULL REFERENCES websites(id) ON DELETE CASCADE,
+  country_id UUID NOT NULL REFERENCES countries(id) ON DELETE RESTRICT,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT,
+  banner_media_id UUID REFERENCES media(id) ON DELETE SET NULL,
+  banner_url TEXT,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'public', 'private', 'pending_review')),
+  live_page BOOLEAN NOT NULL DEFAULT FALSE,
+  draft_page BOOLEAN NOT NULL DEFAULT TRUE,
+  seo JSONB NOT NULL DEFAULT '{}',
+  deleted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_cities_country_slug_unique ON cities(country_id, slug) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_cities_country_id ON cities(country_id);
+CREATE INDEX IF NOT EXISTS idx_cities_status ON cities(website_id, status);
+CREATE INDEX IF NOT EXISTS idx_cities_deleted_at ON cities(deleted_at);
+
+ALTER TABLE countries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cities ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can manage countries of their websites" ON countries FOR ALL
+USING (EXISTS (SELECT 1 FROM websites WHERE id = countries.website_id AND owner_id = auth.uid()));
+
+CREATE POLICY "Users can manage services of their websites" ON services FOR ALL
+USING (EXISTS (SELECT 1 FROM websites WHERE id = services.website_id AND owner_id = auth.uid()));
+
+CREATE POLICY "Users can manage cities of their websites" ON cities FOR ALL
+USING (EXISTS (SELECT 1 FROM websites WHERE id = cities.website_id AND owner_id = auth.uid()));
 
 -- Functions
 CREATE OR REPLACE FUNCTION handle_new_user()

@@ -12,6 +12,7 @@ export interface Taxonomy {
   type: TaxonomyType;
   description: string;
   created_at: string;
+  updated_at?: string;
 }
 
 export function useTaxonomies(websiteId?: string, type?: TaxonomyType) {

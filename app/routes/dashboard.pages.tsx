@@ -26,6 +26,7 @@ import { usePages } from "../hooks/usePages";
 import { useWebsite } from "../hooks/useWebsite";
 import { useTaxonomies } from "../hooks/useTaxonomies";
 import { useState, useEffect, useMemo } from "react";
+import type { ContentType, PostType } from "../types/cms";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Badge } from "../components/ui/Badge";
@@ -78,8 +79,10 @@ export default function PagesManagement() {
     website_id: "", 
     status: "draft" as any,
     is_programmatic: false,
-    category: "",
-    tags: [] as string[],
+    content_type: "page" as ContentType,
+    post_type: "page" as PostType,
+    category_id: "",
+    tag_ids: [] as string[],
     parent_id: null as string | null,
     allow_comments: false
   });
@@ -97,12 +100,16 @@ export default function PagesManagement() {
         const matchesSearch = page.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                              page.slug.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesStatus = statusFilter === "all" || page.status === statusFilter;
-        const matchesCategory = categoryFilter === "all" || page.category === categoryFilter;
+        const matchesCategory =
+          categoryFilter === "all" ||
+          page.categories.some((category) => category.id === categoryFilter || category.name === categoryFilter);
         return matchesSearch && matchesStatus && matchesCategory;
       })
       .sort((a, b) => {
-        let aVal = a[sortConfig.key];
-        let bVal = b[sortConfig.key];
+        const aRecord = a as Record<string, any>;
+        const bRecord = b as Record<string, any>;
+        let aVal = aRecord[sortConfig.key];
+        let bVal = bRecord[sortConfig.key];
         
         if (sortConfig.key === 'title') {
           aVal = aVal.toLowerCase();
@@ -114,6 +121,14 @@ export default function PagesManagement() {
         return 0;
       });
   }, [pages, searchTerm, statusFilter, categoryFilter, sortConfig]);
+
+  const categoryFilterLabel = useMemo(() => {
+    if (categoryFilter === "all") {
+      return "all";
+    }
+
+    return categories.find((category) => category.id === categoryFilter)?.name || "all";
+  }, [categories, categoryFilter]);
 
   const toggleSelectAll = () => {
     if (selectedIds.length === filteredAndSortedPages.length) {
@@ -146,8 +161,10 @@ export default function PagesManagement() {
         website_id: website.id, 
         status: "draft",
         is_programmatic: false,
-        category: "",
-        tags: [],
+        content_type: "page",
+        post_type: "page",
+        category_id: "",
+        tag_ids: [],
         parent_id: null,
         allow_comments: false
       });
@@ -164,13 +181,21 @@ export default function PagesManagement() {
     if (!selectedPage) return;
     setIsSubmitting(true);
     try {
+      const selectedCategory = categories.find((category) => category.id === formData.category_id);
+      const selectedTags = availableTags.filter((tag) => formData.tag_ids.includes(tag.id));
       await updatePage(selectedPage.id, {
         title: formData.title,
         slug: formData.slug,
         status: formData.status,
         is_programmatic: formData.is_programmatic,
-        category: formData.category,
-        tags: formData.tags,
+        content_type: formData.content_type,
+        post_type: formData.post_type,
+        category: selectedCategory?.name || "",
+        tags: selectedTags.map((tag) => tag.name),
+        taxonomy_ids: [
+          ...(formData.category_id ? [formData.category_id] : []),
+          ...formData.tag_ids,
+        ],
         allow_comments: formData.allow_comments
       });
       setIsEditModalOpen(false);
@@ -221,12 +246,12 @@ export default function PagesManagement() {
     }
   };
 
-  const toggleTag = (tagName: string) => {
+  const toggleTag = (tagId: string) => {
     setFormData(prev => {
-      const tags = prev.tags.includes(tagName)
-        ? prev.tags.filter(t => t !== tagName)
-        : [...prev.tags, tagName];
-      return { ...prev, tags };
+      const tag_ids = prev.tag_ids.includes(tagId)
+        ? prev.tag_ids.filter(t => t !== tagId)
+        : [...prev.tag_ids, tagId];
+      return { ...prev, tag_ids };
     });
   };
 
@@ -243,7 +268,7 @@ export default function PagesManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Pages</h2>
-          <p className="text-slate-500">Manage {website?.name || 'your'} website's static and programmatic pages.</p>
+          <p className="text-slate-500">Manage {website?.name || 'your'} website's posts, pages, and reusable taxonomies.</p>
         </div>
         <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90 rounded-full" onClick={() => {
           setFormData({ 
@@ -252,8 +277,10 @@ export default function PagesManagement() {
             website_id: website?.id || "", 
             status: "draft",
             is_programmatic: false,
-            category: "",
-            tags: [],
+            content_type: "page",
+            post_type: "page",
+            category_id: "",
+            tag_ids: [],
             parent_id: null,
             allow_comments: false
           });
@@ -308,15 +335,15 @@ export default function PagesManagement() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="h-10 gap-2 border-slate-200">
                   <FolderTree className="w-4 h-4 text-slate-400" />
-                  Category: <span className="capitalize">{categoryFilter}</span>
+                  Category: <span className="capitalize">{categoryFilterLabel}</span>
                   <ChevronDown className="w-3 h-3 text-slate-400" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => setCategoryFilter("all")}>All Categories</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                {categories.map(cat => (
-                  <DropdownMenuItem key={cat.id} onClick={() => setCategoryFilter(cat.name)}>{cat.name}</DropdownMenuItem>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => setCategoryFilter("all")}>All Categories</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {categories.map(cat => (
+                  <DropdownMenuItem key={cat.id} onClick={() => setCategoryFilter(cat.id)}>{cat.name}</DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -459,7 +486,7 @@ export default function PagesManagement() {
                     <td className="px-6 py-4">
                       {page.category ? (
                         <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-bold uppercase tracking-tighter text-[10px]">
-                          {page.category}
+                          {page.categories[0]?.name || page.category}
                         </Badge>
                       ) : (
                         <span className="text-[11px] text-slate-300 italic font-medium">Uncategorized</span>
@@ -516,8 +543,10 @@ export default function PagesManagement() {
                                 website_id: page.website_id,
                                 status: page.status,
                                 is_programmatic: !!page.is_programmatic,
-                                category: page.category || "",
-                                tags: page.tags || [],
+                                content_type: page.content_type || "page",
+                                post_type: page.post_type || "page",
+                                category_id: page.categories[0]?.id || "",
+                                tag_ids: page.tag_entities?.map((tag) => tag.id) || [],
                                 parent_id: page.parent_id || null,
                                 allow_comments: !!page.allow_comments
                               });
@@ -580,15 +609,56 @@ export default function PagesManagement() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Content Type</label>
+                <select
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
+                  value={formData.content_type}
+                  onChange={(e) => {
+                    const contentType = e.target.value as ContentType;
+                    setFormData({
+                      ...formData,
+                      content_type: contentType,
+                      post_type: contentType === "page" ? "page" : formData.post_type === "page" ? "post" : formData.post_type,
+                    });
+                  }}
+                >
+                  <option value="page">Page</option>
+                  <option value="post">Post</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Post Type</label>
+                <select
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
+                  value={formData.post_type}
+                  onChange={(e) => setFormData({ ...formData, post_type: e.target.value as PostType })}
+                >
+                  {formData.content_type === "page" ? (
+                    <option value="page">Page</option>
+                  ) : (
+                    <>
+                      <option value="post">Standard Post</option>
+                      <option value="blog">Blog</option>
+                      <option value="news">News</option>
+                      <option value="newsletter">Newsletter</option>
+                      <option value="case-study">Case Study</option>
+                    </>
+                  )}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Category</label>
                 <select 
                   className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                 >
                   <option value="">Select Category</option>
                   {categories.map(cat => (
-                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
               </div>
@@ -611,25 +681,28 @@ export default function PagesManagement() {
             <div className="space-y-3">
               <label className="text-sm font-bold text-slate-700">Assign Tags</label>
               <div className="flex flex-wrap gap-2 p-4 bg-blue-50/30 border border-slate-200 rounded-2xl min-h-[56px]">
-                {formData.tags.length === 0 && <span className="text-xs text-slate-400 font-medium">No tags selected</span>}
-                {formData.tags.map(tagName => (
-                  <Badge key={tagName} className="bg-[#155dfc] text-white gap-1 pr-1.5 h-7">
-                    {tagName}
-                    <button type="button" onClick={() => toggleTag(tagName)} className="hover:bg-white/20 rounded-full p-0.5 transition-colors">
+                {formData.tag_ids.length === 0 && <span className="text-xs text-slate-400 font-medium">No tags selected</span>}
+                {formData.tag_ids.map(tagId => {
+                  const tag = availableTags.find((item) => item.id === tagId);
+                  if (!tag) return null;
+                  return (
+                  <Badge key={tagId} className="bg-[#155dfc] text-white gap-1 pr-1.5 h-7">
+                    {tag.name}
+                    <button type="button" onClick={() => toggleTag(tagId)} className="hover:bg-white/20 rounded-full p-0.5 transition-colors">
                       <X className="w-3 h-3" />
                     </button>
                   </Badge>
-                ))}
+                )})}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {availableTags.map(tag => (
                   <button
                     key={tag.id}
                     type="button"
-                    onClick={() => toggleTag(tag.name)}
+                    onClick={() => toggleTag(tag.id)}
                     className={cn(
                       "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
-                      formData.tags.includes(tag.name)
+                      formData.tag_ids.includes(tag.id)
                         ? "bg-[#155dfc] text-white border-[#155dfc] shadow-lg shadow-blue-200 scale-105"
                         : "bg-white text-slate-500 border-slate-200 hover:border-blue-200 hover:text-[#155dfc]"
                     )}
@@ -708,15 +781,56 @@ export default function PagesManagement() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Content Type</label>
+                <select
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
+                  value={formData.content_type}
+                  onChange={(e) => {
+                    const contentType = e.target.value as ContentType;
+                    setFormData({
+                      ...formData,
+                      content_type: contentType,
+                      post_type: contentType === "page" ? "page" : formData.post_type === "page" ? "post" : formData.post_type,
+                    });
+                  }}
+                >
+                  <option value="page">Page</option>
+                  <option value="post">Post</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-700">Post Type</label>
+                <select
+                  className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
+                  value={formData.post_type}
+                  onChange={(e) => setFormData({ ...formData, post_type: e.target.value as PostType })}
+                >
+                  {formData.content_type === "page" ? (
+                    <option value="page">Page</option>
+                  ) : (
+                    <>
+                      <option value="post">Standard Post</option>
+                      <option value="blog">Blog</option>
+                      <option value="news">News</option>
+                      <option value="newsletter">Newsletter</option>
+                      <option value="case-study">Case Study</option>
+                    </>
+                  )}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <label className="text-sm font-bold text-slate-700">Category</label>
                 <select 
                   className="w-full h-11 px-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 outline-none font-bold text-slate-900"
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                 >
                   <option value="">Select Category</option>
                   {categories.map(cat => (
-                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
               </div>
@@ -739,25 +853,28 @@ export default function PagesManagement() {
             <div className="space-y-3">
               <label className="text-sm font-bold text-slate-700">Assign Tags</label>
               <div className="flex flex-wrap gap-2 p-4 bg-blue-50/30 border border-slate-200 rounded-2xl min-h-[56px]">
-                {formData.tags.length === 0 && <span className="text-xs text-slate-400 font-medium">No tags selected</span>}
-                {formData.tags.map(tagName => (
-                  <Badge key={tagName} className="bg-[#155dfc] text-white gap-1 pr-1.5 h-7">
-                    {tagName}
-                    <button type="button" onClick={() => toggleTag(tagName)} className="hover:bg-white/20 rounded-full p-0.5 transition-colors">
+                {formData.tag_ids.length === 0 && <span className="text-xs text-slate-400 font-medium">No tags selected</span>}
+                {formData.tag_ids.map(tagId => {
+                  const tag = availableTags.find((item) => item.id === tagId);
+                  if (!tag) return null;
+                  return (
+                  <Badge key={tagId} className="bg-[#155dfc] text-white gap-1 pr-1.5 h-7">
+                    {tag.name}
+                    <button type="button" onClick={() => toggleTag(tagId)} className="hover:bg-white/20 rounded-full p-0.5 transition-colors">
                       <X className="w-3 h-3" />
                     </button>
                   </Badge>
-                ))}
+                )})}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {availableTags.map(tag => (
                   <button
                     key={tag.id}
                     type="button"
-                    onClick={() => toggleTag(tag.name)}
+                    onClick={() => toggleTag(tag.id)}
                     className={cn(
                       "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border",
-                      formData.tags.includes(tag.name)
+                      formData.tag_ids.includes(tag.id)
                         ? "bg-[#155dfc] text-white border-[#155dfc] shadow-lg shadow-blue-200 scale-105"
                         : "bg-white text-slate-500 border-slate-200 hover:border-blue-200 hover:text-[#155dfc]"
                     )}
