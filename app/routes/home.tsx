@@ -46,145 +46,147 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* 2. Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-        {/* Background Gradients */}
-        <div className="absolute top-0 right-0 -z-10 w-[50%] h-[50%] bg-blue-50/50 blur-[120px] rounded-full translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 -z-10 w-[30%] h-[30%] bg-indigo-50/50 blur-[100px] rounded-full -translate-x-1/2 translate-y-1/2" />
+      {/* 2. Modern Premium Hero Section */}
+      <section className="relative pt-32 pb-20 md:pt-48 bg-white overflow-x-clip">
+        {/* Futuristic Background Gradients & Effects */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 w-full h-full max-w-7xl pointer-events-none">
+           <div className="absolute top-0 left-1/4 w-[40%] h-[40%] bg-blue-50/60 blur-[120px] rounded-full opacity-50" />
+           <div className="absolute top-1/4 right-1/4 w-[30%] h-[50%] bg-[#155dfc]/5 blur-[100px] rounded-full" />
+        </div>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto px-6 md:px-12">
+          {/* Centered Headline */}
           <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center max-w-5xl mx-auto mb-16"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm font-bold border border-blue-100/50">
-              <Sparkles className="w-4 h-4" />
-              <span>Next-Gen Programmatic SEO</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-[80px] font-black tracking-tight text-slate-900 leading-[0.95]">
+            <h1 className="text-5xl md:text-7xl lg:text-[90px] font-black tracking-tight text-slate-900 leading-[0.9] mb-8">
               Transform Your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Search Traffic</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#155dfc] via-blue-500 to-indigo-500">Online Business</span> <br />
+              With Theseofly
             </h1>
-
-            <div className="flex items-center gap-4 pt-2">
-              <div className="flex -space-x-3">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-slate-100 overflow-hidden">
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+10}`} alt="User" />
-                  </div>
-                ))}
-              </div>
-              <p className="text-sm font-bold text-slate-500">
-                <span className="text-slate-900">1,500+</span> Trusted SEO Teams
-              </p>
-            </div>
-
-            <p className="text-xl text-slate-500 max-w-xl leading-relaxed">
-              Generate thousands of high-converting landing pages in minutes. Dominate every search keyword with our AI-powered programmatic engine.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-6 pt-4">
-              <Button size="lg" className="h-14 px-10 text-lg font-bold shadow-xl shadow-blue-200 gap-2 rounded-2xl group">
-                Build My Site <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
-              <div className="flex items-center gap-4">
-                <div className="flex gap-2">
-                  <a href="#" className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
-                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-1.015-2.174-1.648-3.594-1.648-2.718 0-4.92 2.203-4.92 4.917 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.732-.672 1.583-.672 2.488 0 1.708.87 3.214 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"/></svg>
-                  </a>
-                  <a href="#" className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
-                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-5.838 2.435-5.838 5.838 0 3.403 2.435 5.838 5.838 5.838 3.403 0 5.838-2.435 5.838-5.838 0-3.403-2.435-5.838-5.838-5.838zm0 9.512c-2.029 0-3.674-1.645-3.674-3.674 0-2.029 1.645-3.674 3.674-3.674 2.029 0 3.674 1.645 3.674 3.674 0 2.029-1.645 3.674-3.674 3.674zm6.062-11.052c.731 0 1.323-.592 1.323-1.323 0-.731-.592-1.323-1.323-1.323-.731 0-1.323.592-1.323 1.323 0 .731.592 1.323 1.323 1.323z"/></svg>
-                  </a>
-                </div>
-                <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">Connect</span>
-              </div>
-            </div>
           </motion.div>
 
-          {/* Right Column - Abstract Dashboard UI */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
-          >
-            <div className="relative bg-white rounded-3xl border border-slate-100 shadow-2xl p-6 md:p-10">
-              <div className="flex items-center justify-between mb-10">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                    <BarChart3 className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-slate-400 uppercase tracking-wider">Total Traffic</p>
-                    <h3 className="text-2xl font-black text-slate-900">12.4M <span className="text-green-500 text-sm font-bold">+84%</span></h3>
-                  </div>
-                </div>
-                <div className="flex -space-x-2">
-                  {[1,2,3].map(i => (
-                    <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-100" />
-                  ))}
+          {/* Social Proof & Description Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-20">
+            {/* Left: Trust block */}
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex items-center gap-6"
+            >
+              <div className="flex -space-x-4">
+                {[1,2,3,4,5].map(i => (
+                  <motion.div 
+                    key={i}
+                    whileHover={{ y: -5, scale: 1.1 }}
+                    className="w-14 h-14 rounded-full border-4 border-white bg-slate-100 overflow-hidden shadow-xl shadow-blue-900/5 relative"
+                  >
+                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+20}`} alt="User" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 rounded-full border border-[#155dfc]/20" />
+                  </motion.div>
+                ))}
+                <div className="w-14 h-14 rounded-full border-4 border-white bg-[#155dfc] flex items-center justify-center text-white text-xs font-black shadow-xl shadow-blue-200">
+                  +1.5K
                 </div>
               </div>
+              <div className="space-y-0.5">
+                <p className="text-lg font-black text-slate-900">1,500+ Trusted Clients</p>
+                <div className="flex gap-0.5 text-yellow-400">
+                  {[1,2,3,4,5].map(i => <Sparkles key={i} className="w-3.5 h-3.5 fill-current" />)}
+                </div>
+              </div>
+            </motion.div>
 
-              <div className="space-y-6">
+            {/* Right: Description */}
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <p className="text-xl text-slate-500 leading-relaxed max-w-lg md:ml-auto md:text-right font-medium">
+                The world's most advanced programmatic SEO platform. Scale your search dominance with AI-powered page generation and automated meta optimization.
+              </p>
+            </motion.div>
+          </div>
+
+          {/* Large Hero Banner */}
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="relative"
+          >
+            <div className="relative aspect-[16/10] md:aspect-[21/9] bg-gradient-to-br from-[#155dfc] via-[#0d47a1] to-[#0a2e5c] rounded-[40px] md:rounded-[60px] shadow-[0_40px_100px_-20px_rgba(21,93,252,0.4)] overflow-hidden p-8 md:p-16 flex flex-col justify-between">
+              {/* Abstract Visuals inside banner */}
+              <div className="absolute top-0 right-0 w-full h-full opacity-30 pointer-events-none">
+                <svg className="w-full h-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+                   <path d="M0,1000 C300,800 400,900 700,600 C900,400 1000,500 1000,0 L1000,0 L0,0 Z" fill="rgba(255,255,255,0.1)" />
+                   <circle cx="850" cy="150" r="250" fill="url(#grad1)" />
+                   <defs>
+                     <radialGradient id="grad1" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                       <stop offset="0%" stopColor="rgba(255,255,255,0.25)" />
+                       <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+                     </radialGradient>
+                   </defs>
+                </svg>
+              </div>
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/glass.png')] opacity-20 mix-blend-overlay" />
+
+              {/* Floating Service Pills */}
+              <div className="relative z-20 flex flex-wrap gap-3 max-w-3xl">
                 {[
-                  { label: "On-Page SEO", val: 92, color: "bg-blue-500" },
-                  { label: "Content Marketing", val: 78, color: "bg-green-500" },
-                  { label: "Keyword Density", val: 88, color: "bg-purple-500" },
-                ].map((item) => (
-                  <div key={item.label} className="space-y-2">
-                    <div className="flex justify-between text-sm font-bold">
-                      <span>{item.label}</span>
-                      <span>{item.val}%</span>
-                    </div>
-                    <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${item.val}%` }}
-                        transition={{ duration: 1.5, delay: 0.5 }}
-                        className={cn("h-full rounded-full", item.color)} 
-                      />
-                    </div>
-                  </div>
+                  "On-Page SEO", "Content Marketing", "Off-Page SEO", 
+                  "Social Media Marketing", "Analytics & Reporting", "Influencer Marketing"
+                ].map((pill, idx) => (
+                  <motion.div 
+                    key={pill}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.6 + (idx * 0.1) }}
+                    whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.25)", borderColor: "rgba(255,255,255,0.4)" }}
+                    className="px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-sm font-black shadow-xl cursor-default transition-colors"
+                  >
+                    {pill}
+                  </motion.div>
                 ))}
               </div>
 
-              {/* Overlaid Badges */}
-              <motion.div 
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-20 -right-8 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3"
-              >
-                <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-600">
-                  <CheckCircle2 className="w-6 h-6" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">Indexing</p>
-                  <p className="text-xs font-black text-slate-900">100% Success</p>
-                </div>
-              </motion.div>
+              {/* Bottom Actions inside banner */}
+              <div className="relative z-20 flex items-end justify-between mt-auto">
+                <Button size="lg" className="h-16 px-10 rounded-full bg-white text-[#155dfc] hover:bg-slate-50 font-black text-lg shadow-2xl shadow-blue-900/40 group">
+                  View Portfolio <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
 
-              <motion.div 
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute bottom-10 -left-12 bg-white p-5 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-4"
-              >
-                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
-                  <Plus className="w-7 h-7" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-400">Pages Generated</p>
-                  <p className="text-lg font-black text-slate-900">+50,000</p>
-                </div>
-              </motion.div>
+                <motion.button 
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative flex items-center justify-center group"
+                >
+                  <div className="absolute inset-0 bg-blue-400 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity" />
+                  <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center text-white shadow-2xl relative z-10 transition-transform group-hover:scale-110">
+                    <Play className="w-8 h-8 md:w-10 md:h-10 fill-current ml-1" />
+                  </div>
+                  {/* Rotating Decorative Ring */}
+                  <div className="absolute inset-[-12px] border-2 border-dashed border-white/20 rounded-full animate-[spin_15s_linear_infinity]" />
+                </motion.button>
+              </div>
             </div>
 
-            {/* Decorative Elements */}
-            <div className="absolute -top-10 -right-10 -z-10 w-40 h-40 bg-blue-100/50 rounded-full blur-2xl" />
-            <div className="absolute -bottom-10 -left-10 -z-10 w-60 h-60 bg-indigo-100/30 rounded-full blur-3xl" />
+            {/* Floating Decorative Elements */}
+            <motion.div 
+              animate={{ y: [0, -20, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -top-12 -right-12 w-48 h-48 bg-[#155dfc]/10 rounded-full blur-3xl -z-10" 
+            />
+            <motion.div 
+              animate={{ y: [0, 20, 0] }}
+              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -bottom-16 -left-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -z-10" 
+            />
           </motion.div>
         </div>
       </section>
