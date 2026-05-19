@@ -6,20 +6,21 @@ import { MapPin, Briefcase, CheckCircle2, ChevronRight, ArrowRight, Sparkles } f
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   // 1. Extract and normalize the slug from the URL
-  // We use params["*"] to capture the entire nested path.
   let rawSlug = params["*"] || "";
   
-  // Clean the slug: remove leading/trailing slashes, whitespace, and lowercase it for matching
-  const slug = rawSlug.trim().replace(/^\/+|\/+$/g, "").toLowerCase();
+  // Clean the slug: remove leading/trailing slashes and whitespace
+  const slug = rawSlug.trim().replace(/^\/+|\/+$/g, "");
 
-  // Don't try to query empty slugs (handled by index route)
   if (!slug) {
     throw new Response("Page Not Found", { status: 404 });
   }
 
   // 2. Query Supabase for the page
-  // We look for an exact match or variants with leading/trailing slashes. 
-  // RLS policies must allow SELECT for 'published' pages.
+  // We first try an exact match (more efficient)
+  // We check for variants: slug, /slug, slug/, /slug/
+  const slugVariants = [slug, `/${slug}`, `${slug}/`, `/${slug}/`].flatMap(s => [s, s.toLowerCase()]);
+  const uniqueVariants = Array.from(new Set(slugVariants));
+
   const { data: pageData, error } = await supabase
     .from("pages")
     .select(`
@@ -30,17 +31,55 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         taxonomy:taxonomies(*)
       )
     `)
-    .in("slug", [slug, `/${slug}`, `${slug}/`, `/${slug}/`])
+    .in("slug", uniqueVariants)
     .maybeSingle();
 
   if (error) {
-    console.error(`[ContentPage] Database error for slug "${slug}":`, error);
-    throw new Response("Database Error", { status: 500 });
+    console.error(`[ContentPage] Primary query error for slug "${slug}":`, error);
   }
 
+  // 3. Fallback: If not found, try a case-insensitive search
+  // This is a last resort as it might be slower
   if (!pageData) {
-    console.warn(`[ContentPage] No page found for slug: "${slug}"`);
-    throw new Response("Page Not Found", { status: 404 });
+    const { data: fallbackData, error: fallbackError } = await supabase
+      .from("pages")
+      .select(`
+        *,
+        seo:seo_metadata(*),
+        website:websites(global_seo_settings),
+        page_taxonomies(
+          taxonomy:taxonomies(*)
+        )
+      `)
+      .ilike("slug", slug)
+      .maybeSingle();
+
+    if (fallbackError) {
+      console.error(`[ContentPage] Fallback query error for slug "${slug}":`, fallbackError);
+    }
+
+    if (!fallbackData) {
+      // One final check: maybe the slug in the DB starts with a slash but ilike didn't catch it
+      const { data: slashData } = await supabase
+        .from("pages")
+        .select(`
+          *,
+          seo:seo_metadata(*),
+          website:websites(global_seo_settings),
+          page_taxonomies(
+            taxonomy:taxonomies(*)
+          )
+        `)
+        .ilike("slug", `/${slug}`)
+        .maybeSingle();
+
+      if (!slashData) {
+        console.warn(`[ContentPage] 404: No page found for slug: "${slug}"`);
+        throw new Response("Page Not Found", { status: 404 });
+      }
+      return processPage(slashData);
+    }
+    return processPage(fallbackData);
   }
 
   return processPage(pageData);
