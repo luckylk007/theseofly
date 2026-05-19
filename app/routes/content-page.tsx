@@ -24,6 +24,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     .select(`
       *,
       seo:seo_metadata(*),
+      website:websites(global_seo_settings),
       page_taxonomies(
         taxonomy:taxonomies(*)
       )
@@ -44,6 +45,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       .select(`
         *,
         seo:seo_metadata(*),
+        website:websites(global_seo_settings),
         page_taxonomies(
           taxonomy:taxonomies(*)
         )
@@ -225,6 +227,15 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
 
         <main className="max-w-7xl mx-auto px-6 py-20 space-y-24">
           
+          {/* Dynamic Content Template */}
+          {page.website?.global_seo_settings?.programmatic_template && (
+            <section className="bg-white p-12 rounded-[2.5rem] border border-slate-100 shadow-sm">
+              <div className="whitespace-pre-wrap text-slate-600 leading-relaxed text-lg">
+                {interpolate(page.website.global_seo_settings.programmatic_template, vars)}
+              </div>
+            </section>
+          )}
+
           {/* Benefits Section */}
           <section className="space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-4">

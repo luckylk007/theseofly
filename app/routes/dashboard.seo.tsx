@@ -11,7 +11,9 @@ import {
   Check,
   AlertCircle,
   Play,
-  ExternalLink
+  ExternalLink,
+  FileText,
+  Settings
 } from "lucide-react";
 import { useSEOStore } from "../stores/useSEOStore";
 import { useWebsite } from "../hooks/useWebsite";
@@ -24,23 +26,59 @@ import { slugify } from "../lib/slug";
 
 export default function SEOEnginePage() {
   const { interpolate } = useSEOStore();
-  const { website, loading: websiteLoading } = useWebsite();
+  const { website, loading: websiteLoading, updateWebsite } = useWebsite();
   const { bulkAddPages } = usePages(website?.id);
 
   const [patternText, setPatternText] = useState("Best {service} in {city}");
+  const [templateContent, setTemplateContent] = useState("");
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [aiDescription, setAiDescription] = useState("");
   const [copied, setCopied] = useState(false);
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   
   const [batchData, setBatchData] = useState("[{\"service\": \"Electrician\", \"city\": \"Mumbai\"}, {\"service\": \"Carpenter\", \"city\": \"Bangalore\"}]");
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [bulkError, setBulkError] = useState<string | null>(null);
   const [bulkSuccess, setBulkSuccess] = useState<number | null>(null);
 
+  // Initialize from website settings
+  useEffect(() => {
+    if (website?.global_seo_settings) {
+      if (website.global_seo_settings.title_pattern) {
+        setPatternText(website.global_seo_settings.title_pattern);
+      }
+      if (website.global_seo_settings.programmatic_template) {
+        setTemplateContent(website.global_seo_settings.programmatic_template);
+      }
+    }
+  }, [website]);
+
   // Example variables for preview
-  const exampleVariables = { service: "Plumber", city: "Delhi" };
+  const exampleVariables = { service: "Plumber", city: "Delhi", state: "NCR" };
   const preview = interpolate(patternText, exampleVariables);
   const previewSlug = buildPageSlug(exampleVariables, preview);
+  const previewContent = interpolate(templateContent, exampleVariables);
+
+  const handleSaveSettings = async () => {
+    if (!website) return;
+    setIsSavingSettings(true);
+    try {
+      await updateWebsite({
+        global_seo_settings: {
+          ...(website.global_seo_settings || {}),
+          title_pattern: patternText,
+          programmatic_template: templateContent,
+        }
+      });
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      console.error("Failed to save SEO settings:", err);
+    } finally {
+      setIsSavingSettings(false);
+    }
+  };
 
   const generateAIDescription = async () => {
     setIsGeneratingAI(true);
@@ -199,6 +237,43 @@ export default function SEOEnginePage() {
               </p>
             </CardContent>
           </Card>
+
+          {/* Content Template */}
+          <Card className="border-slate-100">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" />
+                Global Page Content Template
+              </CardTitle>
+              <Button 
+                size="sm" 
+                className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90 rounded-full"
+                onClick={handleSaveSettings}
+                isLoading={isSavingSettings}
+              >
+                {saveSuccess ? <Check className="w-4 h-4" /> : <Settings className="w-4 h-4" />}
+                {saveSuccess ? "Saved!" : "Save Engine Settings"}
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Dynamic Content Template</label>
+                <textarea 
+                  className="w-full h-64 px-4 py-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none resize-none"
+                  value={templateContent}
+                  onChange={(e) => setTemplateContent(e.target.value)}
+                  placeholder="Enter content with placeholders like {city}, {state}, {service}..."
+                />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  <Badge variant="outline" className="cursor-pointer" onClick={() => setTemplateContent(prev => prev + "{city}")}>{"{city}"}</Badge>
+                  <Badge variant="outline" className="cursor-pointer" onClick={() => setTemplateContent(prev => prev + "{state}")}>{"{state}"}</Badge>
+                  <Badge variant="outline" className="cursor-pointer" onClick={() => setTemplateContent(prev => prev + "{service}")}>{"{service}"}</Badge>
+                  <Badge variant="outline" className="cursor-pointer" onClick={() => setTemplateContent(prev => prev + "{country}")}>{"{country}"}</Badge>
+                </div>
+                <p className="text-xs text-slate-400">This content will be automatically appended to all programmatic landing pages.</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Live Preview & AI */}
@@ -253,6 +328,37 @@ export default function SEOEnginePage() {
                     Preview Landing Page
                   </Button>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Content Template Preview */}
+          <Card className="border-slate-100">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" />
+                Content Template Preview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="bg-slate-50 rounded-xl border border-dashed p-6 min-h-[100px]">
+                {previewContent ? (
+                  <div className="whitespace-pre-wrap text-sm text-slate-600 leading-relaxed">
+                    {previewContent}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-400 italic text-center py-4">
+                    Enter a content template to see a preview here.
+                  </p>
+                )}
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none font-bold">
+                  City: {exampleVariables.city}
+                </Badge>
+                <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none font-bold">
+                  Service: {exampleVariables.service}
+                </Badge>
               </div>
             </CardContent>
           </Card>
