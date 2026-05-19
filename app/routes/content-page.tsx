@@ -9,8 +9,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   // We use params["*"] to capture the entire nested path.
   let rawSlug = params["*"] || "";
   
-  // Clean the slug: remove leading/trailing slashes and whitespace
-  const slug = rawSlug.trim().replace(/^\/+|\/+$/g, "");
+  // Clean the slug: remove leading/trailing slashes, whitespace, and lowercase it for matching
+  const slug = rawSlug.trim().replace(/^\/+|\/+$/g, "").toLowerCase();
 
   // Don't try to query empty slugs (handled by index route)
   if (!slug) {
@@ -18,7 +18,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   // 2. Query Supabase for the page
-  // We look for an exact match. RLS policies must allow SELECT for 'published' pages.
+  // We look for an exact match or variants with leading/trailing slashes. 
+  // RLS policies must allow SELECT for 'published' pages.
   const { data: pageData, error } = await supabase
     .from("pages")
     .select(`
@@ -29,36 +30,17 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         taxonomy:taxonomies(*)
       )
     `)
-    .eq("slug", slug)
+    .in("slug", [slug, `/${slug}`, `${slug}/`, `/${slug}/`])
     .maybeSingle();
 
   if (error) {
     console.error(`[ContentPage] Database error for slug "${slug}":`, error);
-    // If it's a connection error or similar, we might want to return a 500
     throw new Response("Database Error", { status: 500 });
   }
 
-  // 3. Fallback: try with leading slash if not found
   if (!pageData) {
-    const { data: slashPageData } = await supabase
-      .from("pages")
-      .select(`
-        *,
-        seo:seo_metadata(*),
-        website:websites(global_seo_settings),
-        page_taxonomies(
-          taxonomy:taxonomies(*)
-        )
-      `)
-      .eq("slug", `/${slug}`)
-      .maybeSingle();
-
-    if (!slashPageData) {
-      console.warn(`[ContentPage] No page found for slug: "${slug}"`);
-      throw new Response("Page Not Found", { status: 404 });
-    }
-    
-    return processPage(slashPageData);
+    console.warn(`[ContentPage] No page found for slug: "${slug}"`);
+    throw new Response("Page Not Found", { status: 404 });
   }
 
   return processPage(pageData);
@@ -158,8 +140,8 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
 
   // SEO Template Layout for Programmatic Pages
   if (page.is_programmatic) {
-    const serviceName = vars.service_id ? interpolate("{service}", vars) : (vars.service_slug || "Service").replace(/-/g, " ");
-    const cityName = vars.city_id ? interpolate("{city}", vars) : (vars.city_slug || "City").replace(/-/g, " ");
+    const serviceName = vars.service || (vars.service_id ? interpolate("{service}", vars) : (vars.service_slug || "Service").replace(/-/g, " "));
+    const cityName = vars.city || (vars.city_id ? interpolate("{city}", vars) : (vars.city_slug || "City").replace(/-/g, " "));
 
     return (
       <div className="min-h-screen bg-slate-50">

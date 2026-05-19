@@ -5,8 +5,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const { data: pageData } = await supabase
     .from("pages")
     .select("slug, updated_at")
-    .eq("status", "published")
-    .eq("is_programmatic", false);
+    .eq("status", "published");
 
   const { data: websiteData } = await supabase
     .from("websites")

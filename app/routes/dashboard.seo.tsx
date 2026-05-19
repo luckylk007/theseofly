@@ -353,10 +353,10 @@ export default function SEOEnginePage() {
                 )}
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
-                <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none font-bold">
+                <Badge variant="outline" className="bg-slate-100 text-slate-600 border-none font-bold">
                   City: {exampleVariables.city}
                 </Badge>
-                <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none font-bold">
+                <Badge variant="outline" className="bg-slate-100 text-slate-600 border-none font-bold">
                   Service: {exampleVariables.service}
                 </Badge>
               </div>
