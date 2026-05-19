@@ -38,41 +38,62 @@ export function useMedia() {
   }, [user]);
 
   const uploadFile = async (file: File, websiteId: string) => {
-    if (!user) return;
+    if (!user) {
+      throw new Error("You must be logged in to upload files.");
+    }
 
-    // 1. Upload to Storage
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `${user.id}/${fileName}`;
+    try {
+      // 1. Upload to Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
 
-    const { error: uploadError, data: uploadData } = await supabase.storage
-      .from('media')
-      .upload(filePath, file);
+      console.log(`Uploading ${file.name} to ${filePath}...`);
 
-    if (uploadError) throw uploadError;
+      const { error: uploadError } = await supabase.storage
+        .from('media')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
 
-    // 2. Get Public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('media')
-      .getPublicUrl(filePath);
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        throw uploadError;
+      }
 
-    // 3. Save to Media Table
-    const { data, error: dbError } = await supabase
-      .from('media')
-      .insert([{
-        website_id: websiteId,
-        file_name: file.name,
-        file_path: publicUrl,
-        file_type: file.type,
-        file_size: file.size,
-      }])
-      .select()
-      .single();
+      // 2. Get Public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('media')
+        .getPublicUrl(filePath);
 
-    if (dbError) throw dbError;
-    
-    setMedia([data, ...media]);
-    return data;
+      console.log(`File uploaded successfully. Public URL: ${publicUrl}`);
+
+      // 3. Save to Media Table
+      const { data, error: dbError } = await supabase
+        .from('media')
+        .insert([{
+          website_id: websiteId,
+          file_name: file.name,
+          file_path: publicUrl,
+          file_type: file.type,
+          file_size: file.size,
+          metadata: { storage_path: filePath }
+        }])
+        .select()
+        .single();
+
+      if (dbError) {
+        console.error("Database insert error:", dbError);
+        throw dbError;
+      }
+      
+      setMedia(prev => [data, ...prev]);
+      return data;
+    } catch (err: any) {
+      console.error("Full upload process error:", err);
+      throw err;
+    }
   };
 
   const deleteFile = async (id: string, storagePath: string) => {

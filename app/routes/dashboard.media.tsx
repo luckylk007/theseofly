@@ -55,10 +55,14 @@ export default function MediaLibraryPage() {
     try {
       await uploadFile(files[0], website.id);
       setIsUploadOpen(false);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error("Upload failed:", err);
+      // We rely on the hook's error state or alert here
+      alert(`Upload failed: ${err.message || 'Unknown error'}`);
     } finally {
       setIsUploading(false);
+      // Reset input
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -66,16 +70,22 @@ export default function MediaLibraryPage() {
     if (!selectedItem) return;
     setIsDeleting(true);
     try {
-      // Extract storage path from the URL
-      const urlParts = selectedItem.file_path.split('/');
-      const fileName = urlParts[urlParts.length - 1];
-      const userId = urlParts[urlParts.length - 2];
-      const storagePath = `${userId}/${fileName}`;
+      let storagePath = selectedItem.metadata?.storage_path;
       
+      if (!storagePath) {
+        // Fallback: Extract storage path from the URL
+        const urlParts = selectedItem.file_path.split('/');
+        const fileName = urlParts[urlParts.length - 1];
+        const userId = urlParts[urlParts.length - 2];
+        storagePath = `${userId}/${fileName}`;
+      }
+      
+      console.log(`Deleting file at storage path: ${storagePath}`);
       await deleteFile(selectedItem.id, storagePath);
       setSelectedItem(null);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error("Delete failed:", err);
+      alert(`Delete failed: ${err.message || 'Unknown error'}`);
     } finally {
       setIsDeleting(false);
     }
