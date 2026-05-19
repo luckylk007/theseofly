@@ -315,19 +315,6 @@ export default function SEOEnginePage() {
                     <div className="h-full bg-green-500 w-[92%] rounded-full"></div>
                   </div>
                 </div>
-                <div className="pt-4 border-t flex justify-end">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2 text-blue-600 border-blue-100 hover:bg-blue-50"
-                    onClick={() => {
-                      window.open(`/${previewSlug}`, '_blank');
-                    }}
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Preview Landing Page
-                  </Button>
-                </div>
               </div>
             </CardContent>
           </Card>
