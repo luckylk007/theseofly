@@ -1,0 +1,66 @@
+import { Button } from "./ui/Button";
+
+export function Footer() {
+  return (
+    <footer className="pt-24 pb-12 bg-white border-t border-slate-100">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+        <div className="space-y-8 lg:col-span-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">T</div>
+            <span className="font-bold text-2xl tracking-tighter text-slate-900">Theseofly</span>
+          </div>
+          <p className="text-slate-500 font-medium leading-relaxed">
+            Empowering modern teams to scale their search traffic through programmatic automation and AI optimization.
+          </p>
+          <div className="flex gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all cursor-pointer" />
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-8">
+          <h5 className="text-lg font-black tracking-tight text-slate-900">Quick Links</h5>
+          <ul className="space-y-4 text-slate-500 font-bold text-sm">
+            <li><a href="#" className="hover:text-blue-600 transition-colors">About Company</a></li>
+            <li><a href="#" className="hover:text-blue-600 transition-colors">Our Services</a></li>
+            <li><a href="#" className="hover:text-blue-600 transition-colors">Recent Projects</a></li>
+            <li><a href="#" className="hover:text-blue-600 transition-colors">Latest News</a></li>
+          </ul>
+        </div>
+
+        <div className="space-y-8">
+          <h5 className="text-lg font-black tracking-tight text-slate-900">SEO Services</h5>
+          <ul className="space-y-4 text-slate-500 font-bold text-sm">
+            <li><a href="#" className="hover:text-blue-600 transition-colors">Programmatic SEO</a></li>
+            <li><a href="#" className="hover:text-blue-600 transition-colors">AI Content Writing</a></li>
+            <li><a href="#" className="hover:text-blue-600 transition-colors">Indexing API</a></li>
+            <li><a href="#" className="hover:text-blue-600 transition-colors">Keyword Research</a></li>
+          </ul>
+        </div>
+
+        <div className="space-y-8">
+          <h5 className="text-lg font-black tracking-tight text-slate-900">Contact Us</h5>
+          <div className="space-y-4 text-slate-500 font-bold text-sm">
+            <p>📍 123 SEO Tower, Digital City</p>
+            <p>📧 support@theseofly.com</p>
+            <p>📞 +1 (555) 000-0000</p>
+            <div className="pt-4">
+              <Button variant="outline" className="w-full h-12 rounded-xl font-bold border-slate-200">
+                Request a Quote
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 md:px-12 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">&copy; {new Date().getFullYear()} Theseofly Platform. All rights reserved.</p>
+        <div className="flex gap-8 text-xs font-bold text-slate-400 uppercase tracking-widest">
+          <a href="#" className="hover:text-slate-900 transition-colors">Privacy Policy</a>
+          <a href="#" className="hover:text-slate-900 transition-colors">Terms of Service</a>
+        </div>
+      </div>
+    </footer>
+  );
+}

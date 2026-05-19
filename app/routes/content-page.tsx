@@ -3,6 +3,8 @@ import type { Route } from "./+types/content-page";
 import { useMemo } from "react";
 import { Link } from "react-router";
 import { MapPin, Briefcase, CheckCircle2, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
+import { Header } from "../components/Header";
+import { Footer } from "../components/Footer";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   // 1. Extract and normalize the slug from the URL
@@ -183,7 +185,8 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
     const cityName = vars.city || (vars.city_id ? interpolate("{city}", vars) : (vars.city_slug || "City").replace(/-/g, " "));
 
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-50 pt-20">
+        <Header />
         {page.seo?.[0]?.schema_markup && (
           <script
             type="application/ld+json"
@@ -342,13 +345,15 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
             </div>
           </section>
         </main>
+        <Footer />
       </div>
     );
   }
 
   // Standard Page Layout
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-20">
+      <Header />
       {page.seo?.[0]?.schema_markup && (
         <script
           type="application/ld+json"
@@ -374,6 +379,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
           )}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
