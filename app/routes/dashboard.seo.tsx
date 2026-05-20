@@ -373,11 +373,10 @@ export default function SEOEnginePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="relative">
-                <textarea 
+                <TextEditor 
                   value={aiDescription}
-                  onChange={(e) => setAiDescription(e.target.value)}
-                  placeholder="AI meta description..."
-                  className="w-full h-32 px-4 py-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none resize-none"
+                  onEditorChange={(newContent) => setAiDescription(newContent)}
+                  height={300}
                 />
                 {aiDescription && (
                   <Button 
