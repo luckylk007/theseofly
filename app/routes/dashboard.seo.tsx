@@ -5,7 +5,6 @@ import {
   ArrowRight,
   Database,
   Type,
-  Sparkles,
   Loader2,
   Copy,
   Check,
@@ -32,9 +31,6 @@ export default function SEOEnginePage() {
 
   const [patternText, setPatternText] = useState("Best {service} in {city}");
   const [templateContent, setTemplateContent] = useState("");
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-  const [aiDescription, setAiDescription] = useState("");
-  const [copied, setCopied] = useState(false);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   
@@ -59,7 +55,6 @@ export default function SEOEnginePage() {
   const exampleVariables = { service: "Plumber", city: "Delhi", state: "NCR" };
   const preview = interpolate(patternText, exampleVariables);
   const previewSlug = buildPageSlug(exampleVariables, preview);
-  const previewContent = interpolate(templateContent, exampleVariables);
 
   const handleSaveSettings = async () => {
     if (!website) return;
@@ -81,18 +76,8 @@ export default function SEOEnginePage() {
     }
   };
 
-  const generateAIDescription = async () => {
-    setIsGeneratingAI(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const result = `Looking for the most reliable ${exampleVariables.service} in ${exampleVariables.city}? Our certified experts provide top-rated, affordable, and 24/7 ${exampleVariables.service} services. 100% Satisfaction Guaranteed!`;
-    setAiDescription(result);
-    setIsGeneratingAI(false);
-  };
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleBulkGenerate = async () => {
@@ -192,14 +177,7 @@ export default function SEOEnginePage() {
                     value={patternText}
                     onChange={(e) => setPatternText(e.target.value)}
                     placeholder="e.g. Best {service} in {city}"
-                    className="pr-12"
                   />
-                  <button 
-                    title="Generate AI Title"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-blue-600 transition-colors"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                  </button>
                 </div>
                 <p className="text-xs text-slate-400">Use curly braces for variables: {'{city}'}, {'{service}'}</p>
               </div>
@@ -296,7 +274,7 @@ export default function SEOEnginePage() {
                     <ArrowRight className="w-3 h-3" />
                   </p>
                   <p className="text-slate-600 text-sm line-clamp-3">
-                    {aiDescription || `Looking for the ${preview}? Our expert team provides the highest quality ${exampleVariables.service} services in ${exampleVariables.city}. Book your appointment today!`}
+                    Looking for the {preview}? Our expert team provides the highest quality {exampleVariables.service} services in {exampleVariables.city}. Book your appointment today!
                   </p>
                 </div>
               </div>
@@ -315,79 +293,6 @@ export default function SEOEnginePage() {
                     <div className="h-full bg-green-500 w-[92%] rounded-full"></div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Content Template Preview */}
-          <Card className="border-slate-100">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-600" />
-                Content Template Preview
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-slate-50 rounded-xl border border-dashed p-6 min-h-[100px]">
-                {previewContent ? (
-                  <div 
-                    className="prose prose-sm prose-slate max-w-none text-slate-600 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: previewContent }}
-                  />
-                ) : (
-                  <p className="text-xs text-slate-400 italic text-center py-4">
-                    Enter a content template to see a preview here.
-                  </p>
-                )}
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-slate-100 text-slate-600 border-none font-bold">
-                  City: {exampleVariables.city}
-                </Badge>
-                <Badge variant="outline" className="bg-slate-100 text-slate-600 border-none font-bold">
-                  Service: {exampleVariables.service}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-100 overflow-hidden relative">
-            <div className="absolute top-0 right-0 p-4 opacity-5">
-              <Sparkles className="w-24 h-24" />
-            </div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-600" />
-                AI Assistant
-              </CardTitle>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-8 text-xs border-purple-200 text-purple-600 hover:bg-purple-50"
-                onClick={generateAIDescription}
-                isLoading={isGeneratingAI}
-              >
-                {!isGeneratingAI && <Sparkles className="w-3 h-3 mr-1" />}
-                Generate
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="relative">
-                <TextEditor 
-                  value={aiDescription}
-                  onEditorChange={(newContent) => setAiDescription(newContent)}
-                  height={300}
-                />
-                {aiDescription && (
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="absolute bottom-3 right-3 h-8 w-8 bg-white/80 backdrop-blur-sm border shadow-sm"
-                    onClick={() => copyToClipboard(aiDescription)}
-                  >
-                    {copied ? <Check className="w-4 h-4 text-green-600" /> : <Copy className="w-4 h-4" />}
-                  </Button>
-                )}
               </div>
             </CardContent>
           </Card>
