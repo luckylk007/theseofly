@@ -15,11 +15,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   let rawSlug = params["*"] || "";
   const slug = rawSlug.trim().replace(/^\/+|\/+$/g, "");
 
-  console.log(`[ContentPage] Loading page. Slug: "${slug}", PreviewID: "${previewId}"`);
+  console.log(`[ContentPage] DEBUG: Full URL="${request.url}"`);
+  console.log(`[ContentPage] DEBUG: Slug="${slug}", PreviewID="${previewId}"`);
+  console.log(`[ContentPage] DEBUG: All Params=`, Object.fromEntries(url.searchParams.entries()));
 
   if (!slug && !previewId) {
-    console.error("[ContentPage] 404: No slug and no previewId provided");
-    throw new Response("Page Not Found", { status: 404 });
+    throw new Response("ERR_EMPTY_REQUEST: No slug or preview ID provided.", { status: 404 });
   }
 
   // 2. Handle Preview Mode via RPC with Fallback
@@ -30,7 +31,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     const { data: pageData, error: previewError } = await supabase.rpc("get_page_preview", { p_id: previewId });
     
     if (pageData && !previewError) {
-      console.log(`[ContentPage] Preview success via RPC for ID: ${previewId}`);
       return processPage(pageData, true);
     }
 
@@ -49,14 +49,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       .maybeSingle();
 
     if (directData) {
-      console.log(`[ContentPage] Preview success via direct query for ID: ${previewId}`);
       return processPage(directData, true);
     }
 
-    const rpcMsg = previewError?.message || (previewError ? JSON.stringify(previewError) : "Function returned no data");
-    const directMsg = directError?.message || (directError ? JSON.stringify(directError) : "No record found with this ID");
+    const rpcMsg = previewError?.message || "No RPC data";
+    const directMsg = directError?.message || "No record found with ID";
 
-    throw new Response(`Preview Failed. RPC Error: ${rpcMsg}. Direct Query Error: ${directMsg}`, { 
+    throw new Response(`ERR_PREVIEW_FAILED: RPC[${rpcMsg}] DIRECT[${directMsg}] ID[${previewId}]`, { 
       status: 404,
       statusText: "Preview Not Found"
     });
@@ -78,10 +77,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     `)
     .in("slug", uniqueVariants)
     .maybeSingle();
-
-  if (error) {
-    console.error(`[ContentPage] Primary query error for slug "${slug}":`, error);
-  }
 
   // 4. Fallback: Case-insensitive search
   if (!pageData) {
@@ -113,7 +108,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         .maybeSingle();
 
       if (!slashData) {
-        throw new Response("Page Not Found", { status: 404 });
+        throw new Response(`ERR_SLUG_NOT_FOUND: No page matches slug "${slug}"`, { status: 404 });
       }
       return processPage(slashData, false);
     }
@@ -124,7 +119,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   if (pageData.status !== "published") {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      throw new Response("Page Not Found", { status: 404 });
+      throw new Response(`ERR_AUTH_REQUIRED: Page "${slug}" is a ${pageData.status}. Please login to view.`, { status: 404 });
     }
   }
 
