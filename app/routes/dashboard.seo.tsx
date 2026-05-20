@@ -23,6 +23,7 @@ import { Input } from "../components/ui/Input";
 import { Badge } from "../components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { slugify } from "../lib/slug";
+import TextEditor from "../components/TextEditor";
 
 export default function SEOEnginePage() {
   const { interpolate } = useSEOStore();
@@ -255,14 +256,13 @@ export default function SEOEnginePage() {
                 {saveSuccess ? "Saved!" : "Save Engine Settings"}
               </Button>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
+            <CardContent className="p-0 overflow-hidden">
+              <div className="p-6 space-y-4">
                 <label className="text-sm font-medium text-slate-700">Dynamic Content Template</label>
-                <textarea 
-                  className="w-full h-64 px-4 py-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none resize-none"
+                <TextEditor 
                   value={templateContent}
-                  onChange={(e) => setTemplateContent(e.target.value)}
-                  placeholder="Enter content with placeholders like {city}, {state}, {service}..."
+                  onEditorChange={(newContent) => setTemplateContent(newContent)}
+                  height={500}
                 />
                 <div className="flex flex-wrap gap-2 mt-2">
                   <Badge variant="outline" className="cursor-pointer" onClick={() => setTemplateContent(prev => prev + "{city}")}>{"{city}"}</Badge>
