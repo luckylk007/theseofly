@@ -20,7 +20,8 @@ import {
   FolderTree,
   MessageSquare,
   Zap,
-  X
+  X,
+  Image as ImageIcon
 } from "lucide-react";
 import { usePages } from "../hooks/usePages";
 import { useWebsite } from "../hooks/useWebsite";
@@ -31,6 +32,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Badge } from "../components/ui/Badge";
 import { Card } from "../components/ui/Card";
+import { MediaPicker } from "../components/MediaPicker";
 import {
   Dialog,
   DialogContent,
@@ -71,6 +73,7 @@ export default function PagesManagement() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
   const [selectedPage, setSelectedPage] = useState<any>(null);
   
   const [formData, setFormData] = useState({ 
@@ -757,7 +760,7 @@ export default function PagesManagement() {
 
             {/* Featured Image */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Featured Image URL</label>
+              <label className="text-sm font-bold text-slate-700">Featured Image</label>
               <div className="flex gap-2">
                 <Input 
                   placeholder="https://example.com/image.jpg" 
@@ -765,6 +768,15 @@ export default function PagesManagement() {
                   onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
                   className="flex-1"
                 />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="shrink-0 gap-2 border-slate-200"
+                  onClick={() => setIsMediaPickerOpen(true)}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  Media
+                </Button>
               </div>
               {formData.featured_image_url && (
                 <div className="mt-2 relative group w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
@@ -960,7 +972,7 @@ export default function PagesManagement() {
 
             {/* Featured Image */}
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Featured Image URL</label>
+              <label className="text-sm font-bold text-slate-700">Featured Image</label>
               <div className="flex gap-2">
                 <Input 
                   placeholder="https://example.com/image.jpg" 
@@ -968,6 +980,15 @@ export default function PagesManagement() {
                   onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
                   className="flex-1"
                 />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  className="shrink-0 gap-2 border-slate-200"
+                  onClick={() => setIsMediaPickerOpen(true)}
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  Media
+                </Button>
               </div>
               {formData.featured_image_url && (
                 <div className="mt-2 relative group w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
@@ -1073,6 +1094,13 @@ export default function PagesManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <MediaPicker 
+        open={isMediaPickerOpen}
+        onOpenChange={setIsMediaPickerOpen}
+        onSelect={(url) => setFormData({ ...formData, featured_image_url: url })}
+        title="Select Featured Image"
+      />
     </div>
   );
 }
