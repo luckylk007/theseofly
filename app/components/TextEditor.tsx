@@ -1,32 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
-
-// TinyMCE Core
-import tinymce from 'tinymce/tinymce';
-
-// TinyMCE Theme
-import 'tinymce/themes/silver';
-
-// TinyMCE Icons
-import 'tinymce/icons/default';
-
-// TinyMCE Plugins - Manually imported as required
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/image';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/table';
-import 'tinymce/plugins/code';
-import 'tinymce/plugins/wordcount';
-import 'tinymce/plugins/fullscreen';
-
-// Note: We do NOT import tinymce/skins/... CSS here because it causes 
-// build errors with lightningcss due to modern CSS selectors.
-// TinyMCE loads these skins automatically via the 'base_url' configuration.
-
-// Ensure tinymce is available globally for plugins and themes
-if (typeof window !== 'undefined') {
-  (window as any).tinymce = tinymce;
-}
 
 interface TextEditorProps {
   initialValue?: string;
@@ -36,13 +9,10 @@ interface TextEditorProps {
 }
 
 /**
- * Self-hosted TinyMCE Rich Text Editor Component
+ * Self-hosted TinyMCE Rich Text Editor Component (SSR Safe)
  * 
- * Features:
- * - Completely self-hosted (no Tiny Cloud API or CDN)
- * - WordPress-style classic editor toolbar
- * - Responsive UI and modern styling
- * - Full plugin set (Links, Images, Tables, Code, etc.)
+ * This component loads TinyMCE dynamically from the /public/tinymce folder.
+ * It avoids top-level imports of TinyMCE core to prevent SSR crashes.
  */
 const TextEditor: React.FC<TextEditorProps> = ({ 
   initialValue = '', 
@@ -51,30 +21,48 @@ const TextEditor: React.FC<TextEditorProps> = ({
   height = 500 
 }) => {
   const editorRef = useRef<any>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Only render on the client to ensure SSR safety
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleInit = (evt: any, editor: any) => {
     editorRef.current = editor;
   };
 
+  if (!mounted) {
+    return (
+      <div 
+        className="tinymce-placeholder border rounded-md bg-slate-50 flex items-center justify-center" 
+        style={{ height }}
+      >
+        <span className="text-slate-400 text-sm italic">Loading editor...</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="tinymce-editor-container border rounded-md overflow-hidden">
+    <div className="tinymce-editor-container border rounded-md overflow-hidden bg-white">
       <Editor
         onInit={handleInit}
         initialValue={initialValue}
         value={value}
         onEditorChange={onEditorChange}
-        // Using bundled version, but telling it where to find assets like skins
+        // Load TinyMCE from the public folder
+        tinymceScriptSrc="/tinymce/tinymce.min.js"
         init={{
           height: height,
           menubar: true,
           branding: false,
           promotion: false,
           
-          // Important for self-hosting: tell TinyMCE where to load additional assets
+          // These point to the assets in the /public/tinymce folder
           base_url: '/tinymce',
           suffix: '.min',
           
-          // Plugins configuration
+          // Plugins configuration (must be present in /public/tinymce/plugins)
           plugins: [
             'link', 'image', 'lists', 'table', 'code', 'wordcount', 'fullscreen'
           ],
