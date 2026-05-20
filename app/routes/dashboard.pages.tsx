@@ -561,7 +561,7 @@ export default function PagesManagement() {
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-900">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-[#1F2937] hover:bg-slate-100 transition-all duration-200">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -600,7 +600,7 @@ export default function PagesManagement() {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem 
-                              className="gap-2 text-red-600 focus:text-red-600 focus:bg-red-50"
+                              className="gap-2 text-red-600 hover:bg-red-50 focus:text-red-600 focus:bg-red-50"
                               onClick={() => {
                                 setSelectedPage(page);
                                 setIsDeleteModalOpen(true);
