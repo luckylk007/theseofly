@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Search, 
   Zap, 
@@ -12,7 +12,9 @@ import {
   Play,
   ExternalLink,
   FileText,
-  Settings
+  Settings,
+  Image as ImageIcon,
+  X
 } from "lucide-react";
 import { useSEOStore } from "../stores/useSEOStore";
 import { useWebsite } from "../hooks/useWebsite";
@@ -23,11 +25,14 @@ import { Badge } from "../components/ui/Badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/Card";
 import { slugify } from "../lib/slug";
 import TextEditor from "../components/TextEditor";
+import { MediaPicker } from "../components/MediaPicker";
+import { parseCSV } from "../lib/csv";
 
 export default function SEOEnginePage() {
   const { interpolate } = useSEOStore();
   const { website, loading: websiteLoading, updateWebsite } = useWebsite();
   const { bulkAddPages } = usePages(website?.id);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [patternText, setPatternText] = useState("Best {service} in {city}");
   const [templateContent, setTemplateContent] = useState("");
@@ -38,6 +43,11 @@ export default function SEOEnginePage() {
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [bulkError, setBulkError] = useState<string | null>(null);
   const [bulkSuccess, setBulkSuccess] = useState<number | null>(null);
+
+  // Batch configuration states
+  const [batchFeaturedImage, setBatchFeaturedImage] = useState("");
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
+  const [generateAsDraft, setGenerateAsDraft] = useState(true);
 
   // Initialize from website settings
   useEffect(() => {
@@ -80,6 +90,26 @@ export default function SEOEnginePage() {
     navigator.clipboard.writeText(text);
   };
 
+  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      try {
+        const { rows } = parseCSV(text);
+        setBatchData(JSON.stringify(rows, null, 2));
+        setBulkError(null);
+      } catch (err) {
+        setBulkError("Failed to parse CSV file. Please ensure it is a valid CSV.");
+      }
+    };
+    reader.readAsText(file);
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const handleBulkGenerate = async () => {
     if (!website?.id) {
       setBulkError("Website configuration not found.");
@@ -111,9 +141,10 @@ export default function SEOEnginePage() {
           title,
           slug,
           variables,
-          status: 'published',
+          status: generateAsDraft ? 'draft' : 'published',
           is_programmatic: true,
-          content: { sections: [] }
+          content: { sections: [] },
+          featured_image_url: batchFeaturedImage || null
         };
       });
 
@@ -147,7 +178,14 @@ export default function SEOEnginePage() {
           <p className="text-slate-500">Generate thousands of pages for {website?.name || 'your website'} using dynamic patterns and variables.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" className="gap-2">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleImportCSV} 
+            accept=".csv" 
+            className="hidden" 
+          />
+          <Button variant="outline" className="gap-2" onClick={() => fileInputRef.current?.click()}>
             <Database className="w-4 h-4" />
             Import CSV
           </Button>
@@ -180,6 +218,84 @@ export default function SEOEnginePage() {
                   />
                 </div>
                 <p className="text-xs text-slate-400">Use curly braces for variables: {'{city}'}, {'{service}'}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Batch Configuration */}
+          <Card className="border-slate-100 overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-4 opacity-5">
+              <ImageIcon className="w-24 h-24" />
+            </div>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="w-5 h-5 text-blue-600" />
+                Batch Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">Batch Featured Image</label>
+                  <p className="text-xs text-slate-400 mb-2">This image will be assigned to all generated pages.</p>
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder="https://example.com/image.jpg" 
+                      value={batchFeaturedImage}
+                      onChange={(e) => setBatchFeaturedImage(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      className="shrink-0 gap-2 border-slate-200"
+                      onClick={() => setIsMediaPickerOpen(true)}
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      Media Library
+                    </Button>
+                  </div>
+                  
+                  {batchFeaturedImage && (
+                    <div className="mt-4 relative group w-full max-w-md aspect-video rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm">
+                      <img 
+                        src={batchFeaturedImage} 
+                        alt="Batch Preview" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = "https://placehold.co/600x400?text=Invalid+Image+URL";
+                        }}
+                      />
+                      <button 
+                        type="button"
+                        onClick={() => setBatchFeaturedImage("")}
+                        className="absolute top-2 right-2 p-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-red-50 hover:text-red-600 transition-all"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-4 border-t">
+                  <div className="flex items-center justify-between p-4 bg-blue-50/50 rounded-2xl border border-blue-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-100">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">Generate as Draft</p>
+                        <p className="text-[11px] text-slate-500 font-medium">Pages will not be public until you publish them.</p>
+                      </div>
+                    </div>
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 text-[#155dfc] rounded-lg border-slate-300 focus:ring-[#155dfc]/20"
+                      checked={generateAsDraft}
+                      onChange={(e) => setGenerateAsDraft(e.target.checked)}
+                    />
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -298,6 +414,13 @@ export default function SEOEnginePage() {
           </Card>
         </div>
       </div>
+
+      <MediaPicker 
+        open={isMediaPickerOpen}
+        onOpenChange={setIsMediaPickerOpen}
+        onSelect={(url) => setBatchFeaturedImage(url)}
+        title="Select Batch Featured Image"
+      />
     </div>
   );
 }
