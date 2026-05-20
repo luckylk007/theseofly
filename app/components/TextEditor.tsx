@@ -19,8 +19,9 @@ import 'tinymce/plugins/code';
 import 'tinymce/plugins/wordcount';
 import 'tinymce/plugins/fullscreen';
 
-// TinyMCE Skin CSS - Importing these for bundling
-import 'tinymce/skins/ui/oxide/skin.min.css';
+// Note: We do NOT import tinymce/skins/... CSS here because it causes 
+// build errors with lightningcss due to modern CSS selectors.
+// TinyMCE loads these skins automatically via the 'base_url' configuration.
 
 // Ensure tinymce is available globally for plugins and themes
 if (typeof window !== 'undefined') {
