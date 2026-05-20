@@ -8,19 +8,61 @@ import { Footer } from "../components/Footer";
 import { cn } from "../lib/utils";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const previewId = url.searchParams.get("preview");
+  
   // 1. Extract and normalize the slug from the URL
   let rawSlug = params["*"] || "";
-  
-  // Clean the slug: remove leading/trailing slashes and whitespace
   const slug = rawSlug.trim().replace(/^\/+|\/+$/g, "");
 
-  if (!slug) {
+  console.log(`[ContentPage] Loading page. Slug: "${slug}", PreviewID: "${previewId}"`);
+
+  if (!slug && !previewId) {
+    console.error("[ContentPage] 404: No slug and no previewId provided");
     throw new Response("Page Not Found", { status: 404 });
   }
 
-  // 2. Query Supabase for the page
-  // We first try an exact match (more efficient)
-  // We check for variants: slug, /slug, slug/, /slug/
+  // 2. Handle Preview Mode via RPC with Fallback
+  if (previewId) {
+    console.log(`[ContentPage] Attempting preview for ID: ${previewId}`);
+    
+    // Attempt 1: Optimized RPC
+    const { data: pageData, error: previewError } = await supabase.rpc("get_page_preview", { p_id: previewId });
+    
+    if (pageData && !previewError) {
+      console.log(`[ContentPage] Preview success via RPC for ID: ${previewId}`);
+      return processPage(pageData, true);
+    }
+
+    // Attempt 2: Direct Query Fallback
+    const { data: directData, error: directError } = await supabase
+      .from("pages")
+      .select(`
+        *,
+        seo:seo_metadata(*),
+        website:websites(global_seo_settings),
+        page_taxonomies(
+          taxonomy:taxonomies(*)
+        )
+      `)
+      .eq("id", previewId)
+      .maybeSingle();
+
+    if (directData) {
+      console.log(`[ContentPage] Preview success via direct query for ID: ${previewId}`);
+      return processPage(directData, true);
+    }
+
+    const rpcMsg = previewError?.message || (previewError ? JSON.stringify(previewError) : "Function returned no data");
+    const directMsg = directError?.message || (directError ? JSON.stringify(directError) : "No record found with this ID");
+
+    throw new Response(`Preview Failed. RPC Error: ${rpcMsg}. Direct Query Error: ${directMsg}`, { 
+      status: 404,
+      statusText: "Preview Not Found"
+    });
+  }
+
+  // 3. Normal Mode: Query Supabase for the published page
   const slugVariants = [slug, `/${slug}`, `${slug}/`, `/${slug}/`].flatMap(s => [s, s.toLowerCase()]);
   const uniqueVariants = Array.from(new Set(slugVariants));
 
@@ -41,10 +83,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     console.error(`[ContentPage] Primary query error for slug "${slug}":`, error);
   }
 
-  // 3. Fallback: If not found, try a case-insensitive search
-  // This is a last resort as it might be slower
+  // 4. Fallback: Case-insensitive search
   if (!pageData) {
-    const { data: fallbackData, error: fallbackError } = await supabase
+    const { data: fallbackData } = await supabase
       .from("pages")
       .select(`
         *,
@@ -57,12 +98,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       .ilike("slug", slug)
       .maybeSingle();
 
-    if (fallbackError) {
-      console.error(`[ContentPage] Fallback query error for slug "${slug}":`, fallbackError);
-    }
-
     if (!fallbackData) {
-      // One final check: maybe the slug in the DB starts with a slash but ilike didn't catch it
       const { data: slashData } = await supabase
         .from("pages")
         .select(`
@@ -77,18 +113,25 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         .maybeSingle();
 
       if (!slashData) {
-        console.warn(`[ContentPage] 404: No page found for slug: "${slug}"`);
         throw new Response("Page Not Found", { status: 404 });
       }
-      return processPage(slashData);
+      return processPage(slashData, false);
     }
-    return processPage(fallbackData);
+    return processPage(fallbackData, false);
   }
 
-  return processPage(pageData);
+  // Check if it's a draft and we are NOT in preview mode
+  if (pageData.status !== "published") {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Response("Page Not Found", { status: 404 });
+    }
+  }
+
+  return processPage(pageData, false);
 }
 
-async function processPage(pageData: any) {
+async function processPage(pageData: any, isPreview: boolean) {
   const page = pageData as any;
   let relatedCities: any[] = [];
   let relatedServices: any[] = [];
@@ -129,27 +172,31 @@ async function processPage(pageData: any) {
     },
     relatedCities,
     relatedServices,
+    isPreview: isPreview || page.status !== "published"
   };
 }
 
 export function meta({ data }: Route.MetaArgs) {
   if (!data || !data.page) return [{ title: "Page Not Found" }];
 
-  const { page } = data;
+  const { page, isPreview } = data;
   const seo = page.seo?.[0] || {};
 
+  const title = isPreview ? `[PREVIEW] ${seo.title || page.title}` : (seo.title || page.title);
+
   return [
-    { title: seo.title || page.title },
+    { title },
     { name: "description", content: seo.description || "" },
-    { property: "og:title", content: seo.title || page.title },
+    { property: "og:title", content: title },
     { property: "og:description", content: seo.description || "" },
     { property: "og:image", content: seo.og_image || "" },
     { rel: "canonical", href: seo.canonical_url || "" },
+    ...(isPreview ? [{ name: "robots", content: "noindex, nofollow" }] : [])
   ];
 }
 
 export default function DynamicPage({ loaderData }: Route.ComponentProps) {
-  const { page, relatedCities, relatedServices } = loaderData;
+  const { page, relatedCities, relatedServices, isPreview } = loaderData;
 
   const interpolate = (text: string, variables: Record<string, any>) => {
     if (!text || typeof text !== "string") return text;
@@ -188,6 +235,18 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
     return (
       <div className="min-h-screen bg-slate-50 pt-20">
         <Header />
+
+        {isPreview && (
+          <div className="fixed top-20 left-0 right-0 z-50 bg-amber-500 text-white px-6 py-3 flex items-center justify-center gap-4 shadow-lg animate-in fade-in slide-in-from-top duration-500">
+            <div className="flex items-center gap-2 font-black uppercase tracking-widest text-sm">
+              <Sparkles className="w-5 h-5" />
+              Preview Mode
+            </div>
+            <div className="h-4 w-px bg-white/20" />
+            <p className="text-sm font-bold">You are viewing a draft version of this page. This content is not public.</p>
+          </div>
+        )}
+
         {page.seo?.[0]?.schema_markup && (
           <script
             type="application/ld+json"
@@ -368,6 +427,18 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
   return (
     <div className="min-h-screen bg-white pt-20">
       <Header />
+      
+      {isPreview && (
+        <div className="fixed top-20 left-0 right-0 z-50 bg-amber-500 text-white px-6 py-3 flex items-center justify-center gap-4 shadow-lg animate-in fade-in slide-in-from-top duration-500">
+          <div className="flex items-center gap-2 font-black uppercase tracking-widest text-sm">
+            <Sparkles className="w-5 h-5" />
+            Preview Mode
+          </div>
+          <div className="h-4 w-px bg-white/20" />
+          <p className="text-sm font-bold">You are viewing a draft version of this page. This content is not public.</p>
+        </div>
+      )}
+
       {page.seo?.[0]?.schema_markup && (
         <script
           type="application/ld+json"
