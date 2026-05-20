@@ -254,9 +254,12 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
           {/* Dynamic Content Template */}
           {page.website?.global_seo_settings?.programmatic_template && (
             <section className="bg-white p-12 rounded-[2.5rem] border border-slate-100 shadow-sm">
-              <div className="whitespace-pre-wrap text-slate-600 leading-relaxed text-lg">
-                {interpolate(page.website.global_seo_settings.programmatic_template, vars)}
-              </div>
+              <div 
+                className="prose prose-lg prose-slate max-w-none text-slate-600 leading-relaxed text-lg"
+                dangerouslySetInnerHTML={{ 
+                  __html: interpolate(page.website.global_seo_settings.programmatic_template, vars) 
+                }}
+              />
             </section>
           )}
 

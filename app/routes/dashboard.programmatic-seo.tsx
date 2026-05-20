@@ -25,6 +25,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "../components/ui/Input";
 import { Badge } from "../components/ui/Badge";
 import { cn } from "../lib/utils";
+import TextEditor from "../components/TextEditor";
 import type {
   CityEntity,
   CountryEntity,
@@ -627,10 +628,10 @@ function EntityFormDialog({
 
           <div className="md:col-span-2">
             <Field label="Description">
-              <textarea
-                className="min-h-[100px] w-full rounded-xl border border-slate-200 bg-blue-50/30 px-4 py-3 text-sm outline-none focus:border-[#155dfc] focus:ring-2 focus:ring-[#155dfc]/20"
+              <TextEditor 
                 value={form.description || ""}
-                onChange={(e) => setForm((current) => ({ ...current, description: e.target.value }))}
+                onEditorChange={(newContent) => setForm((current) => ({ ...current, description: newContent }))}
+                height={300}
               />
             </Field>
           </div>

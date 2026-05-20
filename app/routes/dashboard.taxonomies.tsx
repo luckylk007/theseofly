@@ -18,6 +18,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Card } from "../components/ui/Card";
 import { Badge } from "../components/ui/Badge";
+import TextEditor from "../components/TextEditor";
 import {
   Dialog,
   DialogContent,
@@ -301,11 +302,10 @@ export default function TaxonomiesPage() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-bold text-slate-700">Description</label>
-              <textarea 
-                className="w-full px-4 py-3 bg-blue-50/30 border border-slate-200 rounded-xl text-sm text-slate-900 focus:ring-2 focus:ring-[#155dfc]/20 focus:border-[#155dfc] outline-none h-24 resize-none"
-                placeholder="Brief description..."
+              <TextEditor 
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onEditorChange={(newContent) => setFormData({ ...formData, description: newContent })}
+                height={200}
               />
             </div>
             <DialogFooter>

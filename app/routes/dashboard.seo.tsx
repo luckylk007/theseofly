@@ -330,9 +330,10 @@ export default function SEOEnginePage() {
             <CardContent>
               <div className="bg-slate-50 rounded-xl border border-dashed p-6 min-h-[100px]">
                 {previewContent ? (
-                  <div className="whitespace-pre-wrap text-sm text-slate-600 leading-relaxed">
-                    {previewContent}
-                  </div>
+                  <div 
+                    className="prose prose-sm prose-slate max-w-none text-slate-600 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: previewContent }}
+                  />
                 ) : (
                   <p className="text-xs text-slate-400 italic text-center py-4">
                     Enter a content template to see a preview here.
