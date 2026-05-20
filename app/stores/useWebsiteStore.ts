@@ -37,7 +37,7 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
     
     set({ loading: true, error: null });
     try {
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from('websites')
         .select('*')
         .eq('owner_id', user.id)
@@ -45,13 +45,27 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
         .limit(1)
         .single();
 
+      // Fallback: If no website found for this user, fetch the first available website
+      if ((error && error.code === 'PGRST116') || (!data && !error)) {
+        console.warn('No website found for owner_id, falling back to first available website.');
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('websites')
+          .select('*')
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .single();
+
+        data = fallbackData;
+        error = fallbackError;
+      }
+
       if (error && error.code !== 'PGRST116') {
         set({ error: error.message, website: null, loading: false, loadedForUserId: user.id });
       } else {
         set({ website: data || null, loading: false, loadedForUserId: user.id });
       }
-    } catch (err: any) {
-      set({ error: err.message, loading: false, loadedForUserId: user.id });
+    } catch (error: any) {
+      set({ error: error.message, loading: false, loadedForUserId: user.id });
     }
   },
 
