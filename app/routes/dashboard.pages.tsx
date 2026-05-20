@@ -84,7 +84,8 @@ export default function PagesManagement() {
     category_id: "",
     tag_ids: [] as string[],
     parent_id: null as string | null,
-    allow_comments: false
+    allow_comments: false,
+    featured_image_url: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -168,7 +169,8 @@ export default function PagesManagement() {
         category_id: "",
         tag_ids: [],
         parent_id: null,
-        allow_comments: false
+        allow_comments: false,
+        featured_image_url: ""
       });
     } catch (err: any) {
       console.error("Failed to create page:", err);
@@ -199,7 +201,8 @@ export default function PagesManagement() {
           ...(formData.category_id ? [formData.category_id] : []),
           ...formData.tag_ids,
         ],
-        allow_comments: formData.allow_comments
+        allow_comments: formData.allow_comments,
+        featured_image_url: formData.featured_image_url
       });
       setIsEditModalOpen(false);
       setSelectedPage(null);
@@ -493,8 +496,12 @@ export default function PagesManagement() {
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-[#155dfc] group-hover:border-blue-100 transition-colors shrink-0">
-                          <FileText className="w-5 h-5" />
+                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-[#155dfc] group-hover:border-blue-100 transition-colors shrink-0 overflow-hidden">
+                          {page.featured_image_url ? (
+                            <img src={page.featured_image_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <FileText className="w-5 h-5" />
+                          )}
                         </div>
                         <div className="min-w-0">
                           <p className="font-bold text-sm text-slate-900 truncate">{page.title}</p>
@@ -580,7 +587,8 @@ export default function PagesManagement() {
                                   category_id: page.categories[0]?.id || "",
                                   tag_ids: page.tag_entities?.map((tag) => tag.id) || [],
                                   parent_id: page.parent_id || null,
-                                  allow_comments: !!page.allow_comments
+                                  allow_comments: !!page.allow_comments,
+                                  featured_image_url: page.featured_image_url || ""
                                 });
                                 setIsEditModalOpen(true);
                               }}
@@ -745,6 +753,38 @@ export default function PagesManagement() {
                 ))}
                 {availableTags.length === 0 && <p className="text-[10px] text-slate-400 italic">No tags created yet. Go to Taxonomies to add some.</p>}
               </div>
+            </div>
+
+            {/* Featured Image */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700">Featured Image URL</label>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="https://example.com/image.jpg" 
+                  value={formData.featured_image_url || ""}
+                  onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
+                  className="flex-1"
+                />
+              </div>
+              {formData.featured_image_url && (
+                <div className="mt-2 relative group w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+                  <img 
+                    src={formData.featured_image_url} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://placehold.co/600x400?text=Invalid+Image+URL";
+                    }}
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setFormData({ ...formData, featured_image_url: "" })}
+                    className="absolute top-2 right-2 p-1 bg-white/80 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-4 h-4 text-slate-600" />
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
@@ -916,6 +956,38 @@ export default function PagesManagement() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Featured Image */}
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-slate-700">Featured Image URL</label>
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="https://example.com/image.jpg" 
+                  value={formData.featured_image_url || ""}
+                  onChange={(e) => setFormData({ ...formData, featured_image_url: e.target.value })}
+                  className="flex-1"
+                />
+              </div>
+              {formData.featured_image_url && (
+                <div className="mt-2 relative group w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+                  <img 
+                    src={formData.featured_image_url} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://placehold.co/600x400?text=Invalid+Image+URL";
+                    }}
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setFormData({ ...formData, featured_image_url: "" })}
+                    className="absolute top-2 right-2 p-1 bg-white/80 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-4 h-4 text-slate-600" />
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">

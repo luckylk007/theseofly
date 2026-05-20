@@ -34,6 +34,7 @@ export interface CMSPage {
   parent_id?: string | null;
   author_id?: string | null;
   allow_comments?: boolean | null;
+  featured_image_url?: string | null;
   created_at: string;
   updated_at: string;
   seo_metadata?: any[];
