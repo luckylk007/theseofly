@@ -87,6 +87,7 @@ export default function PagesManagement() {
     allow_comments: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
     if (website) {
@@ -148,6 +149,7 @@ export default function PagesManagement() {
     e.preventDefault();
     if (!website?.id) return;
     setIsSubmitting(true);
+    setLocalError(null);
     try {
       await addPage({ 
         ...formData, 
@@ -170,7 +172,7 @@ export default function PagesManagement() {
       });
     } catch (err: any) {
       console.error("Failed to create page:", err);
-      alert("Failed to create page: " + (err.message || "Unknown error"));
+      setLocalError(err.message || "Failed to create page");
     } finally {
       setIsSubmitting(false);
     }
@@ -180,6 +182,7 @@ export default function PagesManagement() {
     e.preventDefault();
     if (!selectedPage) return;
     setIsSubmitting(true);
+    setLocalError(null);
     try {
       const selectedCategory = categories.find((category) => category.id === formData.category_id);
       const selectedTags = availableTags.filter((tag) => formData.tag_ids.includes(tag.id));
@@ -200,8 +203,9 @@ export default function PagesManagement() {
       });
       setIsEditModalOpen(false);
       setSelectedPage(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setLocalError(err.message || "Failed to update page");
     } finally {
       setIsSubmitting(false);
     }
@@ -209,11 +213,13 @@ export default function PagesManagement() {
 
   const handleBulkStatusChange = async (newStatus: string) => {
     setIsSubmitting(true);
+    setLocalError(null);
     try {
       await bulkUpdatePages(selectedIds, { status: newStatus });
       setSelectedIds([]);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setLocalError(err.message || "Failed to update pages status");
     } finally {
       setIsSubmitting(false);
     }
@@ -221,12 +227,14 @@ export default function PagesManagement() {
 
   const handleBulkDelete = async () => {
     setIsSubmitting(true);
+    setLocalError(null);
     try {
       await bulkDeletePages(selectedIds);
       setSelectedIds([]);
       setIsBulkDeleteModalOpen(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setLocalError(err.message || "Failed to delete pages");
     } finally {
       setIsSubmitting(false);
     }
@@ -235,12 +243,14 @@ export default function PagesManagement() {
   const handleDeletePage = async () => {
     if (!selectedPage) return;
     setIsSubmitting(true);
+    setLocalError(null);
     try {
       await deletePage(selectedPage.id);
       setIsDeleteModalOpen(false);
       setSelectedPage(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      setLocalError(err.message || "Failed to delete page");
     } finally {
       setIsSubmitting(false);
     }
@@ -295,6 +305,18 @@ export default function PagesManagement() {
         <div className="p-4 bg-red-50 text-red-600 rounded-xl flex gap-3 items-center text-sm font-medium border border-red-100">
           <AlertCircle className="w-5 h-5" />
           {error}
+        </div>
+      )}
+
+      {localError && (
+        <div className="p-4 bg-red-50 text-red-600 rounded-xl flex gap-3 items-center justify-between text-sm font-medium border border-red-100 animate-in fade-in duration-300">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5" />
+            {localError}
+          </div>
+          <button onClick={() => setLocalError(null)} className="text-red-400 hover:text-red-600">
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 

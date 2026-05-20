@@ -10,7 +10,8 @@ export function usePages(websiteId?: string) {
   const { user } = useAuthStore();
 
   const fetchPages = async () => {
-    if (!user) {
+    if (!user || !websiteId) {
+      setPages([]);
       setLoading(false);
       return;
     }
@@ -20,11 +21,8 @@ export function usePages(websiteId?: string) {
       let query = supabase
         .from('pages')
         .select('*, seo_metadata(*), page_taxonomies(taxonomy:taxonomies(*))')
+        .eq('website_id', websiteId)
         .order('updated_at', { ascending: false });
-
-      if (websiteId) {
-        query = query.eq('website_id', websiteId);
-      }
 
       const { data, error } = await query;
 
@@ -46,10 +44,13 @@ export function usePages(websiteId?: string) {
 
   const addPage = async (page: any) => {
     const { taxonomy_ids = [], ...pagePayload } = page;
+    
+    // Ensure website_id is set
+    const finalPayload = { ...pagePayload, website_id: websiteId };
 
     const { data, error } = await supabase
       .from('pages')
-      .insert([pagePayload])
+      .insert([finalPayload])
       .select()
       .single();
 
@@ -65,7 +66,10 @@ export function usePages(websiteId?: string) {
   };
 
   const bulkAddPages = async (pagesData: any[]) => {
-    const inserts = pagesData.map(({ taxonomy_ids, ...page }) => page);
+    const inserts = pagesData.map(({ taxonomy_ids, ...page }) => ({
+      ...page,
+      website_id: websiteId
+    }));
     const { data, error } = await supabase
       .from('pages')
       .insert(inserts)
@@ -121,8 +125,7 @@ export function usePages(websiteId?: string) {
     if (data && data.length > 0) {
       setPages(pages.filter(p => p.id !== id));
     } else {
-      // If no rows were deleted, it might be due to RLS or already deleted
-      await fetchPages();
+      throw new Error("Failed to delete page. You may not have permission or the page may have already been deleted.");
     }
   };
 
@@ -151,8 +154,14 @@ export function usePages(websiteId?: string) {
     if (data && data.length > 0) {
       const deletedIds = data.map(p => p.id);
       setPages(pages.filter(p => !deletedIds.includes(p.id)));
+      
+      if (deletedIds.length < ids.length) {
+        await fetchPages(); // Some were not deleted
+        throw new Error(`Only ${deletedIds.length} of ${ids.length} pages were deleted.`);
+      }
     } else {
       await fetchPages();
+      throw new Error("Failed to delete pages. You may not have permission.");
     }
   };
 
