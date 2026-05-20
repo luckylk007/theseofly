@@ -20,7 +20,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   console.log(`[ContentPage] DEBUG: All Params=`, Object.fromEntries(url.searchParams.entries()));
 
   if (!slug && !previewId) {
-    throw new Response("ERR_EMPTY_REQUEST: No slug or preview ID provided.", { status: 404 });
+    throw new Response(`[404_EMPTY_REQUEST] No slug or ID. URL: ${request.url}`, { status: 404 });
   }
 
   // 2. Handle Preview Mode via RPC with Fallback
@@ -55,7 +55,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     const rpcMsg = previewError?.message || "No RPC data";
     const directMsg = directError?.message || "No record found with ID";
 
-    throw new Response(`ERR_PREVIEW_FAILED: RPC[${rpcMsg}] DIRECT[${directMsg}] ID[${previewId}]`, { 
+    throw new Response(`[404_PREVIEW_FAILED] ID: "${previewId}" | RPC: ${rpcMsg} | DIRECT: ${directMsg} | URL: ${request.url}`, { 
       status: 404,
       statusText: "Preview Not Found"
     });
@@ -108,7 +108,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         .maybeSingle();
 
       if (!slashData) {
-        throw new Response(`ERR_SLUG_NOT_FOUND: No page matches slug "${slug}"`, { status: 404 });
+        throw new Response(`[404_NOT_FOUND] SLUG: "${slug}" | PREVIEW_ID: "${previewId}" | URL: ${request.url}`, { status: 404 });
       }
       return processPage(slashData, false);
     }
@@ -119,7 +119,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   if (pageData.status !== "published") {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      throw new Response(`ERR_AUTH_REQUIRED: Page "${slug}" is a ${pageData.status}. Please login to view.`, { status: 404 });
+      throw new Response(`[404_AUTH_REQUIRED] Page "${slug}" is ${pageData.status}. PREVIEW_ID: "${previewId}" | URL: ${request.url}`, { status: 404 });
     }
   }
 

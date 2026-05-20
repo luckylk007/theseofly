@@ -555,6 +555,7 @@ export default function PagesManagement() {
                           title="View Live Page"
                           onClick={() => {
                             const url = page.status === 'published' ? `/${page.slug}` : `/${page.slug}?preview=${page.id}`;
+                            console.log(`[Dashboard] Opening URL: ${url}`);
                             window.open(url, '_blank');
                           }}
                         >
