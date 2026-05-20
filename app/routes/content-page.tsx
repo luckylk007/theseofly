@@ -5,6 +5,7 @@ import { Link } from "react-router";
 import { MapPin, Briefcase, CheckCircle2, ChevronRight, ArrowRight, Sparkles } from "lucide-react";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
+import { cn } from "../lib/utils";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   // 1. Extract and normalize the slug from the URL
@@ -238,12 +239,22 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                 </div>
               </div>
               
-              <div className="bg-slate-100 rounded-[2.5rem] aspect-square lg:aspect-[4/3] flex items-center justify-center border-8 border-white shadow-2xl relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-indigo-50 opacity-50" />
-                <div className="relative text-center space-y-4">
-                  <Briefcase className="w-24 h-24 mx-auto text-blue-200" />
-                  <p className="font-black text-2xl text-blue-900 opacity-20 uppercase tracking-widest">{cityName}</p>
-                </div>
+              <div className="bg-slate-100 rounded-[2.5rem] aspect-square lg:aspect-[4/3] flex items-center justify-center border-8 border-white shadow-2xl relative overflow-hidden group">
+                {page.featured_image_url ? (
+                  <img 
+                    src={page.featured_image_url} 
+                    alt={page.title} 
+                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                  />
+                ) : (
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-indigo-50 opacity-50" />
+                    <div className="relative text-center space-y-4">
+                      <Briefcase className="w-24 h-24 mx-auto text-blue-200" />
+                      <p className="font-black text-2xl text-blue-900 opacity-20 uppercase tracking-widest">{cityName}</p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -364,9 +375,38 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
         />
       )}
 
-      <main className="max-w-7xl mx-auto px-6 py-20">
-        <h1 className="text-5xl font-black mb-8">{page.title}</h1>
+      {/* Hero Section */}
+      <section className="bg-slate-50 border-b border-slate-100 py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className={cn(
+            "grid grid-cols-1 items-center gap-12",
+            page.featured_image_url ? "lg:grid-cols-2" : ""
+          )}>
+            <div className="space-y-6">
+              <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight">
+                {page.title}
+              </h1>
+              {page.seo?.[0]?.description && (
+                <p className="text-xl text-slate-600 leading-relaxed max-w-lg">
+                  {page.seo[0].description}
+                </p>
+              )}
+            </div>
+            
+            {page.featured_image_url && (
+              <div className="bg-white rounded-[2.5rem] aspect-square lg:aspect-[4/3] flex items-center justify-center border-8 border-white shadow-2xl relative overflow-hidden group">
+                <img 
+                  src={page.featured_image_url} 
+                  alt={page.title} 
+                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
+      <main className="max-w-7xl mx-auto px-6 py-20">
         <div className="space-y-12">
           {renderData.sections?.map((section: any, idx: number) => (
             <section key={idx} className="prose prose-lg max-w-none">
