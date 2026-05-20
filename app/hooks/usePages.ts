@@ -110,13 +110,20 @@ export function usePages(websiteId?: string) {
   };
 
   const deletePage = async (id: string) => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('pages')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .select();
 
     if (error) throw error;
-    setPages(pages.filter(p => p.id !== id));
+    
+    if (data && data.length > 0) {
+      setPages(pages.filter(p => p.id !== id));
+    } else {
+      // If no rows were deleted, it might be due to RLS or already deleted
+      await fetchPages();
+    }
   };
 
   const bulkUpdatePages = async (ids: string[], updates: any) => {
@@ -127,18 +134,26 @@ export function usePages(websiteId?: string) {
       .select();
 
     if (error) throw error;
-    setPages(pages.map(p => ids.includes(p.id) ? { ...p, ...updates } : p));
+    // Refresh to get full objects with relationships
+    await fetchPages();
     return data;
   };
 
   const bulkDeletePages = async (ids: string[]) => {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('pages')
       .delete()
-      .in('id', ids);
+      .in('id', ids)
+      .select();
 
     if (error) throw error;
-    setPages(pages.filter(p => !ids.includes(p.id)));
+    
+    if (data && data.length > 0) {
+      const deletedIds = data.map(p => p.id);
+      setPages(pages.filter(p => !deletedIds.includes(p.id)));
+    } else {
+      await fetchPages();
+    }
   };
 
   return { 

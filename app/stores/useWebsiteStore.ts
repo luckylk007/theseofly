@@ -40,6 +40,7 @@ export const useWebsiteStore = create<WebsiteState>((set, get) => ({
       const { data, error } = await supabase
         .from('websites')
         .select('*')
+        .eq('owner_id', user.id)
         .order('created_at', { ascending: true })
         .limit(1)
         .single();

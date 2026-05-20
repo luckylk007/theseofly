@@ -15,6 +15,7 @@ export function useWebsites() {
     const { data, error } = await supabase
       .from('websites')
       .select('*')
+      .eq('owner_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
