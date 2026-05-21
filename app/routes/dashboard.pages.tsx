@@ -27,6 +27,7 @@ import { usePages } from "../hooks/usePages";
 import { useWebsite } from "../hooks/useWebsite";
 import { useTaxonomies } from "../hooks/useTaxonomies";
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router";
 import type { ContentType, PostType } from "../types/cms";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -52,6 +53,7 @@ import {
 import { cn } from "../lib/utils";
 
 export default function PagesManagement() {
+  const navigate = useNavigate();
   const { website, loading: websiteLoading } = useWebsite();
   const { 
     pages, loading, error, 
@@ -63,12 +65,31 @@ export default function PagesManagement() {
   const categories = useMemo(() => allTaxonomies.filter(t => t.type === 'category'), [allTaxonomies]);
   const availableTags = useMemo(() => allTaxonomies.filter(t => t.type === 'tag'), [allTaxonomies]);
 
+  const [activeTab, setActiveTab] = useState<'main' | 'programmatic'>('main');
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' }>({ key: 'updated_at', direction: 'desc' });
   
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  
+  useEffect(() => {
+    setSelectedIds([]);
+  }, [activeTab]);
+
+  const counts = useMemo(() => {
+    let mainCount = 0;
+    let programmaticCount = 0;
+    pages.forEach(page => {
+      if (page.is_programmatic) {
+        programmaticCount++;
+      } else {
+        mainCount++;
+      }
+    });
+    return { main: mainCount, programmatic: programmaticCount };
+  }, [pages]);
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -108,7 +129,12 @@ export default function PagesManagement() {
         const matchesCategory =
           categoryFilter === "all" ||
           page.categories.some((category) => category.id === categoryFilter || category.name === categoryFilter);
-        return matchesSearch && matchesStatus && matchesCategory;
+        
+        const matchesTab = activeTab === 'programmatic' 
+          ? !!page.is_programmatic 
+          : !page.is_programmatic;
+
+        return matchesSearch && matchesStatus && matchesCategory && matchesTab;
       })
       .sort((a, b) => {
         const aRecord = a as Record<string, any>;
@@ -125,7 +151,7 @@ export default function PagesManagement() {
         if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
       });
-  }, [pages, searchTerm, statusFilter, categoryFilter, sortConfig]);
+  }, [pages, searchTerm, statusFilter, categoryFilter, sortConfig, activeTab]);
 
   const categoryFilterLabel = useMemo(() => {
     if (categoryFilter === "all") {
@@ -283,8 +309,14 @@ export default function PagesManagement() {
     <div className="space-y-8 relative">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Pages</h2>
-          <p className="text-slate-500">Manage {website?.name || 'your'} website's posts, pages, and reusable taxonomies.</p>
+          <h2 className="text-2xl font-black tracking-tight">
+            {activeTab === 'main' ? 'Website Main Pages' : 'Programmatic Pages'}
+          </h2>
+          <p className="text-slate-500 text-sm">
+            {activeTab === 'main' 
+              ? `Manage ${website?.name || 'your'} website's primary static pages (Home, About, Contact, etc.).`
+              : `Manage ${website?.name || 'your'} website's bulk-generated programmatic service-location pages.`}
+          </p>
         </div>
         <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90 rounded-full" onClick={() => {
           setFormData({ 
@@ -292,7 +324,7 @@ export default function PagesManagement() {
             slug: "", 
             website_id: website?.id || "", 
             status: "draft",
-            is_programmatic: false,
+            is_programmatic: activeTab === 'programmatic',
             content_type: "page",
             post_type: "page",
             category_id: "",
@@ -307,6 +339,69 @@ export default function PagesManagement() {
           Create Page
         </Button>
       </div>
+
+      {/* Dynamic Tab Bar Navigation */}
+      <div className="flex border-b border-slate-200 bg-white/40 p-1.5 rounded-2xl border backdrop-blur-sm self-start">
+        <button
+          onClick={() => setActiveTab('main')}
+          className={cn(
+            "py-2.5 px-6 font-bold text-sm rounded-xl transition-all relative flex items-center gap-2",
+            activeTab === 'main'
+              ? "bg-[#155dfc] text-white shadow-lg shadow-blue-200"
+              : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+          )}
+        >
+          <span>Website Main Pages</span>
+          <span className={cn(
+            "px-2 py-0.5 text-[10px] font-black rounded-full border shrink-0",
+            activeTab === 'main' 
+              ? "bg-white/20 text-white border-white/20" 
+              : "bg-slate-100 text-slate-500 border-slate-200"
+          )}>
+            {counts.main}
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab('programmatic')}
+          className={cn(
+            "py-2.5 px-6 font-bold text-sm rounded-xl transition-all relative flex items-center gap-2",
+            activeTab === 'programmatic'
+              ? "bg-[#155dfc] text-white shadow-lg shadow-blue-200"
+              : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+          )}
+        >
+          <span>Programmatic Pages</span>
+          <span className={cn(
+            "px-2 py-0.5 text-[10px] font-black rounded-full border shrink-0",
+            activeTab === 'programmatic' 
+              ? "bg-white/20 text-white border-white/20" 
+              : "bg-slate-100 text-slate-500 border-slate-200"
+          )}>
+            {counts.programmatic}
+          </span>
+        </button>
+      </div>
+
+      {activeTab === 'programmatic' && (
+        <div className="p-4 bg-blue-50/40 border border-blue-100/50 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-blue-100 shadow-sm shrink-0">
+              <Zap className="w-5 h-5 text-blue-600 animate-pulse" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-800">Need to create programmatic pages in bulk?</p>
+              <p className="text-xs text-slate-500 font-medium">Use our SEO Engine to import CSV/JSON and automatically generate thousands of location & service landing pages.</p>
+            </div>
+          </div>
+          <Button 
+            onClick={() => navigate("/admin/seo")}
+            size="sm" 
+            className="bg-blue-600 hover:bg-blue-700 text-white shrink-0 shadow-md shadow-blue-200 rounded-full"
+          >
+            Launch SEO Engine <ArrowRight className="w-4 h-4 ml-1.5" />
+          </Button>
+        </div>
+      )}
 
       {error && (
         <div className="p-4 bg-red-50 text-red-600 rounded-xl flex gap-3 items-center text-sm font-medium border border-red-100">
@@ -441,12 +536,18 @@ export default function PagesManagement() {
 
         {filteredAndSortedPages.length === 0 ? (
           <div className="p-16 text-center space-y-4">
-            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto border border-slate-100">
+            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto border border-slate-100 animate-pulse">
               <FileText className="w-8 h-8 text-slate-300" />
             </div>
             <div className="space-y-1">
-              <p className="font-semibold text-slate-900">No pages found</p>
-              <p className="text-slate-500 text-sm">Start by creating your first landing page.</p>
+              <p className="font-bold text-slate-900">
+                {activeTab === 'main' ? 'No website main pages found' : 'No programmatic pages found'}
+              </p>
+              <p className="text-slate-500 text-sm font-medium">
+                {activeTab === 'main' 
+                  ? 'Start by creating your first static landing page.'
+                  : 'Bulk generate pages with the SEO Engine or add one manually.'}
+              </p>
             </div>
           </div>
         ) : (
