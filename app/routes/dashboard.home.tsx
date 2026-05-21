@@ -86,6 +86,7 @@ export default function DashboardHome() {
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const [chartData, setChartData] = useState<ChartDay[]>([]);
   const [growthPercentage, setGrowthPercentage] = useState("+0%");
+  const [hoveredDot, setHoveredDot] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchDashboardData() {
@@ -471,16 +472,30 @@ export default function DashboardHome() {
 
                   {/* Intersecting Dots */}
                   {points.map((p, idx) => (
-                    <g key={idx} className="group/dot cursor-pointer">
+                    <g 
+                      key={idx} 
+                      className="cursor-pointer"
+                      onMouseEnter={() => setHoveredDot(idx)}
+                      onMouseLeave={() => setHoveredDot(null)}
+                    >
+                      {/* Generous invisible hover target circle to prevent flickering */}
                       <circle 
                         cx={p.x} 
                         cy={p.y} 
-                        r="5" 
+                        r="16" 
+                        fill="transparent" 
+                      />
+                      {/* Visual Dot */}
+                      <circle 
+                        cx={p.x} 
+                        cy={p.y} 
+                        r={hoveredDot === idx ? "7" : "5"} 
                         fill="#155dfc" 
                         stroke="#ffffff" 
                         strokeWidth="2" 
-                        className="transition-transform group-hover/dot:scale-150"
+                        className="transition-all duration-200"
                       />
+                      {/* Tooltip background */}
                       <rect 
                         x={p.x - 20} 
                         y={p.y - 28} 
@@ -488,8 +503,12 @@ export default function DashboardHome() {
                         height="20" 
                         rx="4" 
                         fill="#0f172a" 
-                        className="opacity-0 group-hover/dot:opacity-100 transition-opacity pointer-events-none"
+                        className={cn(
+                          "transition-opacity pointer-events-none duration-200",
+                          hoveredDot === idx ? "opacity-100" : "opacity-0"
+                        )}
                       />
+                      {/* Tooltip value */}
                       <text 
                         x={p.x} 
                         y={p.y - 14} 
@@ -497,7 +516,10 @@ export default function DashboardHome() {
                         fontSize="9" 
                         fontWeight="bold" 
                         textAnchor="middle" 
-                        className="opacity-0 group-hover/dot:opacity-100 transition-opacity pointer-events-none"
+                        className={cn(
+                          "transition-opacity pointer-events-none duration-200",
+                          hoveredDot === idx ? "opacity-100" : "opacity-0"
+                        )}
                       >
                         {chartData[idx].count}
                       </text>
