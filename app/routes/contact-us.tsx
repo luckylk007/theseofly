@@ -492,7 +492,7 @@ export default function ContactUs() {
       <section className="py-20 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           {/* Left Column Description */}
-          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-32">
+          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-[50%] lg:-translate-y-[50%]">
             <span className="text-xs font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Search Architecture FAQ</span>
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
               Answering Your Scaling Questions
