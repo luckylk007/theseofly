@@ -292,8 +292,8 @@ export default function AboutUs() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
           {/* Left: Content */}
           <div className="lg:col-span-6 space-y-8">
-            <div className="space-y-4">
-              <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Strategic SEO Architects</span>
+            <div className="space-y-6">
+              <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Strategic SEO Architects</span>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
                 Scaling Digital Footprints Through Precise Automation
               </h2>
@@ -358,8 +358,8 @@ export default function AboutUs() {
         
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Header */}
-          <div className="text-center max-w-xl mx-auto mb-20 space-y-4">
-            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Our Foundation</span>
+          <div className="text-center max-w-xl mx-auto mb-20 space-y-6">
+            <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Our Foundation</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Core Strategic Columns</h2>
             <p className="text-slate-500 text-sm font-semibold">The key philosophies that guide our engineering values and customer alignments daily.</p>
           </div>
@@ -419,8 +419,8 @@ export default function AboutUs() {
       <section id="about-team" className="py-22 md:py-30 bg-slate-50 border-t border-b border-slate-100/70">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Header */}
-          <div className="text-center max-w-xl mx-auto mb-20 space-y-4">
-            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Innovators</span>
+          <div className="text-center max-w-xl mx-auto mb-20 space-y-6">
+            <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Innovators</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Our Growth Brain Trust</h2>
             <p className="text-slate-500 text-sm font-semibold">MEET our senior search architects, dataset specialists, and conversion engineers.</p>
           </div>
@@ -505,8 +505,8 @@ export default function AboutUs() {
 
           {/* Right Heading + Feature List */}
           <div className="lg:col-span-6 space-y-10">
-            <div className="space-y-4">
-              <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Advantage</span>
+            <div className="space-y-6">
+              <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Advantage</span>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
                 Empowering Brands with Structural Search Supremacy
               </h2>
@@ -543,7 +543,7 @@ export default function AboutUs() {
             <div className="absolute bottom-[-20%] left-[-10%] w-[45%] h-[80%] bg-[#155dfc]/10 blur-[90px] rounded-full" />
             
             <div className="max-w-2xl mx-auto space-y-6 relative z-10">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-blue-200 border border-white/20 bg-white/10 px-4.5 py-1.5 rounded-full">Elevate Your Indexing</span>
+              <span className="inline-block text-xs font-extrabold uppercase tracking-widest text-blue-200 border border-white/20 bg-white/10 px-4.5 py-1.5 rounded-full">Elevate Your Indexing</span>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
                 Ready to dominate organic search results?
               </h2>
@@ -572,8 +572,8 @@ export default function AboutUs() {
       <section id="about-process" className="py-22 md:py-30 bg-slate-50 border-t border-b border-slate-100/70">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Header */}
-          <div className="text-center mb-20 space-y-4">
-            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Flow</span>
+          <div className="text-center mb-20 space-y-6">
+            <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Flow</span>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
               Step-by-Step Towards Scale
             </h2>
@@ -624,7 +624,7 @@ export default function AboutUs() {
             {/* Left Info Column */}
             <div className="lg:col-span-5 space-y-8">
               <div className="space-y-6">
-                <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Success Stories</span>
+                <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Success Stories</span>
                 <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
                   Grounded in Tangible Organic Revenue
                 </h2>
@@ -727,8 +727,8 @@ export default function AboutUs() {
             <div className="absolute bottom-[-30%] left-[-10%] w-64 h-64 bg-indigo-500/5 rounded-full blur-[70px]" />
 
             <div className="relative z-10 text-center space-y-8 max-w-2xl mx-auto">
-              <div className="space-y-4">
-                <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Algorithmic Updates</span>
+              <div className="space-y-6">
+                <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Algorithmic Updates</span>
                 <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Stay Ahead of Google Changes</h2>
                 <p className="text-slate-500 text-sm font-semibold leading-relaxed">
                   Join 5,000+ organic growth hackers receiving our bi-weekly breakdown of algorithmic indices, taxonomies, and CTR optimization parameters.

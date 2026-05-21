@@ -276,8 +276,8 @@ export default function ContactUs() {
           
           {/* Left Column: Context Card */}
           <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-32">
-            <div className="space-y-4">
-              <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Get Direct Access</span>
+            <div className="space-y-6">
+              <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Get Direct Access</span>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
                 Let's Construct Your Custom Search Engine
               </h2>
@@ -467,8 +467,8 @@ export default function ContactUs() {
       {/* 4. EMBEDDED MAP SECTION */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="text-center max-w-xl mx-auto mb-12 space-y-4">
-            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc]">Global Hub</span>
+          <div className="text-center max-w-xl mx-auto mb-12 space-y-6">
+            <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc]">Global Hub</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900">San Francisco Headquarters</h2>
             <p className="text-slate-500 text-sm font-semibold">Join us at our creative workspace in the heart of San Francisco's Financial District.</p>
           </div>
@@ -493,7 +493,7 @@ export default function ContactUs() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           {/* Left Column Description */}
           <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-36">
-            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Search Architecture FAQ</span>
+            <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Search Architecture FAQ</span>
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
               Answering Your Scaling Questions
             </h2>
@@ -558,7 +558,7 @@ export default function ContactUs() {
             <div className="absolute top-[-30%] right-[-10%] w-[60%] h-[100%] bg-white/5 blur-[120px] rounded-full" />
             
             <div className="max-w-2xl mx-auto space-y-6 relative z-10">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-blue-200 border border-white/20 bg-white/10 px-4.5 py-1.5 rounded-full">Unlock Domination</span>
+              <span className="inline-block text-xs font-extrabold uppercase tracking-widest text-blue-200 border border-white/20 bg-white/10 px-4.5 py-1.5 rounded-full">Unlock Domination</span>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
                 Ready to dominate search engine results?
               </h2>
