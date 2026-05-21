@@ -1,24 +1,17 @@
-export interface CompanyPagePayload {
-  title: string;
-  slug: string;
-  status: "draft" | "published" | "scheduled" | "private" | "pending_preview";
-  is_programmatic: boolean;
-  content_type: "page" | "post";
-  post_type: "page" | "post" | "blog" | "news" | "newsletter" | "case-study";
-  category: string;
-  content: {
-    sections: Array<{
-      heading?: string;
-      text: string;
-    }>;
-  };
-  seo: {
-    title: string;
-    description: string;
-  };
-}
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
 
-export const companyPagesPayload: CompanyPagePayload[] = [
+dotenv.config();
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Standard website ID for Theseofly
+const WEBSITE_ID = '1b51087c-82e7-4983-a31f-730104b6ae43';
+
+// Setup basic company pages payload
+export const companyPagesPayload = [
   {
     title: 'About Us',
     slug: 'about-us',
@@ -100,7 +93,7 @@ export const companyPagesPayload: CompanyPagePayload[] = [
         <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-xl">📧</div>
         <div>
           <p class="text-xs font-bold uppercase tracking-widest text-slate-400">Email Address</p>
-          <p class="text-lg font-black text-slate-880">growth@theseofly.com</p>
+          <p class="text-lg font-black text-slate-800">growth@theseofly.com</p>
         </div>
       </div>
       <div class="flex items-center gap-4">
@@ -140,7 +133,7 @@ export const companyPagesPayload: CompanyPagePayload[] = [
         <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Message</label>
         <textarea class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm h-32" placeholder="Tell us about your organic growth objectives..." required></textarea>
       </div>
-      <button type="submit" class="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-200 cursor-pointer">
+      <button type="submit" class="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-200">
         Submit Consultation Request
       </button>
     </form>
@@ -184,7 +177,7 @@ export const companyPagesPayload: CompanyPagePayload[] = [
         <li class="flex items-center gap-3 text-sm text-slate-600">✅ Schema.org Integration</li>
       </ul>
     </div>
-    <button class="mt-8 w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-2xl transition-colors cursor-pointer">Get Started</button>
+    <button class="mt-8 w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-2xl transition-colors">Get Started</button>
   </div>
   <!-- Growth Plan (Featured) -->
   <div class="bg-white p-8 rounded-[2.5rem] border-2 border-blue-600 shadow-lg flex flex-col justify-between relative overflow-hidden transform scale-105">
@@ -202,7 +195,7 @@ export const companyPagesPayload: CompanyPagePayload[] = [
         <li class="flex items-center gap-3 text-sm text-slate-600">✅ Dedicated Account Engineer</li>
       </ul>
     </div>
-    <button class="mt-8 w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-colors shadow-lg shadow-blue-200 cursor-pointer">Start Dominating</button>
+    <button class="mt-8 w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-colors shadow-lg shadow-blue-200">Start Dominating</button>
   </div>
   <!-- Enterprise Plan -->
   <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
@@ -218,7 +211,7 @@ export const companyPagesPayload: CompanyPagePayload[] = [
         <li class="flex items-center gap-3 text-sm text-slate-600">✅ 24/7 Priority SLA Support</li>
       </ul>
     </div>
-    <button class="mt-8 w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-2xl transition-colors cursor-pointer">Contact Enterprise</button>
+    <button class="mt-8 w-full py-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-2xl transition-colors">Contact Enterprise</button>
   </div>
 </div>`
         }
@@ -273,7 +266,7 @@ export const companyPagesPayload: CompanyPagePayload[] = [
   <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center items-center text-center bg-gradient-to-tr from-blue-50 to-white">
     <h3 class="text-xl font-black text-slate-900 mb-2">Need a Custom Setup?</h3>
     <p class="text-slate-500 text-xs max-w-xs mb-6">Our search engineers will build a bespoke programmatic SEO pipeline specifically for your business database.</p>
-    <button class="px-6 py-3 bg-[#155dfc] text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors shadow-md cursor-pointer">Get in Touch</button>
+    <button class="px-6 py-3 bg-[#155dfc] text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors shadow-md">Get in Touch</button>
   </div>
 </div>`
         }
@@ -353,12 +346,12 @@ export const companyPagesPayload: CompanyPagePayload[] = [
   Explore our targeted local search hubs. We provide hyper-localized search positioning, Google Business optimization, and localized search query scaling in top metropolitan centers.
 </p>
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 my-12">
-  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all cursor-pointer">New York</div>
-  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all cursor-pointer">San Antonio</div>
-  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all cursor-pointer">Chicago</div>
-  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all cursor-pointer">Miami</div>
-  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all cursor-pointer">Los Angeles</div>
-  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all cursor-pointer">London</div>
+  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all">New York</div>
+  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all">San Antonio</div>
+  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all">Chicago</div>
+  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all">Miami</div>
+  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all">Los Angeles</div>
+  <div class="p-4 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/50 hover:border-blue-200 rounded-2xl text-center font-bold transition-all">London</div>
 </div>`
         }
       ]
@@ -450,7 +443,7 @@ export const companyPagesPayload: CompanyPagePayload[] = [
       <span class="text-blue-600 text-xs font-bold uppercase tracking-wider">Algorithm Updates</span>
       <h3 class="text-2xl font-black text-slate-900 leading-snug">Google's Latest AI Overviews Update: What Programmatic SEOs Must Do</h3>
       <p class="text-slate-600 text-sm">An in-depth structural review of how Google’s core layouts prioritize contextual and entity-based landing pages over raw programmatic list entries.</p>
-      <button class="px-6 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition-colors w-fit border border-slate-200/50 cursor-pointer">Read Full Article</button>
+      <button class="px-6 py-3 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition-colors w-fit border border-slate-200/50">Read Full Article</button>
     </div>
   </div>
 </div>`
@@ -463,3 +456,110 @@ export const companyPagesPayload: CompanyPagePayload[] = [
     }
   }
 ];
+
+async function generate() {
+  console.log('🏁 Initiating Company Pages Generation CLI...');
+  console.log('-------------------------------------------');
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('❌ Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in environment.');
+    process.exit(1);
+  }
+
+  // Choose the best key to use (service role is admin, bypasses RLS)
+  const activeKey = supabaseServiceRole || supabaseAnonKey;
+  console.log(`📡 Connecting to Supabase URL: ${supabaseUrl}`);
+  console.log(`🔑 Using Key Type: ${supabaseServiceRole ? 'Service Role Key (Admin)' : 'Anon Key'}`);
+
+  const supabase = createClient(supabaseUrl, activeKey);
+
+  // If using Anon Key, attempt sign in to become authenticated
+  if (!supabaseServiceRole) {
+    const email = 'admin@theseofly.com';
+    const password = 'password123';
+    
+    console.log(`🔐 Attempting to authenticate as: ${email}...`);
+    const { data: sessionData, error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
+      console.warn(`⚠️ Warning: Authentication failed (${signInError.message}).`);
+      console.warn('⚠️ Attempting insert anyway (will fail if RLS prevents unauthenticated inserts).');
+    } else {
+      console.log('✅ Authenticated successfully!');
+    }
+  }
+
+  // Insert Pages
+  console.log(`\n📄 Generating ${companyPagesPayload.length} basic company pages...`);
+  
+  for (const pagePayload of companyPagesPayload) {
+    const { seo, ...pageData } = pagePayload;
+    
+    // Format payload
+    const recordPayload = {
+      ...pageData,
+      website_id: WEBSITE_ID,
+      is_programmatic: false
+    };
+
+    console.log(`👉 Creating page: "${recordPayload.title}" (slug: "/${recordPayload.slug}")...`);
+
+    // 1. Delete existing page with the same slug to prevent unique constraint failures
+    await supabase
+      .from('pages')
+      .delete()
+      .eq('website_id', WEBSITE_ID)
+      .eq('slug', recordPayload.slug);
+
+    // 2. Insert page
+    const { data: insertedPage, error: pageError } = await supabase
+      .from('pages')
+      .insert([recordPayload])
+      .select()
+      .single();
+
+    if (pageError) {
+      console.error(`❌ Failed to create page "${recordPayload.title}":`, pageError.message);
+      continue;
+    }
+
+    console.log(`   ✅ Page created! ID: ${insertedPage.id}`);
+
+    // 3. Create SEO Metadata entry
+    const seoPayload = {
+      page_id: insertedPage.id,
+      title: seo.title,
+      description: seo.description,
+      canonical_url: `https://theseofly.vercel.app/${recordPayload.slug}`,
+      noindex: false,
+      schema_markup: {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": seo.title,
+        "description": seo.description,
+        "url": `https://theseofly.vercel.app/${recordPayload.slug}`
+      }
+    };
+
+    const { error: seoError } = await supabase
+      .from('seo_metadata')
+      .insert([seoPayload]);
+
+    if (seoError) {
+      console.error(`   ⚠️ Failed to create SEO Metadata:`, seoError.message);
+    } else {
+      console.log(`   ✅ SEO Metadata linked!`);
+    }
+  }
+
+  console.log('-------------------------------------------');
+  console.log('🎉 Generation completed!');
+}
+
+// Run if directly called
+if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('generate-company-pages.js')) {
+  generate();
+}
