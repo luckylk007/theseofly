@@ -226,7 +226,7 @@ export default function AboutUs() {
       <Header />
 
       {/* 1. HERO SECTION */}
-      <section id="about-hero" className="relative py-24 md:py-32 bg-slate-50/50 overflow-hidden border-b border-slate-100/70">
+      <section id="about-hero" className="relative py-22 md:py-30 bg-slate-50/50 overflow-hidden border-b border-slate-100/70">
         {/* Soft Blue Gradient Ambient Shapes */}
         <div className="absolute inset-0 pointer-events-none -z-10">
           <div className="absolute top-[-10%] left-[20%] w-[45%] h-[45%] bg-[#155dfc]/5 blur-[130px] rounded-full opacity-70" />
@@ -270,7 +270,7 @@ export default function AboutUs() {
       </section>
 
       {/* 2. CLIENT LOGOS */}
-      <section id="about-logos" className="py-12 border-b border-slate-50 overflow-hidden bg-white">
+      <section id="about-logos" className="py-10 border-b border-slate-50 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center gap-10 md:gap-16 justify-center">
           <span className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.25em] shrink-0">Trusted Worldwide By</span>
           <div className="flex flex-wrap justify-center gap-10 md:gap-16 items-center">
@@ -288,7 +288,7 @@ export default function AboutUs() {
       </section>
 
       {/* 3. ABOUT COMPANY */}
-      <section id="about-company" className="py-24 md:py-32 bg-white">
+      <section id="about-company" className="py-22 md:py-30 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
           {/* Left: Content */}
           <div className="lg:col-span-6 space-y-8">
@@ -353,7 +353,7 @@ export default function AboutUs() {
       </section>
 
       {/* 4. VISION CARDS */}
-      <section id="about-values" className="py-24 md:py-32 bg-slate-50 border-t border-b border-slate-100/70 relative">
+      <section id="about-values" className="py-22 md:py-30 bg-slate-50 border-t border-b border-slate-100/70 relative">
         <div className="absolute top-0 right-1/4 w-80 h-80 bg-indigo-50/50 rounded-full blur-3xl -z-10" />
         
         <div className="max-w-7xl mx-auto px-6 md:px-12">
@@ -398,7 +398,7 @@ export default function AboutUs() {
       </section>
 
       {/* 5. STATS SECTION */}
-      <section id="about-stats" className="py-20 md:py-28 bg-white">
+      <section id="about-stats" className="py-18 md:py-26 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 text-center lg:text-left">
             {stats.map((stat, i) => (
@@ -416,7 +416,7 @@ export default function AboutUs() {
       </section>
 
       {/* 6. TEAM SECTION */}
-      <section id="about-team" className="py-24 md:py-32 bg-slate-50 border-t border-b border-slate-100/70">
+      <section id="about-team" className="py-22 md:py-30 bg-slate-50 border-t border-b border-slate-100/70">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Header */}
           <div className="text-center max-w-xl mx-auto mb-20 space-y-4">
@@ -473,7 +473,7 @@ export default function AboutUs() {
       </section>
 
       {/* 7. WHY CHOOSE US */}
-      <section id="about-why-us" className="py-24 md:py-32 bg-white">
+      <section id="about-why-us" className="py-22 md:py-30 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
           {/* Left Image + Rating Card */}
           <div className="lg:col-span-6 relative order-last lg:order-first">
@@ -534,7 +534,7 @@ export default function AboutUs() {
       </section>
 
       {/* 8. CTA BANNER */}
-      <section id="about-cta" className="py-12 md:py-20 bg-white">
+      <section id="about-cta" className="py-10 md:py-18 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="relative bg-gradient-to-br from-[#155dfc] via-[#0d47a1] to-[#0a2e5c] rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden p-8 md:p-16 text-center space-y-8">
             {/* Background elements */}
@@ -569,7 +569,7 @@ export default function AboutUs() {
       </section>
 
       {/* 9. PROCESS SECTION */}
-      <section id="about-process" className="py-24 md:py-32 bg-slate-50 border-t border-b border-slate-100/70">
+      <section id="about-process" className="py-22 md:py-30 bg-slate-50 border-t border-b border-slate-100/70">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Header */}
           <div className="text-center mb-20 space-y-4">
@@ -615,7 +615,7 @@ export default function AboutUs() {
       </section>
 
       {/* 10. TESTIMONIALS */}
-      <section id="about-testimonials" className="py-24 md:py-32 bg-white relative overflow-hidden">
+      <section id="about-testimonials" className="py-22 md:py-30 bg-white relative overflow-hidden">
         {/* Background ambient light */}
         <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#155dfc]/5 rounded-full blur-[100px] -z-10" />
 
@@ -719,7 +719,7 @@ export default function AboutUs() {
       </section>
 
       {/* 11. NEWSLETTER */}
-      <section id="about-newsletter" className="py-20 md:py-28 bg-slate-50 border-t border-slate-100">
+      <section id="about-newsletter" className="py-18 md:py-26 bg-slate-50 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6">
           <div className="relative bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-10 md:p-14 border border-[#155dfc]/20 shadow-[0_20px_50px_-20px_rgba(21,93,252,0.08)] overflow-hidden">
             {/* ambient ambient light blob inside container */}
