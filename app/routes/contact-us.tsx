@@ -58,7 +58,7 @@ export default function ContactUs() {
       details: ["100 Pine Street, Suite 1250", "San Francisco, CA 94111"],
       actionLabel: "Get Directions",
       actionUrl: "https://maps.google.com/?q=100+Pine+St,+San+Francisco,+CA+94111",
-      color: "from-blue-500 to-indigo-600"
+      color: "from-[#155dfc] to-indigo-600"
     },
     {
       title: "Email Channels",
@@ -66,7 +66,7 @@ export default function ContactUs() {
       details: ["growth@theseofly.com", "partners@theseofly.com"],
       actionLabel: "Send Email",
       actionUrl: "mailto:growth@theseofly.com",
-      color: "from-sky-500 to-blue-600"
+      color: "from-[#155dfc] to-indigo-500"
     },
     {
       title: "Call Direct",
@@ -162,7 +162,7 @@ export default function ContactUs() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900 pt-20">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-[#155dfc]/20 selection:text-slate-900 pt-20">
       <Header />
 
       {/* 1. HERO SECTION */}
@@ -179,9 +179,9 @@ export default function ContactUs() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 text-center relative z-10">
           {/* Breadcrumb Navigation */}
           <div className="flex justify-center items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-300 mb-8">
-            <Link to="/" className="hover:text-blue-400 transition-colors">Home</Link>
+            <Link to="/" className="hover:text-[#155dfc] transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
-            <span className="text-blue-400 font-bold">Contact Us</span>
+            <span className="text-[#155dfc] font-bold">Contact Us</span>
           </div>
 
           <motion.div
@@ -190,8 +190,8 @@ export default function ContactUs() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl mx-auto space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider backdrop-blur-md">
-              <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#155dfc]/10 border border-[#155dfc]/20 text-blue-200 text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-[#155dfc] animate-pulse" />
               Scale Your Organic Growth
             </div>
             <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight leading-tight">
@@ -203,7 +203,7 @@ export default function ContactUs() {
             </p>
             <div className="pt-4 flex justify-center">
               <a href="#contact-form-section">
-                <Button size="lg" className="h-14 px-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-900/40 hover:shadow-blue-600/30 group transition-all cursor-pointer border border-blue-500/30">
+                <Button size="lg" className="h-14 px-8 rounded-full bg-[#155dfc] hover:bg-[#155dfc]/90 text-white font-bold shadow-lg shadow-[#155dfc]/20 hover:shadow-[#155dfc]/40 group transition-all cursor-pointer border border-[#155dfc]/30">
                   Request a Free Audit <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
@@ -228,16 +228,15 @@ export default function ContactUs() {
                 className="bg-white p-8 rounded-3xl border border-slate-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex flex-col justify-between group relative overflow-hidden"
               >
                 {/* Background micro hover circle */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-full translate-x-8 -translate-y-8 group-hover:bg-blue-50/50 transition-colors duration-300" />
+                <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-full translate-x-8 -translate-y-8 group-hover:bg-[#155dfc]/5 transition-colors duration-300" />
                 
                 <div className="space-y-6 relative z-10">
                   {/* Icon with custom gradient backdrop */}
-                  <div className={`w-14 h-14 bg-gradient-to-tr ${card.color} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-100`}>
+                  <div className={`w-14 h-14 bg-gradient-to-tr ${card.color} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-[#155dfc]/15`}>
                     <IconComponent className="w-6 h-6" />
                   </div>
-                  
-                  <div className="space-y-3">
-                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{card.title}</h3>
+                                    <div className="space-y-3">
+                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-[#155dfc] transition-colors">{card.title}</h3>
                     <div className="space-y-1">
                       {card.details.map((detail, dIdx) => (
                         <p key={dIdx} className="text-slate-500 text-sm font-semibold">{detail}</p>
@@ -252,14 +251,14 @@ export default function ContactUs() {
                       href={card.actionUrl} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-blue-600 hover:text-blue-800 transition-colors"
+                      className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-[#155dfc] hover:text-[#155dfc]/80 transition-colors"
                     >
                       {card.actionLabel} <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                     </a>
                   ) : (
                     <Link 
                       to={card.actionUrl} 
-                      className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-blue-600 hover:text-blue-800 transition-colors"
+                      className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-[#155dfc] hover:text-[#155dfc]/80 transition-colors"
                     >
                       {card.actionLabel} <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                     </Link>
@@ -278,7 +277,7 @@ export default function ContactUs() {
           {/* Left Column: Context Card */}
           <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-32">
             <div className="space-y-4">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Get Direct Access</span>
+              <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Get Direct Access</span>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
                 Let's Construct Your Custom Search Engine
               </h2>
@@ -297,7 +296,7 @@ export default function ContactUs() {
                   { title: "Strategy Alignment Call", desc: "A live 30-minute overview dissecting performance and sitemap parameters." }
                 ].map((item, index) => (
                   <li key={index} className="flex gap-4 items-start">
-                    <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0 mt-0.5">
+                    <div className="w-6 h-6 rounded-full bg-[#155dfc]/10 border border-[#155dfc]/25 flex items-center justify-center text-[#155dfc] font-black text-xs shrink-0 mt-0.5">
                       {index + 1}
                     </div>
                     <div>
@@ -310,7 +309,7 @@ export default function ContactUs() {
             </div>
 
             {/* Micro stats banner */}
-            <div className="grid grid-cols-2 gap-6 bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
+            <div className="grid grid-cols-2 gap-6 bg-gradient-to-br from-[#155dfc] via-[#0d47a1] to-[#0a2e5c] p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/glass.png')] opacity-10 mix-blend-overlay" />
               <div className="space-y-1 relative z-10">
                 <p className="text-3xl font-black">10x</p>
@@ -326,7 +325,7 @@ export default function ContactUs() {
           {/* Right Column: Premium Interactive Form */}
           <div className="lg:col-span-7 bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] p-8 md:p-12 relative overflow-hidden">
             {/* Top accent line */}
-            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400" />
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#155dfc] via-blue-500 to-indigo-500" />
 
             <AnimatePresence mode="wait">
               {!isSubmitted ? (
@@ -352,7 +351,7 @@ export default function ContactUs() {
                         type="text"
                         value={formData.name}
                         onChange={(e) => handleInputChange("name", e.target.value)}
-                        className={`w-full h-12 px-5 bg-slate-50 border ${errors.name ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-blue-600'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all`}
+                        className={`w-full h-12 px-5 bg-slate-50 border ${errors.name ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-[#155dfc]'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all`}
                         placeholder="John Doe"
                       />
                       {errors.name && <p className="text-xs text-red-500 font-semibold">{errors.name}</p>}
@@ -365,7 +364,7 @@ export default function ContactUs() {
                         type="email"
                         value={formData.email}
                         onChange={(e) => handleInputChange("email", e.target.value)}
-                        className={`w-full h-12 px-5 bg-slate-50 border ${errors.email ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-blue-600'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all`}
+                        className={`w-full h-12 px-5 bg-slate-50 border ${errors.email ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-[#155dfc]'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all`}
                         placeholder="john@example.com"
                       />
                       {errors.email && <p className="text-xs text-red-500 font-semibold">{errors.email}</p>}
@@ -380,7 +379,7 @@ export default function ContactUs() {
                         type="tel"
                         value={formData.phone}
                         onChange={(e) => handleInputChange("phone", e.target.value)}
-                        className="w-full h-12 px-5 bg-slate-50 border border-slate-100 focus:border-blue-600 rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all"
+                        className="w-full h-12 px-5 bg-slate-50 border border-slate-100 focus:border-[#155dfc] rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all"
                         placeholder="+1 (555) 000-0000"
                       />
                     </div>
@@ -392,7 +391,7 @@ export default function ContactUs() {
                         type="text"
                         value={formData.subject}
                         onChange={(e) => handleInputChange("subject", e.target.value)}
-                        className={`w-full h-12 px-5 bg-slate-50 border ${errors.subject ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-blue-600'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all`}
+                        className={`w-full h-12 px-5 bg-slate-50 border ${errors.subject ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-[#155dfc]'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all`}
                         placeholder="e.g., Programmatic SaaS Growth"
                       />
                       {errors.subject && <p className="text-xs text-red-500 font-semibold">{errors.subject}</p>}
@@ -406,7 +405,7 @@ export default function ContactUs() {
                       value={formData.message}
                       onChange={(e) => handleInputChange("message", e.target.value)}
                       rows={5}
-                      className={`w-full p-5 bg-slate-50 border ${errors.message ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-blue-600'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all resize-none`}
+                      className={`w-full p-5 bg-slate-50 border ${errors.message ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-[#155dfc]'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all resize-none`}
                       placeholder="Describe your market, current keywords, or custom project outline..."
                     />
                     {errors.message && <p className="text-xs text-red-500 font-semibold">{errors.message}</p>}
@@ -417,7 +416,7 @@ export default function ContactUs() {
                     <Button 
                       type="submit" 
                       disabled={isSubmitting}
-                      className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-md shadow-xl shadow-blue-100 hover:shadow-blue-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full h-14 rounded-2xl bg-[#155dfc] hover:bg-[#155dfc]/90 text-white font-black text-md shadow-xl shadow-[#155dfc]/15 hover:shadow-[#155dfc]/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       {isSubmitting ? (
                         <>
@@ -469,7 +468,7 @@ export default function ContactUs() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="text-center max-w-xl mx-auto mb-12 space-y-4">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-blue-600">Global Hub</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc]">Global Hub</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900">San Francisco Headquarters</h2>
             <p className="text-slate-500 text-sm font-semibold">Join us at our creative workspace in the heart of San Francisco's Financial District.</p>
           </div>
@@ -494,7 +493,7 @@ export default function ContactUs() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           {/* Left Column Description */}
           <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-36">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Search Architecture FAQ</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Search Architecture FAQ</span>
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
               Answering Your Scaling Questions
             </h2>
@@ -502,8 +501,8 @@ export default function ContactUs() {
               Programmatic SEO differs substantially from conventional static publishing. Here is an overview answering our most commonly asked structural and integration queries.
             </p>
             <div className="pt-4">
-              <a href="mailto:growth@theseofly.com" className="inline-flex items-center gap-2.5 p-5 bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-100 rounded-2xl transition-all group font-bold text-slate-700 hover:text-blue-700 text-sm">
-                <HelpCircle className="w-5 h-5 text-slate-400 group-hover:text-blue-600" />
+              <a href="mailto:growth@theseofly.com" className="inline-flex items-center gap-2.5 p-5 bg-slate-50 hover:bg-[#155dfc]/5 border border-slate-100 hover:border-[#155dfc]/20 rounded-2xl transition-all group font-bold text-slate-700 hover:text-[#155dfc] text-sm">
+                <HelpCircle className="w-5 h-5 text-slate-400 group-hover:text-[#155dfc]" />
                 Still have questions? Let's discuss
               </a>
             </div>
@@ -516,14 +515,14 @@ export default function ContactUs() {
               return (
                 <div 
                   key={index}
-                  className={`border rounded-2xl transition-all duration-300 ${isOpen ? 'bg-slate-50/50 border-blue-200 shadow-sm' : 'bg-white border-slate-100 hover:border-slate-200'}`}
+                  className={`border rounded-2xl transition-all duration-300 ${isOpen ? 'bg-slate-50/50 border-[#155dfc]/30 shadow-sm' : 'bg-white border-slate-100 hover:border-slate-200'}`}
                 >
                   <button
                     onClick={() => setActiveFaq(isOpen ? null : index)}
                     className="w-full px-6 py-5 flex items-center justify-between text-left focus:outline-none cursor-pointer"
                   >
                     <span className="font-bold text-slate-900 text-base md:text-lg pr-4">{faq.question}</span>
-                    <span className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isOpen ? 'bg-blue-600 text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100'}`}>
+                    <span className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${isOpen ? 'bg-[#155dfc] text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100'}`}>
                       {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
                     </span>
                   </button>
@@ -553,7 +552,7 @@ export default function ContactUs() {
       {/* 6. CTA BANNER SECTION */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="relative bg-gradient-to-br from-blue-600 via-indigo-700 to-blue-900 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden p-8 md:p-16 text-center space-y-8">
+          <div className="relative bg-gradient-to-br from-[#155dfc] via-[#0d47a1] to-[#0a2e5c] rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden p-8 md:p-16 text-center space-y-8">
             {/* Background elements */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/glass.png')] opacity-10 mix-blend-overlay" />
             <div className="absolute top-[-30%] right-[-10%] w-[60%] h-[100%] bg-white/5 blur-[120px] rounded-full" />
@@ -569,7 +568,7 @@ export default function ContactUs() {
               
               <div className="pt-4 flex flex-wrap gap-4 justify-center">
                 <Link to="/plans">
-                  <Button size="lg" className="h-14 px-8 rounded-full bg-white text-blue-600 hover:bg-slate-50 font-black shadow-xl cursor-pointer">
+                  <Button size="lg" className="h-14 px-8 rounded-full bg-white text-[#155dfc] hover:bg-slate-50 font-black shadow-xl cursor-pointer">
                     Explore Packages
                   </Button>
                 </Link>

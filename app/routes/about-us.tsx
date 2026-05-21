@@ -64,24 +64,24 @@ export default function AboutUs() {
       tagline: "Quality at Scale",
       desc: "We believe automation should never compromise integrity. Our semantic templates maintain the highest fidelity of human editorial standards, ensuring every generated page serves genuine user intent with unique data.",
       icon: Lightbulb,
-      color: "from-emerald-500 to-green-500",
-      bg: "bg-emerald-50/50"
+      color: "from-[#155dfc] to-indigo-500",
+      bg: "bg-[#155dfc]/5"
     },
     {
       title: "Vision",
       tagline: "Search Equity",
       desc: "Our vision is to level the organic search playing field. By empowering fast-growing brands with algorithmic page generation, we enable companies to scale keyword visibility in weeks instead of years.",
       icon: Eye,
-      color: "from-teal-500 to-emerald-600",
-      bg: "bg-teal-50/50"
+      color: "from-[#155dfc] to-indigo-600",
+      bg: "bg-indigo-50/50"
     },
     {
       title: "Mission",
       tagline: "100x Organic Velocity",
       desc: "We are on a mission to eliminate static publishing bottlenecks. By combining structured dataset onboarding with instant indexing APIs, we deliver high-performing SEO assets that rank and convert continuously.",
       icon: Target,
-      color: "from-green-500 to-teal-600",
-      bg: "bg-green-50/50"
+      color: "from-indigo-600 to-[#155dfc]",
+      bg: "bg-[#155dfc]/5"
     }
   ];
 
@@ -222,23 +222,23 @@ export default function AboutUs() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-emerald-100 selection:text-emerald-900 pt-20">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-[#155dfc]/20 selection:text-slate-900 pt-20">
       <Header />
 
       {/* 1. HERO SECTION */}
       <section id="about-hero" className="relative py-24 md:py-32 bg-slate-50/50 overflow-hidden border-b border-slate-100/70">
-        {/* Soft Green Gradient Ambient Shapes */}
+        {/* Soft Blue Gradient Ambient Shapes */}
         <div className="absolute inset-0 pointer-events-none -z-10">
-          <div className="absolute top-[-10%] left-[20%] w-[45%] h-[45%] bg-emerald-50/70 blur-[130px] rounded-full opacity-70" />
-          <div className="absolute bottom-[5%] right-[15%] w-[35%] h-[35%] bg-teal-50/60 blur-[100px] rounded-full" />
+          <div className="absolute top-[-10%] left-[20%] w-[45%] h-[45%] bg-[#155dfc]/5 blur-[130px] rounded-full opacity-70" />
+          <div className="absolute bottom-[5%] right-[15%] w-[35%] h-[35%] bg-indigo-50/60 blur-[100px] rounded-full" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 text-center relative z-10">
           {/* Breadcrumb Navigation */}
           <div className="flex justify-center items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 mb-8">
-            <Link to="/" className="hover:text-emerald-600 transition-colors">Home</Link>
+            <Link to="/" className="hover:text-[#155dfc] transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-emerald-600">About Us</span>
+            <span className="text-[#155dfc]">About Us</span>
           </div>
 
           <motion.div
@@ -247,20 +247,20 @@ export default function AboutUs() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl mx-auto space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-4.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black uppercase tracking-widest border border-emerald-100/30">
-              <Sparkles className="w-4 h-4 text-emerald-600" />
+            <div className="inline-flex items-center gap-2 px-4.5 py-1.5 rounded-full bg-[#155dfc]/10 text-[#155dfc] text-xs font-black uppercase tracking-widest border border-[#155dfc]/20">
+              <Sparkles className="w-4 h-4 text-[#155dfc]" />
               Engineers of Search Equity
             </div>
             <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight leading-tight">
               Pioneering the Future of <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500">Organic Visibility</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#155dfc] via-blue-500 to-indigo-500">Organic Visibility</span>
             </h1>
             <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium">
               We construct advanced programmatic distribution frameworks, combining structured data with linguistic models to scale search footprints seamlessly.
             </p>
             <div className="pt-4 flex justify-center">
               <a href="#about-company">
-                <Button size="lg" className="h-14 px-8 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-100 group transition-all cursor-pointer border border-emerald-500/20">
+                <Button size="lg" className="h-14 px-8 rounded-full bg-[#155dfc] hover:bg-[#155dfc]/90 text-white font-bold shadow-lg shadow-[#155dfc]/15 group transition-all cursor-pointer border border-[#155dfc]/20">
                   Explore Our Blueprint <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
@@ -277,7 +277,7 @@ export default function AboutUs() {
             {clientLogos.map((logo) => (
               <div 
                 key={logo.name} 
-                className="text-xl font-black tracking-tighter text-slate-300 hover:text-emerald-600 hover:scale-105 transition-all duration-300 cursor-default"
+                className="text-xl font-black tracking-tighter text-slate-300 hover:text-[#155dfc] hover:scale-105 transition-all duration-300 cursor-default"
                 title={logo.label}
               >
                 {logo.name}
@@ -293,7 +293,7 @@ export default function AboutUs() {
           {/* Left: Content */}
           <div className="lg:col-span-6 space-y-8">
             <div className="space-y-4">
-              <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-100/20">Strategic SEO Architects</span>
+              <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Strategic SEO Architects</span>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
                 Scaling Digital Footprints Through Precise Automation
               </h2>
@@ -332,19 +332,19 @@ export default function AboutUs() {
             </div>
 
             {/* Glowing ambient backing blob */}
-            <div className="absolute -top-12 -left-12 w-64 h-64 bg-emerald-100/50 rounded-full blur-3xl -z-10" />
+            <div className="absolute -top-12 -left-12 w-64 h-64 bg-[#155dfc]/5 rounded-full blur-3xl -z-10" />
 
             {/* Floating Stats Card (Glassmorphic) */}
             <motion.div 
               animate={{ y: [0, -12, 0] }}
               transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -bottom-10 -right-4 bg-white/95 backdrop-blur-xl p-6 rounded-[2rem] shadow-[0_20px_50px_rgba(16,185,129,0.12)] border border-emerald-100 flex items-center gap-5 z-20"
+              className="absolute -bottom-10 -right-4 bg-white/95 backdrop-blur-xl p-6 rounded-[2rem] shadow-[0_20px_50px_rgba(21,93,252,0.12)] border border-[#155dfc]/20 flex items-center gap-5 z-20"
             >
-              <div className="w-14 h-14 bg-gradient-to-tr from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+              <div className="w-14 h-14 bg-gradient-to-tr from-[#155dfc] to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#155dfc]/20">
                 <BarChart3 className="w-7 h-7" />
               </div>
               <div>
-                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">Growth Index</p>
+                <p className="text-[10px] font-black text-[#155dfc] uppercase tracking-widest leading-none mb-1">Growth Index</p>
                 <p className="text-2xl font-black text-slate-900">+280% <span className="text-xs font-bold text-slate-400">YoY</span></p>
               </div>
             </motion.div>
@@ -354,12 +354,12 @@ export default function AboutUs() {
 
       {/* 4. VISION CARDS */}
       <section id="about-values" className="py-24 md:py-32 bg-slate-50 border-t border-b border-slate-100/70 relative">
-        <div className="absolute top-0 right-1/4 w-80 h-80 bg-teal-50/50 rounded-full blur-3xl -z-10" />
+        <div className="absolute top-0 right-1/4 w-80 h-80 bg-indigo-50/50 rounded-full blur-3xl -z-10" />
         
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Header */}
           <div className="text-center max-w-xl mx-auto mb-20 space-y-4">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-100/20">Our Foundation</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Our Foundation</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Core Strategic Columns</h2>
             <p className="text-slate-500 text-sm font-semibold">The key philosophies that guide our engineering values and customer alignments daily.</p>
           </div>
@@ -376,17 +376,17 @@ export default function AboutUs() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.15 }}
                   whileHover={{ y: -8 }}
-                  className="bg-white p-8 md:p-10 rounded-[2rem] border border-slate-200/50 hover:border-emerald-200 shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(16,185,129,0.04)] transition-all flex flex-col justify-between h-full group"
+                  className="bg-white p-8 md:p-10 rounded-[2rem] border border-slate-200/50 hover:border-[#155dfc]/30 shadow-[0_10px_30px_rgba(0,0,0,0.01)] hover:shadow-[0_20px_40px_rgba(21,93,252,0.04)] transition-all flex flex-col justify-between h-full group"
                 >
                   <div className="space-y-6">
                     {/* Icon container */}
-                    <div className={`w-14 h-14 bg-gradient-to-tr ${value.color} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-100 group-hover:scale-105 transition-transform duration-300`}>
+                    <div className={`w-14 h-14 bg-gradient-to-tr ${value.color} text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-100 group-hover:scale-105 transition-transform duration-300`}>
                       <IconComponent className="w-7 h-7" />
                     </div>
 
                     <div className="space-y-3">
-                      <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{value.tagline}</p>
-                      <h3 className="text-2xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors">{value.title}</h3>
+                      <p className="text-[10px] font-black text-[#155dfc] uppercase tracking-widest">{value.tagline}</p>
+                      <h3 className="text-2xl font-black text-slate-900 group-hover:text-[#155dfc] transition-colors">{value.title}</h3>
                       <p className="text-slate-500 text-sm font-medium leading-relaxed pt-2">{value.desc}</p>
                     </div>
                   </div>
@@ -402,9 +402,9 @@ export default function AboutUs() {
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 text-center lg:text-left">
             {stats.map((stat, i) => (
-              <div key={i} className="space-y-3 p-6 bg-slate-50/50 rounded-3xl border border-slate-100 hover:border-emerald-100/50 transition-colors group relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-2 h-full bg-emerald-500 scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top" />
-                <h4 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter group-hover:text-emerald-600 transition-colors">{stat.value}</h4>
+              <div key={i} className="space-y-3 p-6 bg-slate-50/50 rounded-3xl border border-slate-100 hover:border-[#155dfc]/25 transition-colors group relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-2 h-full bg-[#155dfc] scale-y-0 group-hover:scale-y-100 transition-transform duration-300 origin-top" />
+                <h4 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter group-hover:text-[#155dfc] transition-colors">{stat.value}</h4>
                 <div className="space-y-1">
                   <p className="text-sm font-bold text-slate-800">{stat.label}</p>
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{stat.desc}</p>
@@ -420,7 +420,7 @@ export default function AboutUs() {
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Header */}
           <div className="text-center max-w-xl mx-auto mb-20 space-y-4">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-100/20">The Innovators</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Innovators</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Our Growth Brain Trust</h2>
             <p className="text-slate-500 text-sm font-semibold">MEET our senior search architects, dataset specialists, and conversion engineers.</p>
           </div>
@@ -446,13 +446,13 @@ export default function AboutUs() {
                   />
                   {/* Social hover overlay */}
                   <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                    <a href={member.socials.twitter} className="w-10 h-10 bg-white hover:bg-emerald-600 text-slate-800 hover:text-white rounded-xl flex items-center justify-center shadow-lg transition-colors" aria-label="Twitter">
+                    <a href={member.socials.twitter} className="w-10 h-10 bg-white hover:bg-[#155dfc] text-slate-800 hover:text-white rounded-xl flex items-center justify-center shadow-lg transition-colors" aria-label="Twitter">
                       <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                     </a>
-                    <a href={member.socials.linkedin} className="w-10 h-10 bg-white hover:bg-emerald-600 text-slate-800 hover:text-white rounded-xl flex items-center justify-center shadow-lg transition-colors" aria-label="LinkedIn">
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    <a href={member.socials.linkedin} className="w-10 h-10 bg-white hover:bg-[#155dfc] text-slate-800 hover:text-white rounded-xl flex items-center justify-center shadow-lg transition-colors" aria-label="LinkedIn">
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0h.003z"/></svg>
                     </a>
-                    <a href={member.socials.github} className="w-10 h-10 bg-white hover:bg-emerald-600 text-slate-800 hover:text-white rounded-xl flex items-center justify-center shadow-lg transition-colors" aria-label="GitHub">
+                    <a href={member.socials.github} className="w-10 h-10 bg-white hover:bg-[#155dfc] text-slate-800 hover:text-white rounded-xl flex items-center justify-center shadow-lg transition-colors" aria-label="GitHub">
                       <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                     </a>
                   </div>
@@ -461,8 +461,8 @@ export default function AboutUs() {
                 {/* Content */}
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div className="space-y-2">
-                    <h3 className="font-black text-slate-900 text-lg group-hover:text-emerald-600 transition-colors">{member.name}</h3>
-                    <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{member.role}</p>
+                    <h3 className="font-black text-slate-900 text-lg group-hover:text-[#155dfc] transition-colors">{member.name}</h3>
+                    <p className="text-[10px] font-black text-[#155dfc] uppercase tracking-widest">{member.role}</p>
                     <p className="text-slate-400 text-xs font-semibold leading-relaxed pt-2">{member.desc}</p>
                   </div>
                 </div>
@@ -487,7 +487,7 @@ export default function AboutUs() {
             </div>
 
             {/* Glowing background circle */}
-            <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-teal-50 rounded-full blur-[90px] -z-10" />
+            <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-indigo-50 rounded-full blur-[90px] -z-10" />
 
             {/* Rating badge */}
             <motion.div 
@@ -506,7 +506,7 @@ export default function AboutUs() {
           {/* Right Heading + Feature List */}
           <div className="lg:col-span-6 space-y-10">
             <div className="space-y-4">
-              <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-100/20">The Advantage</span>
+              <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Advantage</span>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
                 Empowering Brands with Structural Search Supremacy
               </h2>
@@ -519,8 +519,8 @@ export default function AboutUs() {
               {chooseUsFeatures.map((feature, i) => {
                 const IconComponent = feature.icon;
                 return (
-                  <div key={i} className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 hover:border-emerald-100 transition-colors group">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm mb-4 group-hover:scale-105 transition-transform duration-300">
+                  <div key={i} className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 hover:border-[#155dfc]/20 transition-colors group">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#155dfc] shadow-sm mb-4 group-hover:scale-105 transition-transform duration-300">
                       <IconComponent className="w-6 h-6" />
                     </div>
                     <h4 className="font-black text-slate-900 text-lg mb-2">{feature.title}</h4>
@@ -536,24 +536,24 @@ export default function AboutUs() {
       {/* 8. CTA BANNER */}
       <section id="about-cta" className="py-12 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="relative bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden p-8 md:p-16 text-center space-y-8">
+          <div className="relative bg-gradient-to-br from-[#155dfc] via-[#0d47a1] to-[#0a2e5c] rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden p-8 md:p-16 text-center space-y-8">
             {/* Background elements */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/glass.png')] opacity-10 mix-blend-overlay" />
             <div className="absolute top-[-30%] right-[-10%] w-[60%] h-[100%] bg-white/5 blur-[120px] rounded-full" />
-            <div className="absolute bottom-[-20%] left-[-10%] w-[45%] h-[80%] bg-emerald-400/10 blur-[90px] rounded-full" />
+            <div className="absolute bottom-[-20%] left-[-10%] w-[45%] h-[80%] bg-[#155dfc]/10 blur-[90px] rounded-full" />
             
             <div className="max-w-2xl mx-auto space-y-6 relative z-10">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-200 border border-white/20 bg-white/10 px-4.5 py-1.5 rounded-full">Elevate Your Indexing</span>
+              <span className="text-xs font-extrabold uppercase tracking-widest text-blue-200 border border-white/20 bg-white/10 px-4.5 py-1.5 rounded-full">Elevate Your Indexing</span>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
                 Ready to dominate organic search results?
               </h2>
-              <p className="text-lg text-emerald-100 max-w-lg mx-auto leading-relaxed">
+              <p className="text-lg text-blue-100 max-w-lg mx-auto leading-relaxed">
                 Connect with our semantic engineers, construct your taxonomy outline, and start ranking for thousands of queries.
               </p>
               
               <div className="pt-4 flex flex-wrap gap-4 justify-center">
                 <Link to="/contact-us">
-                  <Button size="lg" className="h-14 px-8 rounded-full bg-white text-emerald-700 hover:bg-slate-50 font-black shadow-xl cursor-pointer">
+                  <Button size="lg" className="h-14 px-8 rounded-full bg-white text-[#155dfc] hover:bg-slate-50 font-black shadow-xl cursor-pointer">
                     Request a Free Audit
                   </Button>
                 </Link>
@@ -573,7 +573,7 @@ export default function AboutUs() {
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Header */}
           <div className="text-center mb-20 space-y-4">
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-100/20">The Flow</span>
+            <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Flow</span>
             <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
               Step-by-Step Towards Scale
             </h2>
@@ -588,19 +588,19 @@ export default function AboutUs() {
               const IconComponent = step.icon;
               return (
                 <div key={idx} className="relative group">
-                  <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-200/60 shadow-sm hover:shadow-xl hover:border-emerald-100 transition-all h-full flex flex-col gap-6 relative z-10">
+                  <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-200/60 shadow-sm hover:shadow-xl hover:border-[#155dfc]/20 transition-all h-full flex flex-col gap-6 relative z-10">
                     {/* Big fade step number */}
-                    <div className="text-6xl font-black text-slate-50 group-hover:text-emerald-50 transition-colors duration-500 absolute top-4 right-8 z-0 select-none">
+                    <div className="text-6xl font-black text-slate-50 group-hover:text-[#155dfc]/10 transition-colors duration-500 absolute top-4 right-8 z-0 select-none">
                       {step.step}
                     </div>
                     
                     {/* Icon container */}
-                    <div className="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-100 relative z-10">
+                    <div className="w-14 h-14 bg-[#155dfc] rounded-2xl flex items-center justify-center text-white shadow-lg shadow-[#155dfc]/15 relative z-10">
                       <IconComponent className="w-6 h-6" />
                     </div>
 
                     <div className="space-y-3 relative z-10 mt-2">
-                      <h3 className="text-xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors">{step.title}</h3>
+                      <h3 className="text-xl font-black text-slate-900 group-hover:text-[#155dfc] transition-colors">{step.title}</h3>
                       <p className="text-slate-500 leading-relaxed text-sm font-semibold">{step.desc}</p>
                     </div>
                   </div>
@@ -617,14 +617,14 @@ export default function AboutUs() {
       {/* 10. TESTIMONIALS */}
       <section id="about-testimonials" className="py-24 md:py-32 bg-white relative overflow-hidden">
         {/* Background ambient light */}
-        <div className="absolute top-1/2 left-0 w-80 h-80 bg-emerald-50/40 rounded-full blur-[100px] -z-10" />
+        <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#155dfc]/5 rounded-full blur-[100px] -z-10" />
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
             {/* Left Info Column */}
             <div className="lg:col-span-5 space-y-8">
               <div className="space-y-6">
-                <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-100/20">Success Stories</span>
+                <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Success Stories</span>
                 <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-[1.1]">
                   Grounded in Tangible Organic Revenue
                 </h2>
@@ -635,7 +635,7 @@ export default function AboutUs() {
 
               {/* Verified Badge Stack */}
               <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 flex items-center gap-6 group">
-                <div className="w-16 h-16 bg-emerald-600 rounded-[24px] flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-emerald-100 group-hover:scale-105 transition-transform duration-300">
+                <div className="w-16 h-16 bg-[#155dfc] rounded-[24px] flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-[#155dfc]/15 group-hover:scale-105 transition-transform duration-300">
                   99%
                 </div>
                 <div>
@@ -660,7 +660,7 @@ export default function AboutUs() {
               <div className="relative bg-white p-8 md:p-12 rounded-[2.5rem] border border-slate-200/60 shadow-[0_15px_45px_rgba(0,0,0,0.02)] min-h-[300px] flex flex-col justify-between overflow-hidden">
                 {/* Accent quote SVG mark */}
                 <div className="absolute top-8 right-8 opacity-[0.03] select-none pointer-events-none">
-                  <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor" className="text-emerald-600">
+                  <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor" className="text-[#155dfc]">
                     <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H16.017C15.4647 8 15.017 8.44772 15.017 9V12C15.017 12.5523 14.5693 13 14.017 13H11.017V21H14.017ZM3.017 21L3.017 18C3.017 16.8954 3.91239 16 5.017 16H8.017C8.56928 16 9.017 15.5523 9.017 15V9C9.017 8.44772 8.56928 8 8.017 8H5.017C4.46472 8 4.017 8.44772 4.017 9V12C4.017 12.5523 3.56928 13 3.017 13H0.017V21H3.017Z" />
                   </svg>
                 </div>
@@ -694,7 +694,7 @@ export default function AboutUs() {
                       <div>
                         <p className="font-black text-slate-900 text-base">{testimonials[activeTestimonial].name}</p>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
-                          {testimonials[activeTestimonial].role} <span className="text-emerald-600 mx-1">•</span> {testimonials[activeTestimonial].company}
+                          {testimonials[activeTestimonial].role} <span className="text-[#155dfc] mx-1">•</span> {testimonials[activeTestimonial].company}
                         </p>
                       </div>
                     </div>
@@ -708,7 +708,7 @@ export default function AboutUs() {
                   <button
                     key={idx}
                     onClick={() => setActiveTestimonial(idx)}
-                    className={`h-3 rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${activeTestimonial === idx ? 'w-8 bg-emerald-600' : 'w-3 bg-slate-200 hover:bg-slate-300'}`}
+                    className={`h-3 rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${activeTestimonial === idx ? 'w-8 bg-[#155dfc]' : 'w-3 bg-slate-200 hover:bg-slate-300'}`}
                     aria-label={`Show testimonial ${idx + 1}`}
                   />
                 ))}
@@ -721,14 +721,14 @@ export default function AboutUs() {
       {/* 11. NEWSLETTER */}
       <section id="about-newsletter" className="py-20 md:py-28 bg-slate-50 border-t border-slate-100">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="relative bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-10 md:p-14 border border-emerald-100/50 shadow-[0_20px_50px_-20px_rgba(16,185,129,0.08)] overflow-hidden">
+          <div className="relative bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-10 md:p-14 border border-[#155dfc]/20 shadow-[0_20px_50px_-20px_rgba(21,93,252,0.08)] overflow-hidden">
             {/* ambient ambient light blob inside container */}
-            <div className="absolute top-[-30%] right-[-10%] w-72 h-72 bg-emerald-500/5 rounded-full blur-[80px]" />
-            <div className="absolute bottom-[-30%] left-[-10%] w-64 h-64 bg-teal-500/5 rounded-full blur-[70px]" />
+            <div className="absolute top-[-30%] right-[-10%] w-72 h-72 bg-[#155dfc]/5 rounded-full blur-[80px]" />
+            <div className="absolute bottom-[-30%] left-[-10%] w-64 h-64 bg-indigo-500/5 rounded-full blur-[70px]" />
 
             <div className="relative z-10 text-center space-y-8 max-w-2xl mx-auto">
               <div className="space-y-4">
-                <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-100/20">Algorithmic Updates</span>
+                <span className="text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Algorithmic Updates</span>
                 <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Stay Ahead of Google Changes</h2>
                 <p className="text-slate-500 text-sm font-semibold leading-relaxed">
                   Join 5,000+ organic growth hackers receiving our bi-weekly breakdown of algorithmic indices, taxonomies, and CTR optimization parameters.
@@ -755,13 +755,13 @@ export default function AboutUs() {
                             if (newsletterError) setNewsletterError("");
                           }}
                           placeholder="your@email.com"
-                          className={`w-full h-12 px-5 bg-slate-50 border ${newsletterError ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-emerald-600'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all`}
+                          className={`w-full h-12 px-5 bg-slate-50 border ${newsletterError ? 'border-red-400 focus:border-red-400' : 'border-slate-100 focus:border-[#155dfc]'} rounded-2xl text-slate-800 text-sm font-bold focus:bg-white focus:outline-none transition-all`}
                         />
                       </div>
                       <Button 
                         type="submit" 
                         disabled={newsletterLoading}
-                        className="h-12 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow-lg shadow-emerald-100 cursor-pointer shrink-0"
+                        className="h-12 px-8 rounded-2xl bg-[#155dfc] hover:bg-[#155dfc]/90 text-white font-black text-sm shadow-lg shadow-[#155dfc]/15 cursor-pointer shrink-0"
                       >
                         {newsletterLoading ? "Analyzing Request..." : "Subscribe"}
                       </Button>
@@ -775,7 +775,7 @@ export default function AboutUs() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="py-4 text-center space-y-4"
                   >
-                    <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto text-emerald-600">
+                    <div className="w-12 h-12 bg-[#155dfc]/10 rounded-full flex items-center justify-center mx-auto text-[#155dfc]">
                       <Check className="w-6 h-6" />
                     </div>
                     <div className="space-y-1">
