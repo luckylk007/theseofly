@@ -255,7 +255,7 @@ export default function AboutUs() {
               Pioneering the Future of <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#155dfc] via-blue-500 to-indigo-500">Organic Visibility</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium">
+            <p className="text-base text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium">
               We construct advanced programmatic distribution frameworks, combining structured data with linguistic models to scale search footprints seamlessly.
             </p>
             <div className="pt-4 flex justify-center">
@@ -299,7 +299,7 @@ export default function AboutUs() {
               </h2>
             </div>
             
-            <p className="text-base md:text-lg text-slate-500 font-medium leading-relaxed">
+            <p className="text-base text-slate-500 font-medium leading-relaxed">
               At Theseofly, we believe static content engines are obsolete. Modern customer acquisition demands organic reach at scale. We combine advanced database onboarding with dynamic search schemas to engineer high-velocity publishing pipelines.
             </p>
             <p className="text-base text-slate-400 font-medium leading-relaxed">
@@ -361,7 +361,7 @@ export default function AboutUs() {
           <div className="text-center max-w-xl mx-auto mb-20 space-y-6">
             <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Our Foundation</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Core Strategic Columns</h2>
-            <p className="text-slate-500 text-sm font-semibold">The key philosophies that guide our engineering values and customer alignments daily.</p>
+            <p className="text-slate-500 text-base font-semibold">The key philosophies that guide our engineering values and customer alignments daily.</p>
           </div>
 
           {/* Core values cards */}
@@ -387,7 +387,7 @@ export default function AboutUs() {
                     <div className="space-y-3">
                       <p className="text-[10px] font-black text-[#155dfc] uppercase tracking-widest">{value.tagline}</p>
                       <h3 className="text-2xl font-black text-slate-900 group-hover:text-[#155dfc] transition-colors">{value.title}</h3>
-                      <p className="text-slate-500 text-sm font-medium leading-relaxed pt-2">{value.desc}</p>
+                      <p className="text-slate-500 text-base font-medium leading-relaxed pt-2">{value.desc}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -422,7 +422,7 @@ export default function AboutUs() {
           <div className="text-center max-w-xl mx-auto mb-20 space-y-6">
             <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">The Innovators</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Our Growth Brain Trust</h2>
-            <p className="text-slate-500 text-sm font-semibold">MEET our senior search architects, dataset specialists, and conversion engineers.</p>
+            <p className="text-slate-500 text-base font-semibold">MEET our senior search architects, dataset specialists, and conversion engineers.</p>
           </div>
 
           {/* Grid */}
@@ -547,7 +547,7 @@ export default function AboutUs() {
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
                 Ready to dominate organic search results?
               </h2>
-              <p className="text-lg text-blue-100 max-w-lg mx-auto leading-relaxed">
+              <p className="text-base text-blue-100 max-w-lg mx-auto leading-relaxed">
                 Connect with our semantic engineers, construct your taxonomy outline, and start ranking for thousands of queries.
               </p>
               
@@ -577,7 +577,7 @@ export default function AboutUs() {
             <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
               Step-by-Step Towards Scale
             </h2>
-            <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+            <p className="text-base text-slate-500 max-w-2xl mx-auto">
               Our structured onboarding guarantees precision taxonomies and absolute indexing speeds.
             </p>
           </div>
@@ -601,7 +601,7 @@ export default function AboutUs() {
 
                     <div className="space-y-3 relative z-10 mt-2">
                       <h3 className="text-xl font-black text-slate-900 group-hover:text-[#155dfc] transition-colors">{step.title}</h3>
-                      <p className="text-slate-500 leading-relaxed text-sm font-semibold">{step.desc}</p>
+                      <p className="text-slate-500 leading-relaxed text-base font-semibold">{step.desc}</p>
                     </div>
                   </div>
                   {idx < 2 && (
@@ -680,7 +680,7 @@ export default function AboutUs() {
                           <Star key={s} className="w-4.5 h-4.5 fill-current" />
                         ))}
                       </div>
-                      <p className="text-slate-700 text-lg md:text-xl font-bold italic leading-relaxed">
+                      <p className="text-slate-700 text-base font-bold italic leading-relaxed">
                         "{testimonials[activeTestimonial].text}"
                       </p>
                     </div>
@@ -730,7 +730,7 @@ export default function AboutUs() {
               <div className="space-y-6">
                 <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc] bg-[#155dfc]/10 px-3.5 py-1.5 rounded-full border border-[#155dfc]/20">Algorithmic Updates</span>
                 <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Stay Ahead of Google Changes</h2>
-                <p className="text-slate-500 text-sm font-semibold leading-relaxed">
+                <p className="text-slate-500 text-base font-semibold leading-relaxed">
                   Join 5,000+ organic growth hackers receiving our bi-weekly breakdown of algorithmic indices, taxonomies, and CTR optimization parameters.
                 </p>
               </div>

@@ -378,7 +378,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                 <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight">
                   {page.title}
                 </h1>
-                <p className="text-xl text-slate-600 leading-relaxed max-w-lg">
+                <p className="text-base text-slate-600 leading-relaxed max-w-lg">
                   Looking for reliable {serviceName || "professional"} experts in {cityName || "your city"}? We provide top-rated, professional services tailored for your needs.
                 </p>
                 <div className="flex flex-wrap gap-4 pt-4">
@@ -418,7 +418,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
           {page.website?.global_seo_settings?.programmatic_template && (
             <section className="bg-white p-12 rounded-[2.5rem] border border-slate-100 shadow-sm">
               <div 
-                className="prose prose-lg prose-slate max-w-none text-slate-600 leading-relaxed text-lg"
+                className="prose prose-slate max-w-none text-slate-600 leading-relaxed text-base"
                 dangerouslySetInnerHTML={{ 
                   __html: interpolate(page.website.global_seo_settings.programmatic_template, vars) 
                 }}
@@ -430,7 +430,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
           <section className="space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-4">
               <h2 className="text-3xl font-black text-slate-900">Why choose our {serviceName || "expert team"} in {cityName || "your city"}?</h2>
-              <p className="text-slate-500 text-lg">We deliver exceptional results by combining local expertise with industry-leading standards.</p>
+              <p className="text-slate-500 text-base">We deliver exceptional results by combining local expertise with industry-leading standards.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -444,7 +444,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                     <CheckCircle2 className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 mb-3">{benefit.title}</h3>
-                  <p className="text-slate-600">{benefit.desc}</p>
+                  <p className="text-slate-600 text-base">{benefit.desc}</p>
                 </div>
               ))}
             </div>
@@ -458,7 +458,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                   <MapPin className="w-6 h-6 text-blue-600" />
                   Nearby Locations
                 </h3>
-                <p className="text-slate-500">We also serve these areas around {cityName || "your city"}:</p>
+                <p className="text-slate-500 text-base">We also serve these areas around {cityName || "your city"}:</p>
                 <div className="grid grid-cols-2 gap-4">
                   {relatedCities.map((c) => {
                      const serviceSlug = vars.service_slug || "services";
@@ -480,7 +480,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                   <Briefcase className="w-6 h-6 text-blue-600" />
                   Other Services in {cityName || "your city"}
                 </h3>
-                <p className="text-slate-500">Explore our full range of solutions:</p>
+                <p className="text-slate-500 text-base">Explore our full range of solutions:</p>
                 <div className="flex flex-wrap gap-2">
                   {relatedServices.map((s) => {
                      const countrySlug = vars.country_slug || "usa";
@@ -504,7 +504,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
             </div>
             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
               <h2 className="text-4xl font-black">Ready to get started in {cityName || "your city"}?</h2>
-              <p className="text-blue-100 text-lg">Contact our {serviceName || "expert"} team today for a free consultation and quote.</p>
+              <p className="text-blue-100 text-base">Contact our {serviceName || "expert"} team today for a free consultation and quote.</p>
               <button className="px-10 py-5 bg-white text-blue-600 hover:bg-blue-50 font-black rounded-2xl text-lg transition-all shadow-xl">
                 Contact Us Now
               </button>
@@ -551,7 +551,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                 {page.title}
               </h1>
               {page.seo?.[0]?.description && (
-                <p className="text-xl text-slate-600 leading-relaxed max-w-lg">
+                <p className="text-base text-slate-600 leading-relaxed max-w-lg">
                   {page.seo[0].description}
                 </p>
               )}
@@ -573,11 +573,11 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
       <main className="max-w-7xl mx-auto px-6 py-20">
         <div className="space-y-12">
           {renderData.sections?.map((section: any, idx: number) => (
-            <section key={idx} className="prose prose-lg max-w-none">
+            <section key={idx} className="prose max-w-none">
               {section.heading && <h2 className="text-3xl font-black text-slate-900 mb-6">{section.heading}</h2>}
               {section.text && (
                 <div 
-                  className="text-slate-600 leading-relaxed space-y-6 text-lg"
+                  className="text-slate-600 leading-relaxed space-y-6 text-base"
                   dangerouslySetInnerHTML={{ __html: section.text }}
                 />
               )}

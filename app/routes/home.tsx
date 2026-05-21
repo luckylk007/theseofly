@@ -88,7 +88,7 @@ export default function HomePage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <p className="text-xl text-slate-500 leading-relaxed max-w-lg md:ml-auto md:text-right font-medium">
+              <p className="text-base text-slate-500 leading-relaxed max-w-lg md:ml-auto md:text-right font-medium">
                 The world's most advanced programmatic SEO platform. Scale your search dominance with AI-powered page generation and automated meta optimization.
               </p>
             </motion.div>
@@ -239,7 +239,7 @@ export default function HomePage() {
                 Transforming Businesses with Programmatic SEO
               </h2>
             </div>
-            <p className="text-lg text-slate-500 leading-relaxed">
+            <p className="text-base text-slate-500 leading-relaxed">
               We don't just build pages; we build automated growth machines. Our platform combines deep technical SEO expertise with cutting-edge AI to help you dominate search results at scale.
             </p>
             <div className="space-y-4">
@@ -271,7 +271,7 @@ export default function HomePage() {
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
             Comprehensive SEO Solutions
           </h2>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+          <p className="text-base text-slate-500 max-w-2xl mx-auto">
             Scale your digital presence with tools built for speed, accuracy, and mass automation.
           </p>
         </div>
@@ -325,7 +325,7 @@ export default function HomePage() {
               </div>
               <div className="space-y-3 flex-1">
                 <h3 className="text-xl font-black text-slate-900">{feature.title}</h3>
-                <p className="text-slate-500 leading-relaxed text-sm font-medium">{feature.desc}</p>
+                <p className="text-slate-500 leading-relaxed text-base font-medium">{feature.desc}</p>
               </div>
               <a href="#" className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:gap-3 transition-all">
                 Learn more <ArrowRight className="w-4 h-4" />
@@ -347,7 +347,7 @@ export default function HomePage() {
                   For Your Business Growth
                 </h2>
               </div>
-              <p className="text-lg text-slate-500 leading-relaxed">
+              <p className="text-base text-slate-500 leading-relaxed">
                 Beyond our platform's automated capabilities, we provide deep-dive strategic services to ensure your programmatic SEO efforts align with your broader business goals.
               </p>
               
@@ -364,7 +364,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h4 className="font-bold text-slate-900">{service.title}</h4>
-                      <p className="text-sm text-slate-500 mt-1">{service.desc}</p>
+                      <p className="text-base text-slate-500 mt-1">{service.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -382,14 +382,14 @@ export default function HomePage() {
                     <MousePointerClick className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-black text-slate-900 mb-2">CRO Analysis</h3>
-                  <p className="text-sm text-slate-500 font-medium">Turn traffic into revenue with conversion testing.</p>
+                  <p className="text-base text-slate-500 font-medium">Turn traffic into revenue with conversion testing.</p>
                 </div>
                 <div className="p-8 bg-blue-600 rounded-[32px] text-white shadow-xl shadow-blue-200 group">
                   <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform">
                     <BarChart3 className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-black mb-2">Data Analytics</h3>
-                  <p className="text-sm text-blue-100 font-medium">Real-time tracking of every keyword and click.</p>
+                  <p className="text-base text-blue-100 font-medium">Real-time tracking of every keyword and click.</p>
                 </div>
               </div>
               <div className="space-y-6">
@@ -398,14 +398,14 @@ export default function HomePage() {
                     <Globe className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-black mb-2">Global Reach</h3>
-                  <p className="text-sm text-indigo-100 font-medium">Scale your presence across multiple languages.</p>
+                  <p className="text-base text-indigo-100 font-medium">Scale your presence across multiple languages.</p>
                 </div>
                 <div className="p-8 bg-slate-50 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-md transition-all group">
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm mb-6 group-hover:scale-110 transition-transform">
                     <Search className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-black text-slate-900 mb-2">Market Intel</h3>
-                  <p className="text-sm text-slate-500 font-medium">Monitor competitors and industry trends.</p>
+                  <p className="text-base text-slate-500 font-medium">Monitor competitors and industry trends.</p>
                 </div>
               </div>
             </div>
@@ -430,7 +430,7 @@ export default function HomePage() {
                 Ready to Dominate <br className="hidden md:block" />
                 Your Search Category?
               </h2>
-              <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed font-medium">
+              <p className="text-base text-blue-100 max-w-2xl mx-auto leading-relaxed font-medium">
                 Join 1,500+ SEO teams using Theseofly to automate their growth. Start building your programmatic empire today.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
@@ -462,7 +462,7 @@ export default function HomePage() {
             <h2 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900">
               Step-by-Step to Achieving Your Goals
             </h2>
-            <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+            <p className="text-base text-slate-500 max-w-2xl mx-auto">
               We follow a rigorous, data-driven methodology to ensure every page we generate contributes to your bottom line.
             </p>
           </div>
@@ -495,7 +495,7 @@ export default function HomePage() {
                   </div>
                   <div className="space-y-3 relative z-10 mt-4">
                     <h3 className="text-xl font-black text-slate-900">{item.title}</h3>
-                    <p className="text-slate-500 leading-relaxed text-sm font-medium">{item.desc}</p>
+                    <p className="text-slate-500 leading-relaxed text-base font-medium">{item.desc}</p>
                   </div>
                 </div>
                 {idx < 2 && (
@@ -550,7 +550,7 @@ export default function HomePage() {
                 Empowering Your Business <br />
                 To Grow Smarter
               </h2>
-              <p className="text-lg text-slate-500 leading-relaxed max-w-xl">
+              <p className="text-base text-slate-500 leading-relaxed max-w-xl">
                 We specialize in scaling digital footprints through a unique blend of programmatic automation, strategic SEO, and data-driven marketing innovation.
               </p>
             </div>
@@ -571,7 +571,7 @@ export default function HomePage() {
                     <feature.icon className="w-6 h-6" />
                   </div>
                   <h4 className="font-bold text-slate-900 text-lg mb-2">{feature.title}</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
+                  <p className="text-base text-slate-500 font-medium leading-relaxed">{feature.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -597,7 +597,7 @@ export default function HomePage() {
                   Success Stories <br />
                   From Our Partners
                 </h2>
-                <p className="text-lg text-slate-500 leading-relaxed max-w-md">
+                <p className="text-base text-slate-500 leading-relaxed max-w-md">
                   We measure our success by the growth of our clients. Join thousands of high-performing teams scaling with Theseofly.
                 </p>
               </div>
@@ -695,7 +695,7 @@ export default function HomePage() {
                     </div>
                   </div>
                   
-                  <p className="text-slate-600 font-bold italic leading-[1.6] flex-1 text-[15px]">
+                  <p className="text-slate-600 font-bold italic leading-[1.6] flex-1 text-base">
                     "{review.text}"
                   </p>
                   

@@ -198,7 +198,7 @@ export default function ContactUs() {
               Let's Start a <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-300 drop-shadow-sm">Conversation</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
+            <p className="text-base text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
               Have questions about programmatic scaling, automated indexing, or custom SEO funnels? Our digital strategists are standing by to engineer your growth blueprint.
             </p>
             <div className="pt-4 flex justify-center">
@@ -239,7 +239,7 @@ export default function ContactUs() {
                     <h3 className="text-xl font-bold text-slate-900 group-hover:text-[#155dfc] transition-colors">{card.title}</h3>
                     <div className="space-y-1">
                       {card.details.map((detail, dIdx) => (
-                        <p key={dIdx} className="text-slate-500 text-sm font-semibold">{detail}</p>
+                        <p key={dIdx} className="text-slate-500 text-base font-semibold">{detail}</p>
                       ))}
                     </div>
                   </div>
@@ -443,7 +443,7 @@ export default function ContactUs() {
                   </div>
                   <div className="space-y-3">
                     <h3 className="text-3xl font-black text-slate-900">Request Received!</h3>
-                    <p className="text-slate-500 font-medium max-w-md mx-auto leading-relaxed">
+                    <p className="text-slate-500 text-base font-medium max-w-md mx-auto leading-relaxed">
                       Thank you for contacting Theseofly! Your project details have been safely queued. A senior programmatic growth architect is compiling your SEO audit now and will email you back within 2 hours.
                     </p>
                   </div>
@@ -470,7 +470,7 @@ export default function ContactUs() {
           <div className="text-center max-w-xl mx-auto mb-12 space-y-6">
             <span className="inline-block text-xs font-black uppercase tracking-widest text-[#155dfc]">Global Hub</span>
             <h2 className="text-3xl md:text-4xl font-black text-slate-900">San Francisco Headquarters</h2>
-            <p className="text-slate-500 text-sm font-semibold">Join us at our creative workspace in the heart of San Francisco's Financial District.</p>
+            <p className="text-slate-500 text-base font-semibold">Join us at our creative workspace in the heart of San Francisco's Financial District.</p>
           </div>
 
           <div className="relative rounded-[2.5rem] overflow-hidden border-8 border-white shadow-2xl aspect-[21/9] min-h-[350px]">
@@ -562,7 +562,7 @@ export default function ContactUs() {
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
                 Ready to dominate search engine results?
               </h2>
-              <p className="text-lg text-blue-100 max-w-lg mx-auto leading-relaxed">
+              <p className="text-base text-blue-100 max-w-lg mx-auto leading-relaxed">
                 Connect with our strategists, check our scaling packages, or read standard algorithmic strategies.
               </p>
               
