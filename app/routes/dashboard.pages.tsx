@@ -58,7 +58,9 @@ export default function PagesManagement() {
   const { 
     pages, loading, error, 
     addPage, updatePage, deletePage, 
-    bulkUpdatePages, bulkDeletePages 
+    bulkUpdatePages, bulkDeletePages,
+    generating: isGenerating,
+    generateDefaultCompanyPages
   } = usePages(website?.id);
   const { taxonomies: allTaxonomies } = useTaxonomies(website?.id);
   
@@ -318,26 +320,57 @@ export default function PagesManagement() {
               : `Manage ${website?.name || 'your'} website's bulk-generated programmatic service-location pages.`}
           </p>
         </div>
-        <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90 rounded-full" onClick={() => {
-          setFormData({ 
-            title: "", 
-            slug: "", 
-            website_id: website?.id || "", 
-            status: "draft",
-            is_programmatic: activeTab === 'programmatic',
-            content_type: "page",
-            post_type: "page",
-            category_id: "",
-            tag_ids: [],
-            parent_id: null,
-            allow_comments: false,
-            featured_image_url: ""
-          });
-          setIsCreateModalOpen(true);
-        }}>
-          <Plus className="w-4 h-4" />
-          Create Page
-        </Button>
+        <div className="flex items-center gap-3">
+          {activeTab === 'main' && (
+            <Button 
+              variant="outline" 
+              className="gap-2 border-slate-200 text-slate-700 hover:bg-slate-50 rounded-full cursor-pointer"
+              onClick={async () => {
+                if (confirm("Are you sure you want to generate (or regenerate) the 8 default company pages? This will overwrite existing pages with the same slugs: /about-us, /contact-us, /plans, /services, /countries, /cities, /industries, and /blog.")) {
+                  try {
+                    await generateDefaultCompanyPages();
+                    alert("Successfully generated all 8 premium company pages!");
+                  } catch (err: any) {
+                    alert(err.message || "Failed to generate company pages");
+                  }
+                }
+              }}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-[#155dfc]" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  Setup Basic Pages
+                </>
+              )}
+            </Button>
+          )}
+          <Button className="gap-2 bg-[#155dfc] hover:bg-[#155dfc]/90 rounded-full cursor-pointer" onClick={() => {
+            setFormData({ 
+              title: "", 
+              slug: "", 
+              website_id: website?.id || "", 
+              status: "draft",
+              is_programmatic: activeTab === 'programmatic',
+              content_type: "page",
+              post_type: "page",
+              category_id: "",
+              tag_ids: [],
+              parent_id: null,
+              allow_comments: false,
+              featured_image_url: ""
+            });
+            setIsCreateModalOpen(true);
+          }}>
+            <Plus className="w-4 h-4" />
+            Create Page
+          </Button>
+        </div>
       </div>
 
       {/* Dynamic Tab Bar Navigation */}

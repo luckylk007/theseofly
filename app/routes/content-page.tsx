@@ -574,8 +574,13 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
         <div className="space-y-12">
           {renderData.sections?.map((section: any, idx: number) => (
             <section key={idx} className="prose prose-lg max-w-none">
-              {section.heading && <h2 className="text-3xl font-bold">{section.heading}</h2>}
-              {section.text && <p className="text-slate-600">{section.text}</p>}
+              {section.heading && <h2 className="text-3xl font-black text-slate-900 mb-6">{section.heading}</h2>}
+              {section.text && (
+                <div 
+                  className="text-slate-600 leading-relaxed space-y-6 text-lg"
+                  dangerouslySetInnerHTML={{ __html: section.text }}
+                />
+              )}
             </section>
           ))}
 

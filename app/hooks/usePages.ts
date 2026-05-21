@@ -7,6 +7,7 @@ export function usePages(websiteId?: string) {
   const [pages, setPages] = useState<CMSPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
   const { user } = useAuthStore();
 
   const fetchPages = async () => {
@@ -165,17 +166,85 @@ export function usePages(websiteId?: string) {
     }
   };
 
+  const generateDefaultCompanyPages = async () => {
+    if (!websiteId) return;
+    setGenerating(true);
+    setError(null);
+    try {
+      const { companyPagesPayload } = await import("../data/companyPagesPayload");
+      for (const pagePayload of companyPagesPayload) {
+        const { seo, ...pageData } = pagePayload;
+        
+        // 1. Delete existing page with the same slug and website_id
+        await supabase
+          .from('pages')
+          .delete()
+          .eq('website_id', websiteId)
+          .eq('slug', pageData.slug);
+
+        // 2. Insert new page
+        const { data: insertedPageData, error: pageError } = await supabase
+          .from('pages')
+          .insert([{
+            ...pageData,
+            website_id: websiteId,
+            is_programmatic: false
+          }])
+          .select()
+          .single();
+
+        const insertedPage = insertedPageData as any;
+
+        if (pageError) {
+          throw new Error(`Failed to create page "${pageData.title}": ${pageError.message}`);
+        }
+
+        // 3. Create SEO Metadata
+        const seoPayload = {
+          page_id: insertedPage.id,
+          title: seo.title,
+          description: seo.description,
+          canonical_url: `https://theseofly.vercel.app/${pageData.slug}`,
+          noindex: false,
+          schema_markup: {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": seo.title,
+            "description": seo.description,
+            "url": `https://theseofly.vercel.app/${pageData.slug}`
+          }
+        };
+
+        const { error: seoError } = await supabase
+          .from('seo_metadata')
+          .insert([seoPayload]);
+
+        if (seoError) {
+          console.warn(`Warning: Failed to create SEO Metadata for "${pageData.title}": ${seoError.message}`);
+        }
+      }
+      await fetchPages();
+    } catch (err: any) {
+      setError(err.message || "Failed to generate default pages");
+      throw err;
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   return { 
     pages, 
     loading, 
     error, 
+    generating,
     fetchPages, 
     addPage, 
-    bulkAddPages, // Added
+    bulkAddPages, 
     updatePage, 
     deletePage, 
     bulkUpdatePages, 
-    bulkDeletePages 
+    bulkDeletePages,
+    generateDefaultCompanyPages
   };
 
   async function syncPageTaxonomies(pageId: string, taxonomyIds: string[]) {
