@@ -4,6 +4,7 @@ export default [
   index("routes/home.tsx"),
   route("login", "routes/login.tsx"),
   route("editor-demo", "routes/editor-demo.tsx"),
+  route("contact-us", "routes/contact-us.tsx"),
   
   layout("layouts/DashboardLayout.tsx", [
     route("admin", "routes/dashboard.home.tsx"),
