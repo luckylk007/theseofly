@@ -166,21 +166,22 @@ export default function ContactUs() {
       <Header />
 
       {/* 1. HERO SECTION */}
-      <section className="relative py-20 lg:py-28 bg-white overflow-hidden border-b border-slate-100">
-        {/* Soft Background Gradients */}
-        <div className="absolute inset-0 pointer-events-none -z-10">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl">
-            <div className="absolute top-[-10%] left-[10%] w-[35%] h-[35%] bg-blue-50/70 blur-[100px] rounded-full opacity-60" />
-            <div className="absolute bottom-[10%] right-[10%] w-[30%] h-[30%] bg-indigo-50/50 blur-[90px] rounded-full" />
-          </div>
-        </div>
+      <section className="relative py-24 lg:py-32 overflow-hidden border-b border-slate-900 bg-slate-950">
+        {/* Background Image with Cover */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url('/assets/blue_crystal_bg.png')` }}
+        />
+        
+        {/* Premium Dark Glassmorphism Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/75 via-slate-950/85 to-slate-950/95 backdrop-blur-[3px] z-0" />
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 text-center relative z-10">
           {/* Breadcrumb Navigation */}
-          <div className="flex justify-center items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400 mb-8">
-            <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-blue-600">Contact Us</span>
+          <div className="flex justify-center items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-300 mb-8">
+            <Link to="/" className="hover:text-blue-400 transition-colors">Home</Link>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-500" />
+            <span className="text-blue-400 font-bold">Contact Us</span>
           </div>
 
           <motion.div
@@ -189,20 +190,20 @@ export default function ContactUs() {
             transition={{ duration: 0.6 }}
             className="max-w-3xl mx-auto space-y-6"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 text-blue-600" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
               Scale Your Organic Growth
             </div>
-            <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight leading-tight">
+            <h1 className="text-5xl md:text-7xl font-black text-white tracking-tight leading-tight">
               Let's Start a <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-500">Conversations</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-indigo-300 drop-shadow-sm">Conversation</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed font-medium">
               Have questions about programmatic scaling, automated indexing, or custom SEO funnels? Our digital strategists are standing by to engineer your growth blueprint.
             </p>
             <div className="pt-4 flex justify-center">
               <a href="#contact-form-section">
-                <Button size="lg" className="h-14 px-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-100 group transition-all cursor-pointer">
+                <Button size="lg" className="h-14 px-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-900/40 hover:shadow-blue-600/30 group transition-all cursor-pointer border border-blue-500/30">
                   Request a Free Audit <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
