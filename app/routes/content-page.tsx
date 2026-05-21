@@ -11,9 +11,17 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const previewId = url.searchParams.get("preview");
   
-  // 1. Extract and normalize the slug from the URL
-  let rawSlug = params["*"] || "";
-  const slug = rawSlug.trim().replace(/^\/+|\/+$/g, "");
+  // 1. Extract and normalize the slug from the URL parameters (supporting both flat catchall and hierarchical URL paths)
+  let slug = "";
+  if (params.country) {
+    const parts = [params.country];
+    if (params.city) parts.push(params.city);
+    if (params.service) parts.push(params.service);
+    slug = parts.join("/");
+  } else {
+    let rawSlug = params["*"] || "";
+    slug = rawSlug.trim().replace(/^\/+|\/+$/g, "");
+  }
 
   console.log(`[ContentPage] DEBUG: Full URL="${request.url}"`);
   console.log(`[ContentPage] DEBUG: Slug="${slug}", PreviewID="${previewId}"`);
@@ -31,7 +39,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     const { data: pageData, error: previewError } = await supabase.rpc("get_page_preview", { p_id: previewId });
     
     if (pageData && !previewError) {
-      return processPage(pageData, true);
+      return processPage(pageData, true, request);
     }
 
     // Attempt 2: Direct Query Fallback
@@ -49,7 +57,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       .maybeSingle();
 
     if (directData) {
-      return processPage(directData, true);
+      return processPage(directData, true, request);
     }
 
     const rpcMsg = previewError?.message || "No RPC data";
@@ -110,9 +118,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       if (!slashData) {
         throw new Response(`[404_NOT_FOUND] SLUG: "${slug}" | PREVIEW_ID: "${previewId}" | URL: ${request.url}`, { status: 404 });
       }
-      return processPage(slashData, false);
+      return processPage(slashData, false, request);
     }
-    return processPage(fallbackData, false);
+    return processPage(fallbackData, false, request);
   }
 
   // Check if it's a draft and we are NOT in preview mode
@@ -123,10 +131,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     }
   }
 
-  return processPage(pageData, false);
+  return processPage(pageData, false, request);
 }
 
-async function processPage(pageData: any, isPreview: boolean) {
+async function processPage(pageData: any, isPreview: boolean, request: Request) {
   const page = pageData as any;
   let relatedCities: any[] = [];
   let relatedServices: any[] = [];
@@ -159,6 +167,8 @@ async function processPage(pageData: any, isPreview: boolean) {
   const categories = assignments.filter((item: any) => item.type === "category");
   const tags = assignments.filter((item: any) => item.type === "tag");
 
+  const url = new URL(request.url);
+
   return {
     page: {
       ...page,
@@ -167,31 +177,56 @@ async function processPage(pageData: any, isPreview: boolean) {
     },
     relatedCities,
     relatedServices,
-    isPreview: isPreview || page.status !== "published"
+    isPreview: isPreview || page.status !== "published",
+    pathname: url.pathname,
+    origin: url.origin
   };
 }
 
 export function meta({ data }: Route.MetaArgs) {
   if (!data || !data.page) return [{ title: "Page Not Found" }];
 
-  const { page, isPreview } = data;
+  const { page, isPreview, pathname, origin } = data;
   const seo = page.seo?.[0] || {};
+  const vars = page.variables || {};
 
-  const title = isPreview ? `[PREVIEW] ${seo.title || page.title}` : (seo.title || page.title);
+  const country = vars.country || vars.country_slug || "";
+  const city = vars.city || vars.city_slug || "";
+  const service = vars.service || vars.service_slug || "";
+
+  const cityName = city ? String(city).replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "";
+  const serviceName = service ? String(service).replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "";
+  const countryName = country ? (String(country).toLowerCase() === "usa" ? "USA" : String(country).replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())) : "";
+
+  // 1. Dynamic Local Title Generation
+  const defaultTitle = page.is_programmatic && cityName && serviceName 
+    ? `Best ${serviceName} in ${cityName}${countryName ? ', ' + countryName : ''} | Expert Local Services`
+    : page.title;
+  const title = isPreview ? `[PREVIEW] ${seo.title || defaultTitle}` : (seo.title || defaultTitle);
+
+  // 2. Dynamic Local Meta Description Generation
+  const defaultDesc = page.is_programmatic && cityName && serviceName 
+    ? `Looking for top-rated ${serviceName} in ${cityName}, ${countryName || 'USA'}? We provide premier, high-quality local professional services. Contact us today for a free quote!`
+    : (page.description || `Expert professional services in your area.`);
+  const metaDesc = seo.description || defaultDesc;
+
+  // 3. Dynamic Canonical URL Generation
+  const baseUrl = origin || "https://theseofly.vercel.app";
+  const canonicalUrl = seo.canonical_url || `${baseUrl}${pathname || ''}`;
 
   return [
     { title },
-    { name: "description", content: seo.description || "" },
+    { name: "description", content: metaDesc },
     { property: "og:title", content: title },
-    { property: "og:description", content: seo.description || "" },
-    { property: "og:image", content: seo.og_image || "" },
-    { rel: "canonical", href: seo.canonical_url || "" },
+    { property: "og:description", content: metaDesc },
+    { property: "og:image", content: seo.og_image || page.featured_image_url || `${baseUrl}/og-image-default.png` },
+    { rel: "canonical", href: canonicalUrl },
     ...(isPreview ? [{ name: "robots", content: "noindex, nofollow" }] : [])
   ];
 }
 
 export default function DynamicPage({ loaderData }: Route.ComponentProps) {
-  const { page, relatedCities, relatedServices, isPreview } = loaderData;
+  const { page, relatedCities, relatedServices, isPreview, pathname, origin } = loaderData;
 
   const interpolate = (text: string, variables: Record<string, any>) => {
     if (!text || typeof text !== "string") return text;
@@ -222,11 +257,75 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
 
   const vars = page.variables || {};
 
+  const country = vars.country || vars.country_slug || "";
+  const city = vars.city || vars.city_slug || "";
+  const service = vars.service || vars.service_slug || "";
+
+  const cityName = city ? String(city).replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "";
+  const serviceName = service ? String(service).replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase()) : "";
+  const countryName = country ? (String(country).toLowerCase() === "usa" ? "USA" : String(country).replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase())) : "";
+
+  // 1. Auto-generate breadcrumbs based on URL segment hierarchy
+  const breadcrumbs = useMemo(() => {
+    const segments = (pathname || "").split("/").filter(Boolean);
+    const crumbs = [{ label: "Home", link: "/" }];
+    
+    let currentPath = "";
+    segments.forEach((segment, idx) => {
+      currentPath += `/${segment}`;
+      let label = segment.replace(/-/g, " ");
+      
+      if (label.toLowerCase() === "usa") {
+        label = "USA";
+      } else if (label.toLowerCase() === "seo") {
+        label = "SEO";
+      } else {
+        label = label.replace(/\b\w/g, (char) => char.toUpperCase());
+      }
+      
+      crumbs.push({
+        label,
+        link: idx === segments.length - 1 ? "" : currentPath
+      });
+    });
+    
+    return crumbs;
+  }, [pathname]);
+
+  // 2. Dynamically build LocalBusiness schema.org JSON-LD
+  const schemaMarkup = useMemo(() => {
+    if (page.seo?.[0]?.schema_markup) {
+      return page.seo[0].schema_markup;
+    }
+
+    if (page.is_programmatic) {
+      const canonical = `${origin || "https://theseofly.vercel.app"}${pathname || ""}`;
+      const desc = page.seo?.[0]?.description || `Professional ${serviceName || "expert"} services in ${cityName || "your local city"}.`;
+      
+      return {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": page.title,
+        "description": desc,
+        "url": canonical,
+        "image": page.featured_image_url || "https://theseofly.vercel.app/og-image-default.png",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": cityName || "Local Area",
+          "addressCountry": countryName || "US"
+        },
+        "offers": {
+          "@type": "Offer",
+          "category": serviceName || "Services"
+        }
+      };
+    }
+
+    return null;
+  }, [page, pathname, origin, cityName, serviceName, countryName]);
+
   // SEO Template Layout for Programmatic Pages
   if (page.is_programmatic) {
-    const serviceName = vars.service || (vars.service_id ? interpolate("{service}", vars) : (vars.service_slug || "Service").replace(/-/g, " "));
-    const cityName = vars.city || (vars.city_id ? interpolate("{city}", vars) : (vars.city_slug || "City").replace(/-/g, " "));
-
     return (
       <div className="min-h-screen bg-slate-50 pt-20">
         <Header />
@@ -242,10 +341,10 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
           </div>
         )}
 
-        {page.seo?.[0]?.schema_markup && (
+        {schemaMarkup && (
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(page.seo[0].schema_markup) }}
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaMarkup) }}
           />
         )}
 
@@ -253,35 +352,34 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
         <section className="bg-white border-b border-slate-100 py-24 px-6">
           <div className="max-w-7xl mx-auto">
             {/* Breadcrumbs */}
-            <div className="flex items-center gap-2 text-sm text-slate-500 mb-8 font-medium">
-              <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
-              <ChevronRight className="w-4 h-4" />
-              {vars.country_slug && (
-                <>
-                  <Link to={`/${vars.country_slug}`} className="hover:text-blue-600 transition-colors capitalize">{vars.country_slug.replace(/-/g, " ")}</Link>
-                  <ChevronRight className="w-4 h-4" />
-                </>
-              )}
-              {vars.city_slug && (
-                <>
-                  <span className="capitalize text-slate-900">{vars.city_slug.replace(/-/g, " ")}</span>
-                  <ChevronRight className="w-4 h-4" />
-                </>
-              )}
-              <span className="text-blue-600 capitalize">{vars.service_slug ? vars.service_slug.replace(/-/g, " ") : "Service"}</span>
+            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-8 font-medium">
+              {breadcrumbs.map((crumb, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  {idx > 0 && <ChevronRight className="w-4 h-4 text-slate-300" />}
+                  {crumb.link ? (
+                    <Link to={crumb.link} className="hover:text-blue-600 transition-colors">
+                      {crumb.label}
+                    </Link>
+                  ) : (
+                    <span className={cn(idx === breadcrumbs.length - 1 ? "text-blue-600 font-bold" : "text-slate-900")}>
+                      {crumb.label}
+                    </span>
+                  )}
+                </div>
+              ))}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-bold tracking-wide uppercase">
                   <MapPin className="w-4 h-4" />
-                  Available in {cityName}
+                  Available in {cityName || "Your City"}
                 </div>
                 <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight">
                   {page.title}
                 </h1>
                 <p className="text-xl text-slate-600 leading-relaxed max-w-lg">
-                  Looking for reliable {serviceName} experts in {cityName}? We provide top-rated, professional services tailored for your needs.
+                  Looking for reliable {serviceName || "professional"} experts in {cityName || "your city"}? We provide top-rated, professional services tailored for your needs.
                 </p>
                 <div className="flex flex-wrap gap-4 pt-4">
                   <button className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-200">
@@ -305,7 +403,7 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                     <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-indigo-50 opacity-50" />
                     <div className="relative text-center space-y-4">
                       <Briefcase className="w-24 h-24 mx-auto text-blue-200" />
-                      <p className="font-black text-2xl text-blue-900 opacity-20 uppercase tracking-widest">{cityName}</p>
+                      <p className="font-black text-2xl text-blue-900 opacity-20 uppercase tracking-widest">{cityName || "Local"}</p>
                     </div>
                   </>
                 )}
@@ -331,13 +429,13 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
           {/* Benefits Section */}
           <section className="space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-4">
-              <h2 className="text-3xl font-black text-slate-900">Why choose our {serviceName} in {cityName}?</h2>
+              <h2 className="text-3xl font-black text-slate-900">Why choose our {serviceName || "expert team"} in {cityName || "your city"}?</h2>
               <p className="text-slate-500 text-lg">We deliver exceptional results by combining local expertise with industry-leading standards.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { title: "Local Experts", desc: `Our team knows ${cityName} inside and out.` },
+                { title: "Local Experts", desc: `Our team knows ${cityName || "your area"} inside and out.` },
                 { title: "Top Rated", desc: "Award-winning services recognized by industry leaders." },
                 { title: "24/7 Support", desc: "We are always here to help you when you need it most." }
               ].map((benefit, i) => (
@@ -360,11 +458,11 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
                   <MapPin className="w-6 h-6 text-blue-600" />
                   Nearby Locations
                 </h3>
-                <p className="text-slate-500">We also serve these areas around {cityName}:</p>
+                <p className="text-slate-500">We also serve these areas around {cityName || "your city"}:</p>
                 <div className="grid grid-cols-2 gap-4">
                   {relatedCities.map((c) => {
                      const serviceSlug = vars.service_slug || "services";
-                     const link = `/${c.country?.slug || 'locations'}/${c.slug}/${serviceSlug}`;
+                     const link = `/${vars.country_slug || c.country?.slug || 'usa'}/${c.slug}/${serviceSlug}`;
                      return (
                       <Link key={c.id} to={link} className="flex items-center gap-2 p-3 rounded-xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all font-semibold text-slate-700 hover:text-blue-600">
                         <ArrowRight className="w-4 h-4 text-slate-400" />
@@ -380,14 +478,14 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
               <div className="space-y-6">
                 <h3 className="text-2xl font-black flex items-center gap-3">
                   <Briefcase className="w-6 h-6 text-blue-600" />
-                  Other Services in {cityName}
+                  Other Services in {cityName || "your city"}
                 </h3>
                 <p className="text-slate-500">Explore our full range of solutions:</p>
                 <div className="flex flex-wrap gap-2">
                   {relatedServices.map((s) => {
-                     const countrySlug = vars.country_slug || "locations";
+                     const countrySlug = vars.country_slug || "usa";
                      const citySlug = vars.city_slug || "city";
-                     const link = `/${countrySlug}/${citySlug}/${s.slug}-services`;
+                     const link = `/${countrySlug}/${citySlug}/${s.slug}`;
                      return (
                       <Link key={s.id} to={link} className="px-4 py-2 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-100 hover:border-blue-100 rounded-xl font-medium transition-colors text-sm">
                         {s.name}
@@ -405,8 +503,8 @@ export default function DynamicPage({ loaderData }: Route.ComponentProps) {
               <Sparkles className="w-64 h-64" />
             </div>
             <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-              <h2 className="text-4xl font-black">Ready to get started in {cityName}?</h2>
-              <p className="text-blue-100 text-lg">Contact our {serviceName} experts today for a free consultation and quote.</p>
+              <h2 className="text-4xl font-black">Ready to get started in {cityName || "your city"}?</h2>
+              <p className="text-blue-100 text-lg">Contact our {serviceName || "expert"} team today for a free consultation and quote.</p>
               <button className="px-10 py-5 bg-white text-blue-600 hover:bg-blue-50 font-black rounded-2xl text-lg transition-all shadow-xl">
                 Contact Us Now
               </button>

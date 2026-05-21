@@ -34,12 +34,19 @@ export default function SEOEnginePage() {
   const { bulkAddPages } = usePages(website?.id);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [patternText, setPatternText] = useState("Best {service} in {city}");
+  const [patternText, setPatternText] = useState("Best {service_keyword} in {city}");
   const [templateContent, setTemplateContent] = useState("");
   const [isSavingSettings, setIsSavingSettings] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   
-  const [batchData, setBatchData] = useState("[{\"service\": \"Electrician\", \"city\": \"Mumbai\"}, {\"service\": \"Carpenter\", \"city\": \"Bangalore\"}]");
+  const [batchData, setBatchData] = useState(
+    JSON.stringify([
+      { country: "usa", city: "san-antonio", service_keyword: "best-content-marketing-in-san-antonio", service: "Content Marketing" },
+      { country: "usa", city: "new-york", service_keyword: "seo-services", service: "SEO" },
+      { country: "usa", city: "chicago", service_keyword: "web-design", service: "Web Design" },
+      { country: "usa", city: "miami", service_keyword: "content-marketing", service: "Content Marketing" }
+    ], null, 2)
+  );
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [bulkError, setBulkError] = useState<string | null>(null);
   const [bulkSuccess, setBulkSuccess] = useState<number | null>(null);
@@ -62,7 +69,13 @@ export default function SEOEnginePage() {
   }, [website]);
 
   // Example variables for preview
-  const exampleVariables = { service: "Plumber", city: "Delhi", state: "NCR" };
+  const exampleVariables = { 
+    country: "usa", 
+    city: "san-antonio", 
+    service_keyword: "best-content-marketing-in-san-antonio",
+    service: "Content Marketing",
+    state: "Texas"
+  };
   const preview = interpolate(patternText, exampleVariables);
   const previewSlug = buildPageSlug(exampleVariables, preview);
 
@@ -426,13 +439,44 @@ export default function SEOEnginePage() {
 }
 
 function buildPageSlug(variables: Record<string, unknown>, fallbackTitle: string) {
-  const rawSlug = readCustomSlug(variables) || fallbackTitle;
+  // 1. First, check for an explicit custom slug field in the variables
+  const customSlug = readCustomSlug(variables);
+  if (customSlug) {
+    return customSlug
+      .split("/")
+      .map((segment) => slugify(segment))
+      .filter(Boolean)
+      .join("/");
+  }
 
-  return String(rawSlug)
-    .split("/")
-    .map((segment) => slugify(segment))
-    .filter(Boolean)
-    .join("/");
+  // 2. Identify keys representing the country, city, and service parameters
+  const countryVal = variables.country_slug || variables.country || variables.country_name || variables.country_code;
+  const cityVal = variables.city_slug || variables.city || variables.city_name;
+  const serviceVal = variables.service_keyword || variables.service_slug || variables.service || variables.service_name || variables.keyword;
+
+  if (countryVal && cityVal && serviceVal) {
+    const countrySlug = slugify(String(countryVal));
+    const citySlug = slugify(String(cityVal));
+    const serviceSlug = slugify(String(serviceVal));
+    return `${countrySlug}/${citySlug}/${serviceSlug}`;
+  }
+
+  // Fallbacks for subsets of hierarchical inputs
+  if (cityVal && serviceVal) {
+    const countrySlug = "usa"; // Sensible default country slug per requirements
+    const citySlug = slugify(String(cityVal));
+    const serviceSlug = slugify(String(serviceVal));
+    return `${countrySlug}/${citySlug}/${serviceSlug}`;
+  }
+
+  if (countryVal && serviceVal) {
+    const countrySlug = slugify(String(countryVal));
+    const serviceSlug = slugify(String(serviceVal));
+    return `${countrySlug}/${serviceSlug}`;
+  }
+
+  // 3. Fallback to title-based slug
+  return slugify(fallbackTitle);
 }
 
 function readCustomSlug(variables: Record<string, unknown>) {

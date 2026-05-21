@@ -23,6 +23,11 @@ export default [
   route("sitemap-services.xml", "routes/sitemap-services.xml.ts"),
   route("robots.txt", "routes/robots.txt.ts"),
 
+  // Dynamic hierarchical SEO routes (locations/services)
+  route(":country/:city/:service", "routes/content-page.tsx", { id: "content-page-service" }),
+  route(":country/:city", "routes/content-page.tsx", { id: "content-page-city" }),
+  route(":country", "routes/content-page.tsx", { id: "content-page-country" }),
+
   // Catch-all route for dynamic pages (MUST BE LAST)
   route("*", "routes/content-page.tsx"),
 ] satisfies RouteConfig;
