@@ -5,6 +5,7 @@ export default [
   route("login", "routes/login.tsx"),
   route("editor-demo", "routes/editor-demo.tsx"),
   route("contact-us", "routes/contact-us.tsx"),
+  route("about-us", "routes/about-us.tsx"),
   
   layout("layouts/DashboardLayout.tsx", [
     route("admin", "routes/dashboard.home.tsx"),
