@@ -29,10 +29,10 @@ export function useUsers() {
     fetchProfiles();
   }, [user]);
 
-  const updateProfileRole = async (id: string, role: 'admin' | 'editor' | 'author') => {
+  const updateProfile = async (id: string, updates: { full_name?: string, avatar_url?: string, role?: 'admin' | 'editor' | 'author' }) => {
     const { data, error } = await supabase
       .from('profiles')
-      .update({ role })
+      .update(updates)
       .eq('id', id)
       .select()
       .single();
@@ -42,5 +42,9 @@ export function useUsers() {
     return data;
   };
 
-  return { profiles, loading, error, fetchProfiles, updateProfileRole };
+  const updateProfileRole = async (id: string, role: 'admin' | 'editor' | 'author') => {
+    return updateProfile(id, { role });
+  };
+
+  return { profiles, loading, error, fetchProfiles, updateProfileRole, updateProfile };
 }
