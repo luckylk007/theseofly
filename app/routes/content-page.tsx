@@ -116,10 +116,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   // Check if it's a draft and we are NOT in preview mode
-  if (pageData.status !== "published") {
+  if ((pageData as any).status !== "published") {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      throw new Response(`[404_AUTH_REQUIRED] Page "${slug}" is ${pageData.status}. PREVIEW_ID: "${previewId}" | URL: ${request.url}`, { status: 404 });
+      throw new Response(`[404_AUTH_REQUIRED] Page "${slug}" is ${(pageData as any).status}. PREVIEW_ID: "${previewId}" | URL: ${request.url}`, { status: 404 });
     }
   }
 

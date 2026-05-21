@@ -152,7 +152,7 @@ export function usePages(websiteId?: string) {
     if (error) throw error;
     
     if (data && data.length > 0) {
-      const deletedIds = data.map(p => p.id);
+      const deletedIds = (data as any[]).map(p => p.id);
       setPages(pages.filter(p => !deletedIds.includes(p.id)));
       
       if (deletedIds.length < ids.length) {

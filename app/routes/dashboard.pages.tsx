@@ -298,7 +298,8 @@ export default function PagesManagement() {
             category_id: "",
             tag_ids: [],
             parent_id: null,
-            allow_comments: false
+            allow_comments: false,
+            featured_image_url: ""
           });
           setIsCreateModalOpen(true);
         }}>
