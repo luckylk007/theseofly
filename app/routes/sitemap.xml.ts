@@ -18,6 +18,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     <loc>${baseUrl}/sitemap-pages.xml</loc>
   </sitemap>
   <sitemap>
+    <loc>${baseUrl}/sitemap-blogs.xml</loc>
+  </sitemap>
+  <sitemap>
     <loc>${baseUrl}/sitemap-cities.xml</loc>
   </sitemap>
   <sitemap>

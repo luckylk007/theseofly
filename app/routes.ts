@@ -6,7 +6,12 @@ export default [
   route("editor-demo", "routes/editor-demo.tsx"),
   route("contact-us", "routes/contact-us.tsx"),
   route("about-us", "routes/about-us.tsx"),
-  
+
+  // Blog Routes
+  route("blog", "routes/blog.index.tsx"),
+  route("blog/:slug", "routes/blog.detail.tsx"),
+  route("sitemap-blogs.xml", "routes/sitemap-blogs.xml.ts"),
+
   layout("layouts/DashboardLayout.tsx", [
     route("admin", "routes/dashboard.home.tsx"),
     route("admin/pages", "routes/dashboard.pages.tsx"),
