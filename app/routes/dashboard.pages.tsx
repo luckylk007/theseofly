@@ -27,7 +27,7 @@ import { usePages } from "../hooks/usePages";
 import { useWebsite } from "../hooks/useWebsite";
 import { useTaxonomies } from "../hooks/useTaxonomies";
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import type { ContentType, PostType } from "../types/cms";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
@@ -65,7 +65,19 @@ export default function PagesManagement() {
   const categories = useMemo(() => allTaxonomies.filter(t => t.type === 'category'), [allTaxonomies]);
   const availableTags = useMemo(() => allTaxonomies.filter(t => t.type === 'tag'), [allTaxonomies]);
 
-  const [activeTab, setActiveTab] = useState<'pages' | 'blogs' | 'programmatic'>('pages');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabQuery = searchParams.get("tab");
+  
+  const activeTab = (tabQuery === 'blogs' || tabQuery === 'programmatic' || tabQuery === 'pages') 
+    ? tabQuery 
+    : 'pages';
+    
+  const setActiveTab = (tab: 'pages' | 'blogs' | 'programmatic') => {
+    setSearchParams((prev) => {
+      prev.set("tab", tab);
+      return prev;
+    });
+  };
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");

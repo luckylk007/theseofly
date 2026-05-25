@@ -14,7 +14,8 @@ import {
   X,
   Loader2,
   Layout,
-  FolderTree
+  FolderTree,
+  BookOpen
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -30,7 +31,8 @@ function cn(...inputs: ClassValue[]) {
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
-  { icon: FileText, label: "Pages", href: "/admin/pages" },
+  { icon: FileText, label: "Pages", href: "/admin/pages?tab=pages" },
+  { icon: BookOpen, label: "Blog", href: "/admin/pages?tab=blogs" },
   { icon: FolderTree, label: "Categories & Tags", href: "/admin/taxonomies" },
   { icon: Search, label: "SEO Engine", href: "/admin/seo" },
   { icon: Globe, label: "Programmatic SEO", href: "/admin/programmatic-seo" },
@@ -47,6 +49,14 @@ export default function DashboardLayout() {
   const { signOut } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const isItemActive = (itemHref: string) => {
+    const currentUrl = location.pathname + location.search;
+    if (itemHref === "/admin/pages?tab=pages") {
+      return currentUrl === itemHref || currentUrl === "/admin/pages" || currentUrl === "/admin/pages/";
+    }
+    return currentUrl === itemHref;
+  };
 
   // 1. Auth Guard
   useEffect(() => {
@@ -95,24 +105,27 @@ export default function DashboardLayout() {
         </div>
 
         <nav className="flex-1 px-3 space-y-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
-                location.pathname === item.href 
-                  ? "bg-blue-50 text-blue-600" 
-                  : "text-slate-500 hover:bg-slate-50"
-              )}
-            >
-              <item.icon className={cn(
-                "w-5 h-5 transition-colors",
-                location.pathname === item.href ? "text-blue-600" : "text-slate-400 group-hover:text-blue-600"
-              )} />
-              {isSidebarOpen && <span className="text-sm font-bold">{item.label}</span>}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isActive = isItemActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all group",
+                  isActive 
+                    ? "bg-blue-50 text-blue-600" 
+                    : "text-slate-500 hover:bg-slate-50"
+                )}
+              >
+                <item.icon className={cn(
+                  "w-5 h-5 transition-colors",
+                  isActive ? "text-blue-600" : "text-slate-400 group-hover:text-blue-600"
+                )} />
+                {isSidebarOpen && <span className="text-sm font-bold">{item.label}</span>}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="p-4 border-t border-slate-100">
@@ -210,22 +223,25 @@ export default function DashboardLayout() {
                 </button>
               </div>
               <nav className="flex-1 px-4 space-y-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all font-bold",
-                      location.pathname === item.href 
-                        ? "bg-blue-50 text-blue-600" 
-                        : "text-slate-500 hover:bg-slate-50"
-                    )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="text-sm">{item.label}</span>
-                  </Link>
-                ))}
+                {navItems.map((item) => {
+                  const isActive = isItemActive(item.href);
+                  return (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all font-bold",
+                        isActive 
+                          ? "bg-blue-50 text-blue-600" 
+                          : "text-slate-500 hover:bg-slate-50"
+                      )}
+                    >
+                      <item.icon className="w-5 h-5" />
+                      <span className="text-sm">{item.label}</span>
+                    </Link>
+                  );
+                })}
               </nav>
               <div className="p-6 border-t border-slate-50">
                 <button 
