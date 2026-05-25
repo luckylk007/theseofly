@@ -1,15 +1,16 @@
 -- Migration: Enable full platform access for users with 'editor' or 'admin' profile roles
--- This solves issues where authenticated editors cannot view the active website or edit its pages/taxonomies due to strict owner_id RLS checks.
+-- Using short, precise policy names (under 63 bytes) to avoid Postgres truncation errors.
 
--- 1. Websites table policies (CRITICAL: Allow editors to read and manage the website to load pages dashboard correctly)
+-- 1. Websites table policies
 DROP POLICY IF EXISTS "Users can see websites they own" ON websites;
 DROP POLICY IF EXISTS "Authenticated users can manage websites" ON websites;
 DROP POLICY IF EXISTS "Public read access for websites" ON websites;
+DROP POLICY IF EXISTS "manage_websites_policy" ON websites;
 
 CREATE POLICY "Public read access for websites" ON websites FOR SELECT 
 USING (true);
 
-CREATE POLICY "Authenticated users with admin/editor roles or owners can manage websites" ON websites FOR ALL
+CREATE POLICY "manage_websites_policy" ON websites FOR ALL
 USING (
   auth.role() = 'authenticated' AND (
     auth.uid() = owner_id OR
@@ -27,11 +28,13 @@ WITH CHECK (
 DROP POLICY IF EXISTS "Users can manage pages of their websites" ON pages;
 DROP POLICY IF EXISTS "Authenticated users can manage pages" ON pages;
 DROP POLICY IF EXISTS "Public read access for published pages" ON pages;
+DROP POLICY IF EXISTS "Authenticated users with admin/editor roles or owners can manag" ON pages;
+DROP POLICY IF EXISTS "manage_pages_policy" ON pages;
 
 CREATE POLICY "Public read access for published pages" ON pages FOR SELECT 
 USING (status = 'published');
 
-CREATE POLICY "Authenticated users with admin/editor roles or owners can manage pages" ON pages FOR ALL
+CREATE POLICY "manage_pages_policy" ON pages FOR ALL
 USING (
   auth.role() = 'authenticated' AND (
     EXISTS (SELECT 1 FROM websites WHERE id = pages.website_id AND owner_id = auth.uid()) OR
@@ -49,11 +52,13 @@ WITH CHECK (
 DROP POLICY IF EXISTS "Users can manage taxonomies of their websites" ON taxonomies;
 DROP POLICY IF EXISTS "Authenticated users can manage taxonomies" ON taxonomies;
 DROP POLICY IF EXISTS "Public read access for taxonomies" ON taxonomies;
+DROP POLICY IF EXISTS "Authenticated users with admin/editor roles or owners can manag" ON taxonomies;
+DROP POLICY IF EXISTS "manage_taxonomies_policy" ON taxonomies;
 
 CREATE POLICY "Public read access for taxonomies" ON taxonomies FOR SELECT 
 USING (true);
 
-CREATE POLICY "Authenticated users with admin/editor roles or owners can manage taxonomies" ON taxonomies FOR ALL
+CREATE POLICY "manage_taxonomies_policy" ON taxonomies FOR ALL
 USING (
   auth.role() = 'authenticated' AND (
     EXISTS (SELECT 1 FROM websites WHERE id = taxonomies.website_id AND owner_id = auth.uid()) OR
@@ -71,11 +76,13 @@ WITH CHECK (
 DROP POLICY IF EXISTS "Users can manage page taxonomies of their websites" ON page_taxonomies;
 DROP POLICY IF EXISTS "Authenticated users can manage page taxonomies" ON page_taxonomies;
 DROP POLICY IF EXISTS "Public read access for page taxonomies" ON page_taxonomies;
+DROP POLICY IF EXISTS "Authenticated users with admin/editor roles or owners can manag" ON page_taxonomies;
+DROP POLICY IF EXISTS "manage_page_tax_policy" ON page_taxonomies;
 
 CREATE POLICY "Public read access for page taxonomies" ON page_taxonomies FOR SELECT 
 USING (true);
 
-CREATE POLICY "Authenticated users with admin/editor roles or owners can manage page taxonomies" ON page_taxonomies FOR ALL
+CREATE POLICY "manage_page_tax_policy" ON page_taxonomies FOR ALL
 USING (
   auth.role() = 'authenticated' AND (
     EXISTS (
@@ -101,11 +108,13 @@ WITH CHECK (
 DROP POLICY IF EXISTS "Users can manage seo metadata of their websites" ON seo_metadata;
 DROP POLICY IF EXISTS "Authenticated users can manage seo metadata" ON seo_metadata;
 DROP POLICY IF EXISTS "Public read access for seo metadata" ON seo_metadata;
+DROP POLICY IF EXISTS "Authenticated users with admin/editor roles or owners can manag" ON seo_metadata;
+DROP POLICY IF EXISTS "manage_seo_policy" ON seo_metadata;
 
 CREATE POLICY "Public read access for seo metadata" ON seo_metadata FOR SELECT 
 USING (true);
 
-CREATE POLICY "Authenticated users with admin/editor roles or owners can manage seo metadata" ON seo_metadata FOR ALL
+CREATE POLICY "manage_seo_policy" ON seo_metadata FOR ALL
 USING (
   auth.role() = 'authenticated' AND (
     EXISTS (
