@@ -198,9 +198,26 @@ export default function PagesManagement() {
     setIsSubmitting(true);
     setLocalError(null);
     try {
+      const selectedCategory = categories.find((category) => category.id === formData.category_id);
+      const selectedTags = availableTags.filter((tag) => formData.tag_ids.includes(tag.id));
+
       await addPage({ 
-        ...formData, 
+        title: formData.title,
+        slug: formData.slug,
         website_id: website.id,
+        status: formData.status,
+        is_programmatic: formData.is_programmatic,
+        content_type: formData.content_type,
+        post_type: formData.post_type,
+        category: selectedCategory?.name || "",
+        tags: selectedTags.map((tag) => tag.name),
+        taxonomy_ids: [
+          ...(formData.category_id ? [formData.category_id] : []),
+          ...formData.tag_ids,
+        ],
+        parent_id: formData.parent_id,
+        allow_comments: formData.allow_comments,
+        featured_image_url: formData.featured_image_url,
         content: { sections: [] } 
       });
       setIsCreateModalOpen(false);
@@ -210,8 +227,8 @@ export default function PagesManagement() {
         website_id: website.id, 
         status: "draft",
         is_programmatic: false,
-        content_type: "page",
-        post_type: "page",
+        content_type: activeTab === 'blogs' ? "post" : "page",
+        post_type: activeTab === 'blogs' ? "blog" : "page",
         category_id: "",
         tag_ids: [],
         parent_id: null,
