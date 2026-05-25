@@ -65,7 +65,7 @@ export default function PagesManagement() {
   const categories = useMemo(() => allTaxonomies.filter(t => t.type === 'category'), [allTaxonomies]);
   const availableTags = useMemo(() => allTaxonomies.filter(t => t.type === 'tag'), [allTaxonomies]);
 
-  const [activeTab, setActiveTab] = useState<'main' | 'programmatic'>('main');
+  const [activeTab, setActiveTab] = useState<'pages' | 'blogs' | 'programmatic'>('pages');
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -78,16 +78,19 @@ export default function PagesManagement() {
   }, [activeTab]);
 
   const counts = useMemo(() => {
-    let mainCount = 0;
+    let pagesCount = 0;
+    let blogsCount = 0;
     let programmaticCount = 0;
     pages.forEach(page => {
       if (page.is_programmatic) {
         programmaticCount++;
+      } else if (page.content_type === 'post') {
+        blogsCount++;
       } else {
-        mainCount++;
+        pagesCount++;
       }
     });
-    return { main: mainCount, programmatic: programmaticCount };
+    return { pages: pagesCount, blogs: blogsCount, programmatic: programmaticCount };
   }, [pages]);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -132,7 +135,9 @@ export default function PagesManagement() {
         
         const matchesTab = activeTab === 'programmatic' 
           ? !!page.is_programmatic 
-          : !page.is_programmatic;
+          : activeTab === 'blogs'
+          ? (!page.is_programmatic && page.content_type === 'post')
+          : (!page.is_programmatic && page.content_type === 'page');
 
         return matchesSearch && matchesStatus && matchesCategory && matchesTab;
       })
@@ -310,11 +315,13 @@ export default function PagesManagement() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-black tracking-tight">
-            {activeTab === 'main' ? 'Website Main Pages' : 'Programmatic Pages'}
+            {activeTab === 'pages' ? 'Website Static Pages' : activeTab === 'blogs' ? 'Blog Articles' : 'Programmatic Pages'}
           </h2>
           <p className="text-slate-500 text-sm">
-            {activeTab === 'main' 
+            {activeTab === 'pages' 
               ? `Manage ${website?.name || 'your'} website's primary static pages (Home, About, Contact, etc.).`
+              : activeTab === 'blogs'
+              ? `Manage ${website?.name || 'your'} website's rich dynamic blog posts, articles, and insights.`
               : `Manage ${website?.name || 'your'} website's bulk-generated programmatic service-location pages.`}
           </p>
         </div>
@@ -325,8 +332,8 @@ export default function PagesManagement() {
             website_id: website?.id || "", 
             status: "draft",
             is_programmatic: activeTab === 'programmatic',
-            content_type: "page",
-            post_type: "page",
+            content_type: activeTab === 'blogs' ? "post" : "page",
+            post_type: activeTab === 'blogs' ? "blog" : "page",
             category_id: "",
             tag_ids: [],
             parent_id: null,
@@ -343,22 +350,41 @@ export default function PagesManagement() {
       {/* Dynamic Tab Bar Navigation */}
       <div className="flex border-b border-slate-200 bg-white/40 p-1.5 rounded-2xl border backdrop-blur-sm self-start">
         <button
-          onClick={() => setActiveTab('main')}
+          onClick={() => setActiveTab('pages')}
           className={cn(
             "py-2.5 px-6 font-bold text-sm rounded-xl transition-all relative flex items-center gap-2",
-            activeTab === 'main'
+            activeTab === 'pages'
               ? "bg-[#155dfc] text-white shadow-lg shadow-blue-200"
               : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
           )}
         >
-          <span>Website Main Pages</span>
+          <span>Static Pages</span>
           <span className={cn(
             "px-2 py-0.5 text-[10px] font-black rounded-full border shrink-0",
-            activeTab === 'main' 
+            activeTab === 'pages' 
               ? "bg-white/20 text-white border-white/20" 
               : "bg-slate-100 text-slate-500 border-slate-200"
           )}>
-            {counts.main}
+            {counts.pages}
+          </span>
+        </button>
+        <button
+          onClick={() => setActiveTab('blogs')}
+          className={cn(
+            "py-2.5 px-6 font-bold text-sm rounded-xl transition-all relative flex items-center gap-2",
+            activeTab === 'blogs'
+              ? "bg-[#155dfc] text-white shadow-lg shadow-blue-200"
+              : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"
+          )}
+        >
+          <span>Blog Articles</span>
+          <span className={cn(
+            "px-2 py-0.5 text-[10px] font-black rounded-full border shrink-0",
+            activeTab === 'blogs' 
+              ? "bg-white/20 text-white border-white/20" 
+              : "bg-slate-100 text-slate-500 border-slate-200"
+          )}>
+            {counts.blogs}
           </span>
         </button>
         <button
@@ -541,11 +567,17 @@ export default function PagesManagement() {
             </div>
             <div className="space-y-1">
               <p className="font-bold text-slate-900">
-                {activeTab === 'main' ? 'No website main pages found' : 'No programmatic pages found'}
+                {activeTab === 'pages' 
+                  ? 'No website static pages found' 
+                  : activeTab === 'blogs'
+                  ? 'No blog articles found'
+                  : 'No programmatic pages found'}
               </p>
               <p className="text-slate-500 text-sm font-medium">
-                {activeTab === 'main' 
+                {activeTab === 'pages' 
                   ? 'Start by creating your first static landing page.'
+                  : activeTab === 'blogs'
+                  ? 'Start by writing and publishing your first dynamic blog post.'
                   : 'Bulk generate pages with the SEO Engine or add one manually.'}
               </p>
             </div>
