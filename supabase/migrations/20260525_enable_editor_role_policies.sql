@@ -1,7 +1,29 @@
--- Migration: Enable page and taxonomy management for users with 'editor' or 'admin' profile roles
--- This solves issues where authenticated editors cannot view, edit, or create blogs/pages due to strict RLS ownership checks.
+-- Migration: Enable full platform access for users with 'editor' or 'admin' profile roles
+-- This solves issues where authenticated editors cannot view the active website or edit its pages/taxonomies due to strict owner_id RLS checks.
 
--- 1. Pages table policies
+-- 1. Websites table policies (CRITICAL: Allow editors to read and manage the website to load pages dashboard correctly)
+DROP POLICY IF EXISTS "Users can see websites they own" ON websites;
+DROP POLICY IF EXISTS "Authenticated users can manage websites" ON websites;
+DROP POLICY IF EXISTS "Public read access for websites" ON websites;
+
+CREATE POLICY "Public read access for websites" ON websites FOR SELECT 
+USING (true);
+
+CREATE POLICY "Authenticated users with admin/editor roles or owners can manage websites" ON websites FOR ALL
+USING (
+  auth.role() = 'authenticated' AND (
+    auth.uid() = owner_id OR
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'editor'))
+  )
+)
+WITH CHECK (
+  auth.role() = 'authenticated' AND (
+    auth.uid() = owner_id OR
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'editor'))
+  )
+);
+
+-- 2. Pages table policies
 DROP POLICY IF EXISTS "Users can manage pages of their websites" ON pages;
 DROP POLICY IF EXISTS "Authenticated users can manage pages" ON pages;
 DROP POLICY IF EXISTS "Public read access for published pages" ON pages;
@@ -23,7 +45,7 @@ WITH CHECK (
   )
 );
 
--- 2. Taxonomies table policies
+-- 3. Taxonomies table policies
 DROP POLICY IF EXISTS "Users can manage taxonomies of their websites" ON taxonomies;
 DROP POLICY IF EXISTS "Authenticated users can manage taxonomies" ON taxonomies;
 DROP POLICY IF EXISTS "Public read access for taxonomies" ON taxonomies;
@@ -45,7 +67,7 @@ WITH CHECK (
   )
 );
 
--- 3. Page Taxonomies table policies
+-- 4. Page Taxonomies table policies
 DROP POLICY IF EXISTS "Users can manage page taxonomies of their websites" ON page_taxonomies;
 DROP POLICY IF EXISTS "Authenticated users can manage page taxonomies" ON page_taxonomies;
 DROP POLICY IF EXISTS "Public read access for page taxonomies" ON page_taxonomies;
@@ -75,7 +97,7 @@ WITH CHECK (
   )
 );
 
--- 4. SEO Metadata table policies
+-- 5. SEO Metadata table policies
 DROP POLICY IF EXISTS "Users can manage seo metadata of their websites" ON seo_metadata;
 DROP POLICY IF EXISTS "Authenticated users can manage seo metadata" ON seo_metadata;
 DROP POLICY IF EXISTS "Public read access for seo metadata" ON seo_metadata;
